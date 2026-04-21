@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         create: { key: "invite_token", value: JSON.stringify({ token, expiresAt: expiresAt.toISOString() }) },
       });
 
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const baseUrl = req.headers.get("origin") || process.env.NEXT_PUBLIC_BASE_URL || "https://doriz.store";
       const inviteLink = `${baseUrl}/register?token=${token}`;
 
       return NextResponse.json({ success: true, inviteLink, expiresAt });

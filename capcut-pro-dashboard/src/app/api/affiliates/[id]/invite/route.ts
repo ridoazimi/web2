@@ -35,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     // Build invite URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.headers.get("origin") || "http://localhost:3000";
+    const baseUrl = req.headers.get("origin") || process.env.NEXT_PUBLIC_BASE_URL || "https://doriz.store";
     const inviteUrl = `${baseUrl}/affiliate/setup?token=${inviteToken}`;
 
     return NextResponse.json({
