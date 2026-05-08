@@ -63,7 +63,7 @@ export async function createProduct(formData: FormData) {
     let imageUrl = formData.get("imageUrl") as string || "";
 
     if (imageFile && imageFile.size > 0) {
-      const uploadsDir = path.join(process.cwd(), "public/uploads/products");
+      const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
       try {
         await mkdir(uploadsDir, { recursive: true });
       } catch (err) {}
@@ -73,7 +73,7 @@ export async function createProduct(formData: FormData) {
       const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
       const filePath = path.join(uploadsDir, filename);
       await writeFile(filePath, buffer);
-      imageUrl = `/uploads/products/${filename}`;
+      imageUrl = `/api/uploads/products/${filename}`;
     }
 
     const product = await prisma.product.create({
@@ -119,7 +119,7 @@ export async function updateProduct(id: string, formData: FormData) {
     let imageUrl = formData.get("imageUrl") as string || "";
 
     if (imageFile && imageFile.size > 0) {
-      const uploadsDir = path.join(process.cwd(), "public/uploads/products");
+      const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
       try {
         await mkdir(uploadsDir, { recursive: true });
       } catch (err) {}
@@ -129,7 +129,7 @@ export async function updateProduct(id: string, formData: FormData) {
       const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
       const filePath = path.join(uploadsDir, filename);
       await writeFile(filePath, buffer);
-      imageUrl = `/uploads/products/${filename}`;
+      imageUrl = `/api/uploads/products/${filename}`;
     }
 
     const product = await prisma.product.update({

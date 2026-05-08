@@ -81,7 +81,7 @@ export async function submitWarrantyClaim(formData: FormData) {
     let evidenceUrl = null;
     if (photo && photo.size > 0) {
       // Create uploads directory if not exists
-      const uploadsDir = path.join(process.cwd(), "public/uploads/warranty");
+      const uploadsDir = path.join(process.cwd(), "storage/uploads/warranty");
       try {
         await mkdir(uploadsDir, { recursive: true });
       } catch (err) {}
@@ -95,7 +95,7 @@ export async function submitWarrantyClaim(formData: FormData) {
       const filePath = path.join(uploadsDir, filename);
 
       await writeFile(filePath, buffer);
-      evidenceUrl = `/uploads/warranty/${filename}`;
+      evidenceUrl = `/api/uploads/warranty/${filename}`;
     }
 
     await prisma.warrantyClaim.create({

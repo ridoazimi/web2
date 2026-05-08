@@ -27,7 +27,11 @@ export default function LoginPage() {
         setError(json.error || "Login gagal");
         return;
       }
-      router.push("/");
+      if (json.user?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
       router.refresh();
     } catch {
       setError("Terjadi kesalahan. Coba lagi.");
