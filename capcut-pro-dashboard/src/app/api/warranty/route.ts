@@ -105,10 +105,10 @@ export async function POST(req: NextRequest) {
       where: { transactionId, status: "pending" },
     });
 
-    // 2. Tentukan productType dari akun lama agar akun pengganti sesuai tipe produk
-    const oldProductType = transaction.stockAccount?.product?.productType ?? "mobile";
+    // 2. Tentukan maxSlots dari akun lama agar akun pengganti sesuai
+    const oldProductName = transaction.stockAccount?.product?.name ?? "produk";
     const oldProductId = transaction.stockAccount?.productId;
-    const defaultMaxSlots = oldProductType === "desktop" ? 2 : 3;
+    const defaultMaxSlots = transaction.stockAccount?.product?.maxSlots ?? 3;
 
     // Cari akun baru yang tersedia dengan productType yang SAMA
     // PENTING: exclude akun lama agar tidak reassign akun yang sama!
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     ) ?? null;
 
     if (!newAccount) {
-      return NextResponse.json({ error: `Stok akun ${oldProductType} habis! Semua akun ${oldProductType} sudah penuh.` }, { status: 400 });
+      return NextResponse.json({ error: `Stok akun ${oldProductName} habis! Semua akun pengganti sudah penuh.` }, { status: 400 });
     }
 
     // 3. Buat atau update klaim garansi
@@ -275,6 +275,10 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Transaksi terkait tidak ditemukan" }, { status: 404 });
     }
 
+    const oldProductName = transaction.stockAccount?.product?.name ?? "produk";
+    const oldProductId = transaction.stockAccount?.productId;
+    const defaultMaxSlots = transaction.stockAccount?.product?.maxSlots ?? 3;
+
     let newAccount;
     if (newAccountId) {
       // Manual selection
@@ -289,9 +293,6 @@ export async function PATCH(req: NextRequest) {
       }
     } else {
       // Auto selection (fallback)
-      const oldProductType = transaction.stockAccount?.product?.productType ?? "mobile";
-      const oldProductId = transaction.stockAccount?.productId;
-      const defaultMaxSlots = oldProductType === "desktop" ? 2 : 3;
 
       const candidateAccounts = await prisma.stockAccount.findMany({
         where: {
@@ -308,7 +309,7 @@ export async function PATCH(req: NextRequest) {
       ) ?? null;
 
       if (!newAccount) {
-        return NextResponse.json({ error: `Stok akun ${oldProductType} habis! Silakan tambah stok terlebih dahulu.` }, { status: 400 });
+        return NextResponse.json({ error: `Stok akun ${oldProductName} habis! Silakan tambah stok terlebih dahulu.` }, { status: 400 });
       }
     }
 

@@ -13,7 +13,6 @@ const PUBLIC_PATHS = [
   "/api/cron",
   "/api/products",
   "/api/checkout",
-  "/",
   "/checkout",
   "/payment",
   "/terms",
@@ -30,6 +29,11 @@ const PUBLIC_PATHS = [
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Allow exact root path
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
 
   // Allow public paths
   if (PUBLIC_PATHS.some(p => pathname.startsWith(p))) {

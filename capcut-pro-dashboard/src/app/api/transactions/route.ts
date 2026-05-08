@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     const matchedProduct = await prisma.product.findFirst({
       where: { name: productName || "" }
     });
-    const detectedProductType = matchedProduct?.productType || parseProductType(productName || "");
+    const detectedProductType = matchedProduct?.name || parseProductType(productName || "");
 
     if (!email || !name || !whatsapp) {
       return NextResponse.json({ error: "Email, nama, dan WhatsApp wajib diisi" }, { status: 400 });
