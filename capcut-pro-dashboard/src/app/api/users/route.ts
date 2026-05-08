@@ -196,6 +196,8 @@ export async function GET(req: NextRequest) {
 
 // POST /api/users - Tambah user baru
 export async function POST(req: NextRequest) {
+  const auth = await requirePermission("page_customers");
+  if ("error" in auth) return auth.error;
   try {
     const body = await req.json();
     const { email, name, whatsapp, notes } = body;

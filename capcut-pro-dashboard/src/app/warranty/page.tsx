@@ -1,244 +1,279 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Topbar from "@/components/Topbar";
-import { usePrivacy } from "@/context/PrivacyContext";
-import {
-  Search,
-  ShieldCheck,
-  AlertTriangle,
-  X,
-  Check,
-  ArrowRight,
-  Loader2,
-  LayoutList,
-  LayoutGrid,
-} from "lucide-react";
+import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { ShieldAlert, Send, Info, MessageSquare, Ticket, CheckCircle2, Search, Image as ImageIcon } from "lucide-react";
+import Link from "next/link";
+import { checkTransactionValidity, submitWarrantyClaim } from "./actions";
 
-interface WarrantyItem {
-  id: string;
-  claimReason: string | null;
-  status: string | null;
-  createdAt: string | null;
-  transaction: {
-    id: string;
-    lynkIdRef: string | null;
-    user: { name: string; whatsapp: string | null } | null;
-  } | null;
-  oldAccount: { accountEmail: string } | null;
-  newAccount: { accountEmail: string; accountPassword: string } | null;
-}
+export default function ClaimWarrantyPage() {
+  const [formData, setFormData] = useState({
+    orderId: "",
+    issue: "",
+    photo: null as File | null,
+  });
+  const [checking, setChecking] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const [checkResult, setCheckResult] = useState<{
+    valid: boolean,
+    message?: string,
+    productName?: string | null,
+    oldAccountId?: string | null,
+    rules?: string | null
+  }>({ valid: false });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-function getClaimBadge(status: string | null) {
-  switch (status) {
-    case "resolved": return <span className="badge badge-success">Selesai</span>;
-    case "pending": return <span className="badge badge-warning">Pending</span>;
-    case "rejected": return <span className="badge badge-danger">Ditolak</span>;
-    default: return <span className="badge badge-neutral">{status}</span>;
-  }
-}
+  const handleCheck = async () => {
+    if (!formData.orderId) return;
+    setChecking(true);
+    setIsValid(false);
 
-export default function WarrantyPage() {
-  const { maskPhone } = usePrivacy();
-  const [claims, setClaims] = useState<WarrantyItem[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [showClaimModal, setShowClaimModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [claimForm, setClaimForm] = useState({ transactionId: "", claimReason: "" });
-  const [claimResult, setClaimResult] = useState<{ newAccount?: { email: string; password: string }; message?: string } | null>(null);
-  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
-
-  const fetchData = useCallback(() => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    fetch(`/api/warranty?${params}`)
-      .then((res) => res.json())
-      .then((json) => { setClaims(json.claims || []); setTotal(json.total || 0); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [search]);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
-
-  async function handleClaim() {
-    if (!claimForm.transactionId) return;
-    setSubmitting(true);
-    setClaimResult(null);
     try {
-      const res = await fetch("/api/warranty", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(claimForm),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        setClaimResult({ newAccount: json.newAccount, message: json.message });
-        fetchData();
-      } else {
-        setClaimResult({ message: json.error });
+      const result = await checkTransactionValidity(formData.orderId);
+      setCheckResult(result);
+      if (result.valid) {
+        setIsValid(true);
       }
-    } catch { setClaimResult({ message: "Koneksi error" }); }
-    setSubmitting(false);
-  }
+    } catch (error) {
+      setCheckResult({ valid: false, message: "Terjadi kesalahan saat memeriksa." });
+    } finally {
+      setChecking(false);
+    }
+  };
 
-  function closeModal() {
-    setShowClaimModal(false);
-    setClaimForm({ transactionId: "", claimReason: "" });
-    setClaimResult(null);
-  }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, photo: e.target.files[0] });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValid) return;
+
+    setLoading(true);
+
+    // Simpan ke database dengan status pending via FormData
+    const submissionData = new FormData();
+    submissionData.append("orderId", formData.orderId);
+    if (checkResult.oldAccountId) {
+      submissionData.append("oldAccountId", checkResult.oldAccountId);
+    }
+    submissionData.append("issue", formData.issue);
+    if (formData.photo) {
+      submissionData.append("photo", formData.photo);
+    }
+
+    const res = await submitWarrantyClaim(submissionData);
+
+    if (!res.success) {
+      alert(res.message);
+      setLoading(false);
+      return;
+    }
+
+    setSuccess(true);
+    setLoading(false);
+
+    // Buka WhatsApp untuk mengirimkan foto bukti
+    // const message = `Halo Admin Dorizz Store, saya telah mengirimkan form klaim garansi di web:%0A%0AOrder ID: ${formData.orderId}%0AProduk: ${checkResult.productName}%0AKendala: ${formData.issue}%0A%0ABerikut adalah lampiran foto bukti kendala saya:`;
+    // window.open(`https://wa.me/6281234567890?text=${message}`, '_blank');
+  };
 
   return (
-    <>
-      <Topbar title="Klaim Garansi" subtitle="Kelola klaim garansi dan penggantian akun pelanggan" />
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
+      <Navbar />
 
-      <div className="px-4 md:px-8 pb-8 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="search-box flex-1 max-w-md">
-            <Search size={16} className="search-icon" />
-            <input type="text" placeholder="Cari nama, ID transaksi, atau nomor WA..." className="form-input !pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
-          <button className="btn-primary" onClick={() => setShowClaimModal(true)}>
-            <ShieldCheck size={16} /> Proses Klaim Baru
-          </button>
-        </div>
+      <main className="relative z-10 pt-32 pb-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20">
 
-        {/* View Toggle mobile */}
-        <div className="flex items-center justify-between lg:hidden">
-          <p className="text-xs text-[var(--text-muted)]">Total {total} klaim</p>
-          <div className="flex gap-1">
-            <button className={`view-toggle-btn ${viewMode==='table'?'active':''}`} onClick={()=>setViewMode('table')}><LayoutList size={13}/> Tabel</button>
-            <button className={`view-toggle-btn ${viewMode==='card'?'active':''}`} onClick={()=>setViewMode('card')}><LayoutGrid size={13}/> Card</button>
-          </div>
-        </div>
-
-        <div className="glass-card overflow-hidden">
-          {loading ? (
-            <div className="flex items-center justify-center py-16"><Loader2 size={24} className="animate-spin text-[#818cf8]"/><span className="ml-2 text-[var(--text-secondary)]">Memuat...</span></div>
-          ) : (
-            <>
-              {viewMode==='table' && (
-                <div className="overflow-x-auto">
-                  <table className="data-table">
-                    <thead><tr>
-                      <th>Transaksi</th>
-                      <th>Pelanggan</th>
-                      <th>Akun Lama → Baru</th>
-                      <th>Alasan</th>
-                      <th>Tanggal</th>
-                      <th className="sticky-col-head">Status</th>
-                    </tr></thead>
-                    <tbody>
-                      {claims.length===0 ? (
-                        <tr><td colSpan={6} className="text-center py-8 text-[var(--text-muted)]">Belum ada klaim garansi</td></tr>
-                      ) : claims.map((claim)=>(
-                        <tr key={claim.id}>
-                          <td className="font-mono text-sm text-[#818cf8]">{claim.transaction?.lynkIdRef||claim.transaction?.id?.substring(0,8)||"-"}</td>
-                          <td><p className="font-medium">{claim.transaction?.user?.name||"-"}</p><p className="text-xs text-[var(--text-muted)]">{maskPhone(claim.transaction?.user?.whatsapp)}</p></td>
-                          <td>
-                            <div className="flex items-center gap-1.5 text-xs">
-                              <span className="text-rose-400 font-mono">{claim.oldAccount?.accountEmail||"—"}</span>
-                              <ArrowRight size={12} className="text-[var(--text-muted)] flex-shrink-0"/>
-                              <span className="text-emerald-400 font-mono">{claim.newAccount?.accountEmail||"—"}</span>
-                            </div>
-                          </td>
-                          <td className="text-[var(--text-secondary)] text-sm max-w-[160px] truncate">{claim.claimReason||"-"}</td>
-                          <td className="text-[var(--text-secondary)] text-sm">{claim.createdAt?new Date(claim.createdAt).toLocaleDateString("id-ID"):"-"}</td>
-                          <td className="sticky-col-body">{getClaimBadge(claim.status)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              {viewMode==='card' && (
-                <div className="data-card-grid">
-                  {claims.length===0 ? <p className="text-center py-8 text-[var(--text-muted)]">Belum ada klaim garansi</p> : claims.map((claim)=>(
-                    <div key={claim.id} className="data-card">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="min-w-0 flex-1 mr-2">
-                          <p className="font-semibold text-white text-sm truncate">{claim.transaction?.user?.name||"-"}</p>
-                          <p className="text-xs text-[var(--text-muted)]">{maskPhone(claim.transaction?.user?.whatsapp)}</p>
-                        </div>
-                        {getClaimBadge(claim.status)}
-                      </div>
-                      <div className="space-y-1.5 pt-2.5 border-t border-[rgba(99,102,241,0.08)]">
-                        <div className="data-card-row"><span className="data-card-label">ID Transaksi</span><span className="data-card-value font-mono text-xs text-[#818cf8]">{claim.transaction?.lynkIdRef||claim.transaction?.id?.substring(0,8)||"-"}</span></div>
-                        <div className="data-card-row"><span className="data-card-label">Akun Lama</span><span className="data-card-value font-mono text-xs text-rose-400">{claim.oldAccount?.accountEmail||"—"}</span></div>
-                        <div className="data-card-row"><span className="data-card-label">Akun Baru</span><span className="data-card-value font-mono text-xs text-emerald-400">{claim.newAccount?.accountEmail||"—"}</span></div>
-                        <div className="data-card-row"><span className="data-card-label">Alasan</span><span className="data-card-value">{claim.claimReason||"-"}</span></div>
-                        <div className="data-card-row"><span className="data-card-label">Tanggal</span><span className="data-card-value">{claim.createdAt?new Date(claim.createdAt).toLocaleDateString("id-ID"):"-"}</span></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="px-4 md:px-6 py-4 border-t border-[rgba(99,102,241,0.08)]">
-                <p className="text-sm text-[var(--text-muted)]">Total {total} klaim garansi</p>
+            {/* Kolom Kiri: Informasi */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-xs font-bold uppercase tracking-widest mb-6">
+                <ShieldAlert size={14} />
+                <span>Warranty Center</span>
               </div>
-            </>
-          )}
-        </div>
-      </div>
+              <h1 className="text-4xl font-black mb-6 leading-tight">
+                Klaim Garansi <br />
+                <span className="text-[var(--accent-primary)]">Produk Anda</span>
+              </h1>
+              <p className="text-[var(--text-secondary)] mb-10 leading-relaxed">
+                Kami berkomitmen memberikan layanan purna jual terbaik. Jika akun Anda mengalami kendala sebelum masa aktif habis, silakan lengkapi form di samping untuk bantuan cepat.
+              </p>
 
-      {/* Modal Klaim */}
-      {showClaimModal && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2"><ShieldCheck size={20} className="text-[#818cf8]" /> Proses Klaim Garansi</h3>
-              <button className="btn-icon" onClick={closeModal}><X size={18} /></button>
-            </div>
-            <div className="modal-body space-y-4">
-              {claimResult?.newAccount ? (
-                <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-3">
-                  <p className="font-semibold text-emerald-300">✅ {claimResult.message}</p>
-                  <div className="bg-[var(--bg-primary)] rounded-lg p-3 font-mono text-sm space-y-1">
-                    <p><span className="text-[var(--text-muted)]">Email Baru:</span> <span className="text-white">{claimResult.newAccount.email}</span></p>
-                    <p><span className="text-[var(--text-muted)]">Password:</span> <span className="text-white">{claimResult.newAccount.password}</span></p>
+              <div className="space-y-6">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0 text-[var(--accent-primary)] shadow-lg">
+                    <Info size={20} />
                   </div>
-                  <p className="text-xs text-[var(--text-muted)]">Slot akun lama sudah dikurangi. Kirim data akun baru ke pelanggan.</p>
-                </div>
-              ) : (
-                <>
-                  <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle size={18} className="text-amber-400 mt-0.5" />
-                      <div className="text-sm">
-                        <p className="font-medium text-amber-300">Perhatian</p>
-                        <p className="text-[var(--text-secondary)] mt-1">Proses ini akan otomatis mengambil 1 stok akun baru, mengurangi slot akun lama, dan menyiapkan akun baru untuk dikirim ke pelanggan. Satu transaksi dapat diklaim lebih dari 1 kali.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div><label className="form-label">ID Transaksi (UUID)</label><input type="text" className="form-input" placeholder="Paste UUID transaksi dari tabel" value={claimForm.transactionId} onChange={(e) => setClaimForm({ ...claimForm, transactionId: e.target.value })} /></div>
                   <div>
-                    <label className="form-label">Alasan Klaim</label>
-                    <select className="form-input" value={claimForm.claimReason} onChange={(e) => setClaimForm({ ...claimForm, claimReason: e.target.value })}>
-                      <option value="">-- Pilih Alasan --</option>
-                      <option value="Batas Limit Perangkat">Batas Limit Perangkat</option>
-                      <option value="Akun Tidak Bisa Login">Akun Tidak Bisa Login</option>
-                      <option value="Fitur Pro Tidak Aktif">Fitur Pro Tidak Aktif</option>
-                      <option value="Lainnya">Lainnya</option>
-                    </select>
+                    <h3 className="font-bold mb-1">Persiapkan Order ID</h3>
+                    <p className="text-sm text-[var(--text-muted)]">Anda bisa menemukan Order ID di riwayat transaksi atau pesan WhatsApp/Email saat pembelian.</p>
                   </div>
-                  {claimResult?.message && <p className="text-sm text-rose-400">{claimResult.message}</p>}
-                </>
-              )}
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] flex items-center justify-center flex-shrink-0 text-emerald-400 shadow-lg">
+                    <MessageSquare size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold mb-1">Kirim Bukti Foto</h3>
+                    <p className="text-sm text-[var(--text-muted)]">Lampirkan *screenshot* kendala akun untuk mempercepat proses klaim garansi oleh admin.</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn-secondary" onClick={closeModal}>Tutup</button>
-              {!claimResult?.newAccount && (
-                <button className="btn-success" onClick={handleClaim} disabled={submitting}>
-                  {submitting ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                  Proses & Ganti Akun
-                </button>
+
+            {/* Kolom Kanan: Form */}
+            <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-[var(--accent-primary)]"></div>
+
+              {!success && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-5 mb-8">
+                  <h3 className="text-sm font-bold text-rose-500 dark:text-rose-400 mb-3 flex items-center gap-2">
+                    <ShieldAlert size={16} /> 🏷️ PASTIKAN SUDAH MEMENUHI RULES‼️
+                  </h3>
+                  {isValid && checkResult.rules ? (
+                    <div
+                      className="rich-text-content text-xs md:text-sm text-[var(--text-secondary)]"
+                      dangerouslySetInnerHTML={{ __html: checkResult.rules }}
+                    />
+                  ) : null}
+                </div>
+              )}
+
+              {!success ? (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* ... form content ... */}
+                  <div>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Order ID / ID Transaksi</label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" size={18} />
+                        <input
+                          type="text"
+                          required
+                          disabled={isValid}
+                          value={formData.orderId}
+                          onChange={e => {
+                            setFormData({ ...formData, orderId: e.target.value });
+                            setCheckResult({ valid: false });
+                            setIsValid(false);
+                          }}
+                          placeholder="Contoh: DIRECT-123..."
+                          className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-2xl px-12 py-4 text-[var(--text-primary)] focus:outline-none focus:border-amber-500 transition-all shadow-inner disabled:opacity-60"
+                        />
+                      </div>
+                      {!isValid ? (
+                        <button
+                          type="button"
+                          onClick={handleCheck}
+                          disabled={checking || !formData.orderId}
+                          className="bg-[var(--bg-secondary)] border border-[var(--border-color)] px-6 rounded-2xl font-bold hover:bg-[var(--border-active)] transition-colors disabled:opacity-50"
+                        >
+                          {checking ? "Cek..." : "Cek"}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setIsValid(false)}
+                          className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-4 rounded-2xl font-bold hover:bg-amber-500/20 transition-colors"
+                        >
+                          Ganti
+                        </button>
+                      )}
+                    </div>
+
+                    {checkResult.message && (
+                      <p className={`mt-2 text-sm font-medium ${checkResult.valid ? 'text-emerald-500' : 'text-rose-500'}`}>
+                        {checkResult.valid ? `✅ Valid: ${checkResult.productName}` : `❌ ${checkResult.message}`}
+                      </p>
+                    )}
+                  </div>
+
+                  {isValid && (
+                    <div className="space-y-6 animate-in slide-in-from-top-4 fade-in duration-300">
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Detail Kendala</label>
+                        <textarea
+                          required
+                          rows={3}
+                          value={formData.issue}
+                          onChange={e => setFormData({ ...formData, issue: e.target.value })}
+                          placeholder="Jelaskan kendala yang Anda alami (misal: password salah, terkena limit)..."
+                          className="w-full bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-2xl px-5 py-4 text-[var(--text-primary)] focus:outline-none focus:border-amber-500 transition-all shadow-inner resize-none"
+                        ></textarea>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Bukti Kendala (Foto/Screenshot)</label>
+                        <div className="relative border-2 border-dashed border-[var(--border-color)] rounded-2xl p-4 text-center hover:border-[var(--accent-primary)] transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            required
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          />
+                          <div className="flex flex-col items-center justify-center gap-2 text-[var(--text-muted)]">
+                            <ImageIcon size={24} />
+                            <span className="text-sm font-medium">
+                              {formData.photo ? formData.photo.name : "Klik atau seret gambar ke sini"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                      >
+                        {loading ? (
+                          <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <>
+                            <Send size={18} />
+                            <span>Submit Warranty</span>
+                          </>
+                        )}
+                      </button>
+                      <p className="text-xs text-center text-[var(--text-muted)]">
+                        Foto bukti akan dikirimkan secara manual melalui WhatsApp setelah jendela chat terbuka.
+                      </p>
+                    </div>
+                  )}
+                </form>
+              ) : (
+                <div className="text-center py-10 animate-in zoom-in-95 duration-300">
+                  <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle2 size={40} className="text-emerald-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-3">Permintaan Disimpan!</h2>
+                  <p className="text-[var(--text-secondary)] mb-8 leading-relaxed">
+                    Data klaim Anda telah berhasil dicatat dengan status <strong>Pending</strong>. Jangan lupa untuk mengirimkan lampiran foto bukti pada jendela WhatsApp yang baru saja terbuka.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSuccess(false);
+                      setIsValid(false);
+                      setFormData({ orderId: "", issue: "", photo: null });
+                      setCheckResult({ valid: false });
+                    }}
+                    className="text-[var(--accent-primary)] font-semibold hover:underline"
+                  >
+                    Kirim Klaim Lainnya
+                  </button>
+                </div>
               )}
             </div>
           </div>
         </div>
-      )}
-    </>
+      </main>
+
+      <Footer />
+    </div>
   );
 }

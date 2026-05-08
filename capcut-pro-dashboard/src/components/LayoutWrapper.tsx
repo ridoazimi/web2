@@ -9,15 +9,17 @@ import { PrivacyProvider } from "@/context/PrivacyContext";
 import { MobileNavProvider } from "@/context/MobileNavContext";
 import { ReactNode } from "react";
 
-const AUTH_PAGES = ["/login", "/register", "/affiliate/login", "/affiliate/setup"];
+const PUBLIC_PAGES = ["/", "/checkout", "/login", "/register", "/affiliate/login", "/affiliate/setup", "/payment", "/terms", "/privacy", "/warranty"];
+
+
 
 export default function LayoutWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isAuthPage = AUTH_PAGES.some(p => pathname === p || pathname.startsWith(p + "?"));
+  const isPublicPage = PUBLIC_PAGES.some(p => pathname === p || pathname.startsWith(p + "?") || pathname.startsWith(p + "/"));
   const isAffiliatePage = pathname === "/affiliate" || pathname.startsWith("/affiliate/");
 
-  // Auth pages (admin login, register, affiliate login/setup) — no layout
-  if (isAuthPage) {
+  // Auth pages and marketplace — no layout
+  if (isPublicPage) {
     return <>{children}</>;
   }
 

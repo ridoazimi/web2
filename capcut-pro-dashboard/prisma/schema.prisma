@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,22 +7,22 @@ datasource db {
 }
 
 model User {
-  id                 String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email              String                 @unique @db.VarChar(255)
-  name               String                 @db.VarChar(255)
-  whatsapp           String?                @db.VarChar(50)
-  customerType       String?                @default("new") @map("customer_type") @db.VarChar(50)
-  notes              String?
-  createdAt          DateTime?              @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime?              @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  subscriptionStatus String?                @default("inactive") @map("subscription_status") @db.VarChar(50)
-  followUpStatus     String?                @default("none") @map("follow_up_status") @db.VarChar(50)
-  referredBy         String?                @map("referred_by") @db.Uuid
-  affiliate          Affiliate?             @relation(fields: [referredBy], references: [id], onUpdate: NoAction)
-  messageLogs        MessageLog[]
-  transactions       Transaction[]
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                String                @unique @db.VarChar(255)
+  name                 String                @db.VarChar(255)
+  whatsapp             String?               @db.VarChar(50)
+  customerType         String?               @default("new") @map("customer_type") @db.VarChar(50)
+  notes                String?
+  createdAt            DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  subscriptionStatus   String?               @default("inactive") @map("subscription_status") @db.VarChar(50)
+  followUpStatus       String?               @default("none") @map("follow_up_status") @db.VarChar(50)
+  referredBy           String?               @map("referred_by") @db.Uuid
+  affiliate            Affiliate?            @relation(fields: [referredBy], references: [id], onUpdate: NoAction)
+  messageLogs          MessageLog[]
+  transactions         Transaction[]
   affiliateCommissions AffiliateCommission[]
-  tags               CustomerTag[]
+  tags                 CustomerTag[]
 
   @@map("users")
 }
@@ -37,7 +36,10 @@ model StockAccount {
   notes             String?
   createdAt         DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime?       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  productType       String?         @default("mobile") @map("product_type") @db.VarChar(50)
+  productId         String?         @map("product_id") @db.Uuid
+  product           Product?        @relation(fields: [productId], references: [id], onUpdate: NoAction)
+  // productType       String?         @default("mobile") @map("product_type") @db.VarChar(50)
+  usageType         String?         @default("sale") @map("usage_type") @db.VarChar(50)
   maxSlots          Int?            @default(3) @map("max_slots")
   usedSlots         Int?            @default(0) @map("used_slots")
   transactions      Transaction[]
@@ -55,11 +57,12 @@ model Transaction {
   amount               Decimal               @default(0) @db.Decimal(12, 2)
   productName          String?               @map("product_name") @db.VarChar(255)
   status               String?               @default("success") @db.VarChar(50)
-  isManual             Boolean?              @default(false) @map("is_manual")
+  source               String?               @default("lynkid") @db.VarChar(50)
   purchaseDate         DateTime?             @default(now()) @map("purchase_date") @db.Timestamptz(6)
   warrantyExpiredAt    DateTime?             @map("warranty_expired_at") @db.Timestamptz(6)
   createdAt            DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  paymentData          Json?                 @map("payment_data")
   messageLogs          MessageLog[]
   stockAccount         StockAccount?         @relation(fields: [stockAccountId], references: [id], onUpdate: NoAction)
   user                 User?                 @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
@@ -75,6 +78,7 @@ model WarrantyClaim {
   oldAccountId  String?       @map("old_account_id") @db.Uuid
   newAccountId  String?       @map("new_account_id") @db.Uuid
   claimReason   String?       @map("claim_reason")
+  evidenceUrl   String?       @map("evidence_url")
   status        String?       @default("resolved") @db.VarChar(50)
   createdAt     DateTime?     @default(now()) @map("created_at") @db.Timestamptz(6)
   newAccount    StockAccount? @relation("NewAccount", fields: [newAccountId], references: [id], onUpdate: NoAction)
@@ -102,15 +106,15 @@ model MessageLog {
 // ===== Follow-Up Terjadwal =====
 
 model ScheduledFollowup {
-  id              String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title           String                      @db.VarChar(255)
-  messageTemplate String                      @map("message_template")
-  scheduledAt     DateTime                    @map("scheduled_at") @db.Timestamptz(6)
-  status          String?                     @default("pending") @db.VarChar(50)
-  totalRecipients Int?                        @default(0) @map("total_recipients")
-  sentCount       Int?                        @default(0) @map("sent_count")
-  createdAt       DateTime?                   @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime?                   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  id              String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title           String                       @db.VarChar(255)
+  messageTemplate String                       @map("message_template")
+  scheduledAt     DateTime                     @map("scheduled_at") @db.Timestamptz(6)
+  status          String?                      @default("pending") @db.VarChar(50)
+  totalRecipients Int?                         @default(0) @map("total_recipients")
+  sentCount       Int?                         @default(0) @map("sent_count")
+  createdAt       DateTime?                    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime?                    @default(now()) @map("updated_at") @db.Timestamptz(6)
   recipients      ScheduledFollowupRecipient[]
 
   @@map("scheduled_followups")
@@ -151,17 +155,17 @@ model Affiliate {
 }
 
 model AffiliateCommission {
-  id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  affiliateId       String?    @map("affiliate_id") @db.Uuid
-  transactionId     String?    @map("transaction_id") @db.Uuid
-  userId            String?    @map("user_id") @db.Uuid
-  amount            Decimal    @db.Decimal(12, 2)
-  transactionAmount Decimal    @map("transaction_amount") @db.Decimal(12, 2)
-  status            String?    @default("credited") @db.VarChar(50)
-  createdAt         DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
-  affiliate         Affiliate? @relation(fields: [affiliateId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  affiliateId       String?      @map("affiliate_id") @db.Uuid
+  transactionId     String?      @map("transaction_id") @db.Uuid
+  userId            String?      @map("user_id") @db.Uuid
+  amount            Decimal      @db.Decimal(12, 2)
+  transactionAmount Decimal      @map("transaction_amount") @db.Decimal(12, 2)
+  status            String?      @default("credited") @db.VarChar(50)
+  createdAt         DateTime?    @default(now()) @map("created_at") @db.Timestamptz(6)
+  affiliate         Affiliate?   @relation(fields: [affiliateId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   transaction       Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  user              User?      @relation(fields: [userId], references: [id], onUpdate: NoAction)
+  user              User?        @relation(fields: [userId], references: [id], onUpdate: NoAction)
 
   @@map("affiliate_commissions")
 }
@@ -206,7 +210,7 @@ model CustomerTag {
 
 model AppSetting {
   key       String   @id @db.VarChar(100)
-  value     String   // JSON string atau plain string
+  value     String // JSON string atau plain string
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   @@map("app_settings")
@@ -226,9 +230,9 @@ model AdminUser {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  schedule    AdminSchedule?
-  tasks       TaskAssignment[]
-  attendance  AttendanceRecord[]
+  schedule   AdminSchedule?
+  tasks      TaskAssignment[]
+  attendance AttendanceRecord[]
 
   @@map("admin_users")
 }
@@ -239,8 +243,8 @@ model AdminSchedule {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   adminId    String    @unique @db.Uuid
   admin      AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  shiftStart String    @db.VarChar(5)   // "08:00" WIB
-  shiftEnd   String    @db.VarChar(5)   // "17:00" WIB
+  shiftStart String    @db.VarChar(5) // "08:00" WIB
+  shiftEnd   String    @db.VarChar(5) // "17:00" WIB
   isActive   Boolean   @default(true)
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -251,16 +255,16 @@ model AdminSchedule {
 // ===== Task Management (RKHI) =====
 
 model Task {
-  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title          String    @db.VarChar(255)
-  description    String?   @db.Text
-  recurrenceType String    @default("daily") @db.VarChar(20) // "daily" | "once"
-  scheduledDate  String?   @db.VarChar(10)  // "2026-04-09" — only for recurrenceType=once
-  periodStart    String?   @map("period_start") @db.VarChar(10) // "2026-04-09" — optional period start
-  periodEnd      String?   @map("period_end") @db.VarChar(10)   // "2026-04-15" — optional period end
-  isActive       Boolean   @default(true)
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title          String   @db.VarChar(255)
+  description    String?  @db.Text
+  recurrenceType String   @default("daily") @db.VarChar(20) // "daily" | "once"
+  scheduledDate  String?  @db.VarChar(10) // "2026-04-09" — only for recurrenceType=once
+  periodStart    String?  @map("period_start") @db.VarChar(10) // "2026-04-09" — optional period start
+  periodEnd      String?  @map("period_end") @db.VarChar(10) // "2026-04-15" — optional period end
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   assignments TaskAssignment[]
 
@@ -273,7 +277,7 @@ model TaskAssignment {
   task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   adminId     String    @db.Uuid
   admin       AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  date        String    @db.VarChar(10)  // "2026-04-09" — copy baru per hari via cron
+  date        String    @db.VarChar(10) // "2026-04-09" — copy baru per hari via cron
   status      String    @default("pending") @db.VarChar(20) // pending | done
   completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
   assignedAt  DateTime  @default(now()) @map("assigned_at") @db.Timestamptz(6)
@@ -288,7 +292,7 @@ model AttendanceRecord {
   id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   adminId        String    @db.Uuid
   admin          AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  date           String    @db.VarChar(10)  // "2026-04-09"
+  date           String    @db.VarChar(10) // "2026-04-09"
   checkInAt      DateTime? @map("check_in_at") @db.Timestamptz(6)
   checkOutAt     DateTime? @map("check_out_at") @db.Timestamptz(6)
   webhookSentIn  Boolean   @default(false) @map("webhook_sent_in")
@@ -297,4 +301,27 @@ model AttendanceRecord {
 
   @@unique([adminId, date])
   @@map("attendance_records")
+}
+
+// ===== Marketplace =====
+
+model Product {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @db.VarChar(255)
+  slug        String?  @unique @db.VarChar(255)
+  description String?  @db.Text
+  price       Decimal  @default(0) @db.Decimal(12, 2)
+  imageUrl    String?  @map("image_url") @db.VarChar(500)
+  category    String?  @db.VarChar(100)
+  maxSlots    Int?     @default(3) @map("max_slots")
+  // productType String?  @default("mobile") @map("product_type") @db.VarChar(50)
+  duration    Int?     @default(30)
+  rules       String?  @db.Text
+  messageTemplate String? @map("message_template") @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  stockAccounts StockAccount[]
+
+  @@map("products")
 }

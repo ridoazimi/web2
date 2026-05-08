@@ -45,6 +45,18 @@ export async function POST(req: NextRequest) {
     const price = messageData.totals?.grandTotal || firstItem.price || 0;
     const durationDays = parseDuration(productTitle);
     const productType = parseProductType(productTitle);
+    
+    // Find matching product in DB
+    const product = await prisma.product.findFirst({
+      where: {
+        OR: [
+          { name: { contains: productTitle, mode: "insensitive" } },
+          { slug: { contains: productTitle.toLowerCase().replace(/ /g, "-"), mode: "insensitive" } }
+        ]
+      }
+    });
+    const productId = product?.id || null;
+
     const questions = firstItem.questions || "";
 
     // Data affiliate dari payload Lynk.id
@@ -116,14 +128,14 @@ export async function POST(req: NextRequest) {
 
     // ===== 3. SHARING ACCOUNT: Cari stok yang masih ada slot kosong =====
     // Cari akun yang masih ada slot kosong (status "available")
-    const maxSlotsForType = productType === "desktop" ? 2 : 3;
+    const maxSlotsForType = product?.maxSlots || (productType === "desktop" ? 2 : 3);
 
     // FIX #1: Gunakan $transaction untuk atomic slot assignment
     const txResult = await prisma.$transaction(async (tx) => {
       // Cari kandidat akun yang matching durasi + tipe
       let candidateAccounts = await tx.stockAccount.findMany({
         where: {
-          productType,
+          productId,
           status: "available",
           durationDays,
         },
@@ -131,9 +143,9 @@ export async function POST(req: NextRequest) {
       });
 
       // Fallback 1: tipe sama, tanpa filter durasi
-      if (candidateAccounts.length === 0) {
+      if (candidateAccounts.length === 0 && productId) {
         candidateAccounts = await tx.stockAccount.findMany({
-          where: { productType, status: "available" },
+          where: { productId, status: "available" },
           orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
         });
       }
@@ -165,7 +177,7 @@ export async function POST(req: NextRequest) {
           amount: price,
           productName: productTitle,
           status: "success",
-          isManual: false,
+          source: "lynkid",
           purchaseDate,
           warrantyExpiredAt,
         },

@@ -41,7 +41,7 @@ interface Transaction {
   amount: number;
   productName: string | null;
   status: string | null;
-  isManual: boolean | null;
+  source: string | null;
   purchaseDate: string | null;
   warrantyExpiredAt: string | null;
   createdAt: string | null;
@@ -99,8 +99,17 @@ function getActiveBadge(expiredAt: string | null) {
   );
 }
 
-const sourceFilters = ["Semua", "lynkid", "manual"];
-const sourceLabels: Record<string, string> = { Semua: "Semua Sumber", lynkid: "Lynk.id", manual: "Manual" };
+const sourceFilters = ["Semua", "lynkid", "manual", "website"];
+const sourceLabels: Record<string, string> = { Semua: "Semua Sumber", lynkid: "Lynk.id", manual: "Manual", website: "Website" };
+
+function getSourceBadge(source: string | null) {
+  switch (source) {
+    case "manual": return <span className="badge badge-purple">Manual</span>;
+    case "website": return <span className="badge badge-warning">Website</span>;
+    case "lynkid": return <span className="badge badge-info">Lynk.id</span>;
+    default: return <span className="badge badge-info">Lynk.id</span>;
+  }
+}
 
 export default function TransactionsPage() {
   const { maskEmail, maskPhone } = usePrivacy();
@@ -270,7 +279,7 @@ export default function TransactionsPage() {
     try {
       // 1. Ambil stok akun tersedia sesuai tipe + template dari settings (parallel)
       const [stockRes, settingsRes] = await Promise.all([
-        fetch(`/api/stock?status=available&productType=${accountType}&limit=1`),
+        fetch(`/api/stock?status=available&productType=${accountType}&usageType=sale&limit=1`),
         fetch("/api/settings"),
       ]);
       const stockJson = await stockRes.json();
@@ -779,7 +788,7 @@ export default function TransactionsPage() {
                               </div>
                             </td>
                             <td className="text-xs text-[var(--text-muted)]">{formatDateTime(trx.createdAt ?? null)}</td>
-                            <td>{trx.isManual ? <span className="badge badge-purple">Manual</span> : <span className="badge badge-info">Lynk.id</span>}</td>
+                            <td>{getSourceBadge(trx.source)}</td>
                             <td className="sticky-col-body">{getStatusBadge(trx.status)}</td>
                           </tr>
                         ))
@@ -830,7 +839,7 @@ export default function TransactionsPage() {
                           </div>
                           <div className="data-card-row">
                             <span className="data-card-label">Sumber</span>
-                            <span className="data-card-value">{trx.isManual ? <span className="badge badge-purple">Manual</span> : <span className="badge badge-info">Lynk.id</span>}</span>
+                            <span className="data-card-value">{getSourceBadge(trx.source)}</span>
                           </div>
                           <div className="data-card-row">
                             <span className="data-card-label">WA</span>

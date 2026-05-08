@@ -228,7 +228,7 @@ export async function POST(req: NextRequest) {
                 amount: row.amount,
                 productName: row.productName,
                 status: "success",
-                isManual: false,
+                source: "lynkid",
                 purchaseDate: row.purchaseDate,
                 warrantyExpiredAt: row.warrantyExpiredAt,
               },

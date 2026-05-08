@@ -50,6 +50,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         ...(body.status && { status: body.status }),
         ...(body.notes !== undefined && { notes: body.notes }),
         ...(body.usedSlots !== undefined && { usedSlots: body.usedSlots }),
+        ...(body.usageType && { usageType: body.usageType }),
       },
     });
 

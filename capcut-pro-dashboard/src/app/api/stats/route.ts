@@ -1,10 +1,14 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { requireAuth } from "@/lib/auth";
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/stats - Statistik untuk halaman Dashboard Overview
 export async function GET() {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   try {
     const [
       totalTransactions,

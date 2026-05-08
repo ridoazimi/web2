@@ -11,7 +11,17 @@ const PUBLIC_PATHS = [
   "/api/webhook",
   "/api/webhook/orderkuota",
   "/api/cron",
+  "/api/products",
+  "/api/checkout",
+  "/",
+  "/checkout",
+  "/payment",
+  "/terms",
+  "/privacy",
+  "/warranty",
   // Affiliate public paths
+
+
   "/affiliate/login",
   "/affiliate/setup",
   "/api/affiliate-portal/auth/login",

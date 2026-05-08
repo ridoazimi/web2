@@ -52,7 +52,10 @@ export async function GET(req: NextRequest) {
         where,
         include: {
           transaction: {
-            include: { user: { select: { name: true, whatsapp: true } } },
+            include: { 
+              user: { select: { name: true, whatsapp: true } },
+              stockAccount: { select: { productId: true } }
+            },
           },
           oldAccount: { select: { accountEmail: true } },
           newAccount: { select: { accountEmail: true, accountPassword: true } },
@@ -87,7 +90,7 @@ export async function POST(req: NextRequest) {
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
       include: {
-        stockAccount: true,
+        stockAccount: { include: { product: true } },
         user: { select: { name: true, email: true, whatsapp: true } },
       },
     });
@@ -97,19 +100,14 @@ export async function POST(req: NextRequest) {
     }
 
 
-    // Cek jika ada klaim PENDING untuk transaksi yang sama (hindari double-submit bersamaan)
+    // Cek jika ada klaim PENDING untuk transaksi yang sama
     const pendingClaim = await prisma.warrantyClaim.findFirst({
       where: { transactionId, status: "pending" },
     });
-    if (pendingClaim) {
-      return NextResponse.json(
-        { error: "Klaim garansi untuk transaksi ini sedang dalam proses. Harap tunggu sebentar." },
-        { status: 400 }
-      );
-    }
 
     // 2. Tentukan productType dari akun lama agar akun pengganti sesuai tipe produk
-    const oldProductType = transaction.stockAccount?.productType ?? "mobile";
+    const oldProductType = transaction.stockAccount?.product?.productType ?? "mobile";
+    const oldProductId = transaction.stockAccount?.productId;
     const defaultMaxSlots = oldProductType === "desktop" ? 2 : 3;
 
     // Cari akun baru yang tersedia dengan productType yang SAMA
@@ -117,7 +115,8 @@ export async function POST(req: NextRequest) {
     const candidateAccounts = await prisma.stockAccount.findMany({
       where: {
         status: "available",
-        productType: oldProductType,
+        productId: oldProductId,
+        usageType: "warranty",
         ...(transaction.stockAccountId ? { id: { not: transaction.stockAccountId } } : {}),
       },
       orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
@@ -131,20 +130,36 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Stok akun ${oldProductType} habis! Semua akun ${oldProductType} sudah penuh.` }, { status: 400 });
     }
 
-    // 3. Buat klaim garansi
-    const claim = await prisma.warrantyClaim.create({
-      data: {
-        transactionId,
-        oldAccountId: transaction.stockAccountId,
-        newAccountId: newAccount.id,
-        claimReason: claimReason || "Tidak disebutkan",
-        status: "resolved",
-      },
-      include: {
-        oldAccount: true,
-        newAccount: true,
-      },
-    });
+    // 3. Buat atau update klaim garansi
+    let claim;
+    if (pendingClaim) {
+      claim = await prisma.warrantyClaim.update({
+        where: { id: pendingClaim.id },
+        data: {
+          newAccountId: newAccount.id,
+          status: "resolved",
+          claimReason: claimReason || pendingClaim.claimReason,
+        },
+        include: {
+          oldAccount: true,
+          newAccount: true,
+        },
+      });
+    } else {
+      claim = await prisma.warrantyClaim.create({
+        data: {
+          transactionId,
+          oldAccountId: transaction.stockAccountId,
+          newAccountId: newAccount.id,
+          claimReason: claimReason || "Tidak disebutkan",
+          status: "resolved",
+        },
+        include: {
+          oldAccount: true,
+          newAccount: true,
+        },
+      });
+    }
 
     // 4. Update akun lama: kurangi slot, jangan ban jika masih ada sisa slot
     if (transaction.stockAccountId) {
@@ -204,6 +219,162 @@ export async function POST(req: NextRequest) {
     }, { status: 201 });
   } catch (error) {
     console.error("POST /api/warranty error:", error);
+    return NextResponse.json({ error: "Gagal memproses klaim garansi" }, { status: 500 });
+  }
+}
+
+// PATCH /api/warranty - Terima atau tolak klaim garansi
+export async function PATCH(req: NextRequest) {
+  const auth = await requirePermission("page_warranty");
+  if ("error" in auth) return auth.error;
+  try {
+    const body = await req.json();
+    const { claimId, action, newAccountId } = body; // action: "approve" | "reject"
+
+    if (!claimId || !action) {
+      return NextResponse.json({ error: "claimId dan action wajib diisi" }, { status: 400 });
+    }
+
+    if (!["approve", "reject"].includes(action)) {
+      return NextResponse.json({ error: "Action tidak valid. Gunakan 'approve' atau 'reject'" }, { status: 400 });
+    }
+
+    // Ambil klaim yang pending
+    const claim = await prisma.warrantyClaim.findUnique({
+      where: { id: claimId },
+      include: {
+        transaction: {
+          include: {
+            stockAccount: { include: { product: true } },
+            user: { select: { name: true, email: true, whatsapp: true } },
+          },
+        },
+      },
+    });
+
+    if (!claim) {
+      return NextResponse.json({ error: "Klaim tidak ditemukan" }, { status: 404 });
+    }
+
+    if (claim.status !== "pending") {
+      return NextResponse.json({ error: "Klaim ini sudah diproses sebelumnya" }, { status: 400 });
+    }
+
+    // === REJECT ===
+    if (action === "reject") {
+      await prisma.warrantyClaim.update({
+        where: { id: claimId },
+        data: { status: "rejected" },
+      });
+      return NextResponse.json({ message: "Klaim garansi berhasil ditolak." });
+    }
+
+    // === APPROVE ===
+    const transaction = claim.transaction;
+    if (!transaction) {
+      return NextResponse.json({ error: "Transaksi terkait tidak ditemukan" }, { status: 404 });
+    }
+
+    let newAccount;
+    if (newAccountId) {
+      // Manual selection
+      newAccount = await prisma.stockAccount.findUnique({
+        where: { id: newAccountId }
+      });
+      if (!newAccount) {
+        return NextResponse.json({ error: "Akun pengganti tidak ditemukan" }, { status: 404 });
+      }
+      if (newAccount.status !== "available") {
+        return NextResponse.json({ error: "Akun pengganti sudah tidak tersedia" }, { status: 400 });
+      }
+    } else {
+      // Auto selection (fallback)
+      const oldProductType = transaction.stockAccount?.product?.productType ?? "mobile";
+      const oldProductId = transaction.stockAccount?.productId;
+      const defaultMaxSlots = oldProductType === "desktop" ? 2 : 3;
+
+      const candidateAccounts = await prisma.stockAccount.findMany({
+        where: {
+          status: "available",
+          productId: oldProductId,
+          usageType: "warranty",
+          ...(transaction.stockAccountId ? { id: { not: transaction.stockAccountId } } : {}),
+        },
+        orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
+      });
+
+      newAccount = candidateAccounts.find(acc =>
+        (acc.usedSlots ?? 0) < (acc.maxSlots ?? defaultMaxSlots)
+      ) ?? null;
+
+      if (!newAccount) {
+        return NextResponse.json({ error: `Stok akun ${oldProductType} habis! Silakan tambah stok terlebih dahulu.` }, { status: 400 });
+      }
+    }
+
+    // Update klaim ke resolved
+    await prisma.warrantyClaim.update({
+      where: { id: claimId },
+      data: {
+        newAccountId: newAccount.id,
+        status: "resolved",
+      },
+    });
+
+    // Update akun lama: kurangi slot
+    if (transaction.stockAccountId) {
+      const oldAccount = transaction.stockAccount;
+      const currentUsedSlots = oldAccount?.usedSlots ?? 1;
+      const oldMaxSlots = oldAccount?.maxSlots ?? defaultMaxSlots;
+      const newUsedSlotsOld = Math.max(0, currentUsedSlots - 1);
+
+      await prisma.stockAccount.update({
+        where: { id: transaction.stockAccountId },
+        data: {
+          status: "available",
+          usedSlots: newUsedSlotsOld,
+          notes: `Klaim garansi diterima: sisa ${newUsedSlotsOld}/${oldMaxSlots} slot. ${claim.claimReason || ""}`.trim(),
+        },
+      });
+    }
+
+    // Update slot akun baru
+    const newUsedSlots = (newAccount.usedSlots ?? 0) + 1;
+    const newMaxSlots = newAccount.maxSlots ?? defaultMaxSlots;
+    await prisma.stockAccount.update({
+      where: { id: newAccount.id },
+      data: {
+        status: newUsedSlots >= newMaxSlots ? "sold" : "available",
+        usedSlots: { increment: 1 },
+      },
+    });
+
+    // Update transaksi ke akun baru
+    await prisma.transaction.update({
+      where: { id: transaction.id },
+      data: { stockAccountId: newAccount.id },
+    });
+
+    // Kirim data ke webhook
+    sendWarrantyWebhook({
+      nama: transaction.user?.name ?? "-",
+      email: transaction.user?.email ?? "-",
+      no_hp: transaction.user?.whatsapp ?? "-",
+      akun_email: newAccount.accountEmail,
+      akun_password: newAccount.accountPassword,
+      alasan_klaim: claim.claimReason || "Tidak disebutkan",
+      tanggal_klaim: new Date().toISOString(),
+    });
+
+    return NextResponse.json({
+      newAccount: {
+        email: newAccount.accountEmail,
+        password: newAccount.accountPassword,
+      },
+      message: "Klaim garansi diterima! Akun baru sudah siap dikirim.",
+    });
+  } catch (error) {
+    console.error("PATCH /api/warranty error:", error);
     return NextResponse.json({ error: "Gagal memproses klaim garansi" }, { status: 500 });
   }
 }

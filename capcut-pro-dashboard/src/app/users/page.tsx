@@ -66,7 +66,7 @@ interface TransactionHistory {
   warrantyExpiredAt: string;
   stockAccount: {
     accountEmail: string;
-    productType: string;
+    product: { name: string } | null;
   } | null;
 }
 
@@ -1255,7 +1255,7 @@ export default function UsersPage() {
                           <td className="text-[var(--text-secondary)]">{formatDate(trx.purchaseDate)}</td>
                           <td className="font-semibold">{formatCurrency(trx.amount)}</td>
                           <td className="font-mono text-xs text-[var(--text-secondary)]">{trx.stockAccount?.accountEmail || "-"}</td>
-                          <td className="capitalize">{trx.stockAccount?.productType || "-"}</td>
+                          <td className="capitalize">{trx.stockAccount?.product?.productType || "-"}</td>
                           <td>
                             {trx.status === "success"
                               ? <span className="badge badge-success !text-[10px] !py-0.5">Sukses</span>

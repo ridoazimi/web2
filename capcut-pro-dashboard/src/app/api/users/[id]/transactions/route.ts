@@ -14,7 +14,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       orderBy: { purchaseDate: 'desc' },
       include: {
         stockAccount: {
-          select: { accountEmail: true, productType: true }
+          select: { 
+            accountEmail: true, 
+            product: { select: { name: true } } 
+          }
         }
       }
     });

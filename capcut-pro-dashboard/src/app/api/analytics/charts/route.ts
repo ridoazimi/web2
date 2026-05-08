@@ -1,11 +1,15 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/analytics/charts?range=3m
 // range: 1m | 3m | 6m | 1y
 export async function GET(req: NextRequest) {
+  const auth = await requireAuth();
+  if ("error" in auth) return auth.error;
+
   try {
     const { searchParams } = new URL(req.url);
     const range = searchParams.get("range") || "3m";

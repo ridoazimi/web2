@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import { ThemeProvider } from "@/context/ThemeContext";
+
 
 export const metadata: Metadata = {
   title: "Dorizz Store Dashboard",
@@ -21,8 +23,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <ThemeProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </ThemeProvider>
       </body>
+
     </html>
   );
 }

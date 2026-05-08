@@ -1,28 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #111827;
-  --bg-card: #1a2035;
-  --bg-card-hover: #1f2847;
-  --border-color: rgba(99, 102, 241, 0.15);
-  --border-active: rgba(99, 102, 241, 0.4);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-indigo: #6366f1;
-  --accent-cyan: #22d3ee;
-  --accent-emerald: #10b981;
-  --accent-rose: #f43f5e;
-  --accent-amber: #f59e0b;
-  --accent-purple: #a855f7;
-  --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
-  --gradient-cyan: linear-gradient(135deg, #06b6d4, #22d3ee);
-  --gradient-success: linear-gradient(135deg, #059669, #10b981);
-  --gradient-danger: linear-gradient(135deg, #e11d48, #f43f5e);
-  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  /* Dark Mode (Default) */
+  --bg-primary: #06080F;
+  --bg-secondary: #0A0D17;
+  --bg-card: #0D111C;
+  --bg-card-hover: #141927;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-active: rgba(32, 213, 210, 0.3);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  
+  /* Brand Colors (Matched to CapCut Logo) */
+  --accent-primary: #20D5D2; /* CapCut Teal */
+  --accent-secondary: #16A3A1;
+  --accent-glow: rgba(32, 213, 210, 0.3);
+  
+  --nav-bg: rgba(6, 8, 15, 0.7);
+  --selection-bg: rgba(32, 213, 210, 0.2);
+  
+  --shadow-glow: 0 0 30px rgba(32, 213, 210, 0.15);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --grid-color: rgba(32, 213, 210, 0.15);
+  --hero-bg: #06080F;
+  --hero-text: #FFFFFF;
+  --hero-text-muted: rgba(255, 255, 255, 0.7);
+  --hero-accent: var(--accent-primary);
 }
+
+[data-theme='light'] {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --border-active: rgba(32, 213, 210, 0.4);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  
+  --nav-bg: rgba(255, 255, 255, 0.8);
+  --selection-bg: rgba(32, 213, 210, 0.15);
+  
+  --shadow-glow: 0 0 30px rgba(32, 213, 210, 0.1);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.03);
+  --grid-color: rgba(255, 255, 255, 0.25);
+  --hero-bg: #1c95d1;
+  --hero-text: #FFFFFF;
+  --hero-text-muted: rgba(255, 255, 255, 0.9);
+  --hero-accent: #FFFFFF;
+}
+
 
 @theme inline {
   --color-background: var(--bg-primary);
@@ -50,13 +79,14 @@ body {
 
 /* Glassmorphism Card */
 .glass-card {
-  background: rgba(26, 32, 53, 0.7);
+  background: var(--bg-card);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   box-shadow: var(--shadow-card);
   transition: all 0.3s ease;
 }
+
 .glass-card:hover {
   border-color: var(--border-active);
   box-shadow: var(--shadow-glow);
@@ -64,9 +94,11 @@ body {
 
 /* Sidebar */
 .sidebar {
-  background: linear-gradient(180deg, #0f1629 0%, #111827 100%);
+  background: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
+
 .sidebar-link {
   display: flex;
   align-items: center;
@@ -550,4 +582,106 @@ body {
   color: #818cf8;
   background: rgba(99, 102, 241, 0.08);
 }
+
+
+/* Rich Text Content Styling */
+.rich-text-content {
+  line-height: 1.6;
+  color: var(--text-secondary);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.rich-text-content p {
+  margin-bottom: 0.75rem;
+}
+
+.rich-text-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content b, 
+.rich-text-content strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.rich-text-content ul, 
+.rich-text-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+}
+
+.rich-text-content li {
+  margin-bottom: 0.25rem;
+}
+
+.rich-text-content a {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3 {
+  color: var(--text-primary);
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+
+
+/* Quill Editor Custom Styles */
+.rich-text-editor .ql-toolbar {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+.rich-text-editor .ql-container {
+  border-color: var(--border-color) !important;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  min-height: 150px;
+  font-family: inherit;
+}
+.rich-text-editor .ql-editor {
+  min-height: 150px;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+.rich-text-editor .ql-editor.ql-blank::before {
+  color: var(--text-muted);
+  font-style: normal;
+}
+.rich-text-editor .ql-stroke {
+  stroke: var(--text-secondary) !important;
+}
+.rich-text-editor .ql-fill {
+  fill: var(--text-secondary) !important;
+}
+.rich-text-editor .ql-picker {
+  color: var(--text-secondary) !important;
+}
+.rich-text-editor .ql-picker-options {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+.rich-text-editor .ql-active .ql-stroke {
+  stroke: var(--accent-primary) !important;
+}
+.rich-text-editor .ql-active .ql-fill {
+  fill: var(--accent-primary) !important;
+}
+
 

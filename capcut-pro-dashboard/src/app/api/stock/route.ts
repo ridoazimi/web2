@@ -11,6 +11,8 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || "";
     const status = searchParams.get("status") || "";
     const productType = searchParams.get("productType") || "";
+    const productId = searchParams.get("productId") || "";
+    const usageType = searchParams.get("usageType") || ""; // sale | warranty
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "30");
     const skip = (page - 1) * limit;
@@ -23,11 +25,19 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    if (status && status !== "all") where.status = status;
-    if (productType && productType !== "all") where.productType = productType;
+    if (status && status !== "all" && status !== "Semua") where.status = status;
+    if (productId && productId !== "all" && productId !== "Semua") {
+      where.productId = productId;
+    } else if (productType && productType !== "all" && productType !== "Semua") {
+      where.product = { maxSlots: productType === "desktop" ? 2 : 3 };
+    }
+    if (usageType && usageType !== "all" && usageType !== "Semua") {
+      where.usageType = usageType;
+    }
 
     // ── Fetch semua data yang diperlukan ─────────────────────────────────────
-    const [accounts, total, allMobileRaw, allDesktopRaw] = await Promise.all([
+    // ── Fetch paginated list ────────────────────────────────────────────────
+    const [accounts, total] = await Promise.all([
       prisma.stockAccount.findMany({
         where,
         include: {
@@ -42,48 +52,53 @@ export async function GET(req: NextRequest) {
             },
             orderBy: { purchaseDate: "desc" },
           },
+          product: {
+            select: { name: true, maxSlots: true }
+          }
         },
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
       prisma.stockAccount.count({ where }),
-      // Semua akun mobile (untuk stats akurat)
-      prisma.stockAccount.findMany({
-        where: { productType: "mobile" },
-        select: { id: true, status: true, usedSlots: true, maxSlots: true },
-      }),
-      // Semua akun desktop (untuk stats akurat)
-      prisma.stockAccount.findMany({
-        where: { productType: "desktop" },
-        select: { id: true, status: true, usedSlots: true, maxSlots: true },
-      }),
     ]);
 
+    // ── Fetch all accounts for stats (Trigger reload) ───────────────────────
+    const allAccounts = await prisma.stockAccount.findMany({
+      select: {
+        id: true,
+        status: true,
+        usedSlots: true,
+        maxSlots: true,
+        usageType: true,
+        product: { select: { maxSlots: true } }
+      }
+    });
+
+    const mobileAccounts = allAccounts.filter(a => (a.product?.maxSlots || a.maxSlots || 3) === 3);
+    const desktopAccounts = allAccounts.filter(a => (a.product?.maxSlots || a.maxSlots || 3) === 2);
+    const saleAccounts = allAccounts.filter(a => a.usageType === "sale");
+    const warrantyAccounts = allAccounts.filter(a => a.usageType === "warranty");
+
     // ── Helper: hitung status berdasarkan usedSlots vs maxSlots ──
-    function effectiveStatus(acc: { status: string | null; usedSlots: number | null; maxSlots: number | null }, defaultMax: number) {
+    function effectiveStatus(acc: { status: string | null; usedSlots: number | null; maxSlots: number | null; product?: { maxSlots: number | null } | null }, defaultMax: number) {
       const used = acc.usedSlots ?? 0;
-      const max = acc.maxSlots ?? defaultMax;
-      // Hanya 2 status: available (masih ada slot) atau sold (penuh)
+      const max = acc.maxSlots ?? acc.product?.maxSlots ?? defaultMax;
       if (used < max) return "available";
       return "sold";
     }
 
-    // ── Auto-fix background: update status akun yang stale (in_use/full → available/sold) ──
-    const staleIds = [...allMobileRaw, ...allDesktopRaw]
+    // ── Auto-fix background ──────────────────────────────────────────────────
+    const staleIds = allAccounts
       .filter(a => {
-        const defaultMax = a.status === "desktop" ? 2 : 3;
-        const used = a.usedSlots ?? 0;
-        const max = a.maxSlots ?? defaultMax;
-        const correctStatus = used < max ? "available" : "sold";
-        return a.status !== correctStatus; // status di DB tidak sesuai
+        const correctStatus = effectiveStatus(a, 3);
+        return a.status !== correctStatus;
       })
       .map(a => a.id);
 
     if (staleIds.length > 0) {
-      // Fix akun yang harusnya available (masih ada slot kosong)
-      const shouldBeAvailable = [...allMobileRaw, ...allDesktopRaw]
-        .filter(a => staleIds.includes(a.id) && (a.usedSlots ?? 0) < (a.maxSlots ?? 3))
+      const shouldBeAvailable = allAccounts
+        .filter(a => staleIds.includes(a.id) && effectiveStatus(a, 3) === "available")
         .map(a => a.id);
       const shouldBeSold = staleIds.filter(id => !shouldBeAvailable.includes(id));
 
@@ -101,48 +116,61 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // ── Hitung stats Mobile (berdasarkan usedSlots vs maxSlots) ──────
-    const mobileStatusCounts: Record<string, number> = { available: 0, sold: 0 };
-    for (const acc of allMobileRaw) {
-      const eff = effectiveStatus(acc, 3);
-      if (eff === "available") mobileStatusCounts.available++;
+    // ── Hitung stats ─────────────────────────────────────────────────────────
+    const mobileStatusCounts = { available: 0, sold: 0 };
+    mobileAccounts.forEach(acc => {
+      if (effectiveStatus(acc, 3) === "available") mobileStatusCounts.available++;
       else mobileStatusCounts.sold++;
-    }
-    const mobileTotal = allMobileRaw.length;
+    });
 
-    // ── Hitung stats Desktop (berdasarkan usedSlots vs maxSlots) ─────
-    const desktopStatusCounts: Record<string, number> = { available: 0, sold: 0 };
-    for (const acc of allDesktopRaw) {
-      const eff = effectiveStatus(acc, 2);
-      if (eff === "available") desktopStatusCounts.available++;
+    const desktopStatusCounts = { available: 0, sold: 0 };
+    desktopAccounts.forEach(acc => {
+      if (effectiveStatus(acc, 2) === "available") desktopStatusCounts.available++;
       else desktopStatusCounts.sold++;
-    }
-    const desktopTotal = allDesktopRaw.length;
+    });
 
-    // ── Overall (gabungan) ────────────────────────────────────────────────────
-    const statusCounts: Record<string, number> = {
+    const saleStatusCounts = { available: 0, sold: 0 };
+    saleAccounts.forEach(acc => {
+      if (effectiveStatus(acc, 3) === "available") saleStatusCounts.available++;
+      else saleStatusCounts.sold++;
+    });
+
+    const warrantyStatusCounts = { available: 0, sold: 0 };
+    warrantyAccounts.forEach(acc => {
+      if (effectiveStatus(acc, 3) === "available") warrantyStatusCounts.available++;
+      else warrantyStatusCounts.sold++;
+    });
+
+    const statusCounts = {
       available: mobileStatusCounts.available + desktopStatusCounts.available,
       sold: mobileStatusCounts.sold + desktopStatusCounts.sold,
     };
 
-    // ── Sisa slot (hanya dari akun yang status available) ─────────────────────
-    const remainingSlotsMobile = allMobileRaw
+    const remainingSlotsMobile = mobileAccounts
       .filter(acc => effectiveStatus(acc, 3) === "available")
-      .reduce((sum, acc) => {
-        return sum + Math.max(0, (acc.maxSlots ?? 3) - (acc.usedSlots ?? 0));
-      }, 0);
-    const remainingSlotsDesktop = allDesktopRaw
+      .reduce((sum, acc) => sum + Math.max(0, (acc.maxSlots ?? 3) - (acc.usedSlots ?? 0)), 0);
+
+    const remainingSlotsDesktop = desktopAccounts
       .filter(acc => effectiveStatus(acc, 2) === "available")
-      .reduce((sum, acc) => {
-        return sum + Math.max(0, (acc.maxSlots ?? 2) - (acc.usedSlots ?? 0));
-      }, 0);
+      .reduce((sum, acc) => sum + Math.max(0, (acc.maxSlots ?? 2) - (acc.usedSlots ?? 0)), 0);
+
+    const remainingSlotsSale = saleAccounts
+      .filter(acc => effectiveStatus(acc, 3) === "available")
+      .reduce((sum, acc) => sum + Math.max(0, (acc.maxSlots ?? 3) - (acc.usedSlots ?? 0)), 0);
+
+    const remainingSlotsWarranty = warrantyAccounts
+      .filter(acc => effectiveStatus(acc, 3) === "available")
+      .reduce((sum, acc) => sum + Math.max(0, (acc.maxSlots ?? 3) - (acc.usedSlots ?? 0)), 0);
 
     return NextResponse.json({
       accounts, total, page, limit,
       statusCounts,
-      mobileStatusCounts, mobileTotal,
-      desktopStatusCounts, desktopTotal,
+      mobileStatusCounts, mobileTotal: mobileAccounts.length,
+      desktopStatusCounts, desktopTotal: desktopAccounts.length,
+      saleStatusCounts, saleTotal: saleAccounts.length,
+      warrantyStatusCounts, warrantyTotal: warrantyAccounts.length,
       remainingSlotsMobile, remainingSlotsDesktop,
+      remainingSlotsSale, remainingSlotsWarranty,
     });
   } catch (error) {
     console.error("GET /api/stock error:", error);
@@ -154,32 +182,52 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { accounts, durationDays = 30, productType = "mobile", maxSlots } = body;
+    const { accounts, durationDays = 30, productId, maxSlots, usageType = "sale" } = body;
 
-    const slots = maxSlots || (productType === "desktop" ? 2 : 3);
+    // Get maxSlots from product if not provided
+    let slots = maxSlots;
+    if (!slots && productId) {
+      const product = await prisma.product.findUnique({ where: { id: productId } });
+      slots = product?.maxSlots || 3;
+    }
+    if (!slots) slots = 3;
 
-    let data: { accountEmail: string; accountPassword: string; durationDays: number; productType: string; maxSlots: number; usedSlots: number }[];
+    let data: { accountEmail: string; accountPassword: string; durationDays: number; productId: string | null; maxSlots: number; usedSlots: number; usageType: string }[];
 
     if (Array.isArray(accounts)) {
       data = accounts.map((acc: { email: string; password: string }) => ({
         accountEmail: acc.email,
         accountPassword: acc.password,
         durationDays,
-        productType,
+        productId: body.productId || null, // Tambahkan productId jika ada
         maxSlots: slots,
         usedSlots: 0,
+        usageType: usageType,
       }));
     } else if (body.email && body.password) {
-      data = [{ accountEmail: body.email, accountPassword: body.password, durationDays, productType, maxSlots: slots, usedSlots: 0 }];
+      data = [{ 
+        accountEmail: body.email, 
+        accountPassword: body.password, 
+        durationDays, 
+        productId: body.productId || null,
+        maxSlots: slots, 
+        usedSlots: 0,
+        usageType: usageType,
+      }];
     } else {
       return NextResponse.json({ error: "Data akun tidak valid" }, { status: 400 });
     }
 
-    const result = await prisma.stockAccount.createMany({ data });
+    const result = await prisma.stockAccount.createMany({ 
+      data: data as any 
+    });
 
     return NextResponse.json({ created: result.count }, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("POST /api/stock error:", error);
-    return NextResponse.json({ error: "Gagal menambahkan stok" }, { status: 500 });
+    if (error.code === 'P2002') {
+      return NextResponse.json({ error: "Email akun sudah terdaftar di sistem." }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Gagal menambahkan stok: " + (error.message || "Unknown error") }, { status: 500 });
   }
 }

@@ -61,10 +61,8 @@ export async function GET(req: NextRequest) {
       where.warrantyExpiredAt = warrantyFilter;
     }
 
-    if (source === "manual") {
-      where.isManual = true;
-    } else if (source === "lynkid") {
-      where.isManual = false;
+    if (source && source !== "all") {
+      where.source = source;
     }
 
     const [transactions, total] = await Promise.all([
@@ -101,8 +99,11 @@ export async function POST(req: NextRequest) {
     const durationFromName = productName ? parseDuration(productName) : 0;
     const durationDays = durationFromName > 0 ? durationFromName : rawDuration;
 
-    // FIX #4: Deteksi productType dari nama produk
-    const detectedProductType = parseProductType(productName || "");
+    // FIX #4: Cari produk di database
+    const matchedProduct = await prisma.product.findFirst({
+      where: { name: productName || "" }
+    });
+    const detectedProductType = matchedProduct?.productType || parseProductType(productName || "");
 
     if (!email || !name || !whatsapp) {
       return NextResponse.json({ error: "Email, nama, dan WhatsApp wajib diisi" }, { status: 400 });
@@ -135,7 +136,8 @@ export async function POST(req: NextRequest) {
       const candidateAccounts = await tx.stockAccount.findMany({
         where: {
           status: "available",
-          productType: detectedProductType, // FIX #4: filter by productType
+          productId: matchedProduct?.id, // FIX #4: filter by productId
+          usageType: "sale",
         },
         orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
       });
@@ -160,7 +162,7 @@ export async function POST(req: NextRequest) {
           amount: amount || 0,
           productName: productName || null,
           status: "success",
-          isManual: true,
+          source: "manual",
           warrantyExpiredAt,
         },
         include: {
