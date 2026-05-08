@@ -29,6 +29,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Save,
+  Settings2,
+  MessageSquare,
+  RotateCcw,
+  Info,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -159,6 +163,119 @@ export default function UsersPage() {
   // Load More state
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  // ─── WA Template Settings Modal ──────────────────────────────────────────────
+  const WA_TEMPLATES = [
+    {
+      key: "template_promo",
+      label: "Template Promo",
+      description: "Pesan promo/penawaran untuk pelanggan",
+      color: "#f59e0b",
+      variables: ["{nama}"],
+    },
+    {
+      key: "template_followup",
+      label: "Template Follow-Up",
+      description: "Pesan pengingat perpanjangan langganan",
+      color: "#6366f1",
+      variables: ["{nama}"],
+    },
+    {
+      key: "template_wa_expired",
+      label: "Template Masa Habis",
+      description: "Notifikasi masa aktif akun berakhir",
+      color: "#ef4444",
+      variables: ["{nama}"],
+    },
+    {
+      key: "template_send_account",
+      label: "Template Kirim Akun",
+      description: "Pesan pengiriman data akun ke pelanggan",
+      color: "#10b981",
+      variables: ["{nama}", "{akun_email}", "{akun_password}", "{tipe}", "{durasi}"],
+    },
+    {
+      key: "template_warranty",
+      label: "Template Garansi",
+      description: "Pesan klaim garansi & akun pengganti",
+      color: "#06b6d4",
+      variables: ["{nama}", "{akun_email}", "{akun_password}"],
+    },
+  ];
+
+  const DEFAULT_TEMPLATES: Record<string, string> = {
+    template_promo: `Halo {{nama}} 👋\n\nAda promo spesial dari Dorizz Store untuk kamu hari ini! 🎉\n\nDapatkan akun premium dengan harga terbaik dan nikmati semua fitur tanpa batas.\n\nJangan lewatkan kesempatan ini! Hubungi kami sekarang untuk info lebih lanjut 🔥`,
+    template_followup: `Halo {{nama}} 👋\n\nKami dari tim Dorizz Store ingin mengingatkan kamu bahwa masa berlangganan kamu akan segera habis.\n\nJangan sampai ketinggalan update terbaru! Yuk, perpanjang sekarang dan nikmati fitur premium tanpa batas 🎬✨\n\nBalas pesan ini atau hubungi kami untuk info lebih lanjut ya!\n\nTerima kasih sudah bersama kami 🙏`,
+    template_wa_expired: `Halo {{nama}}, kami dari Dorizz Store 😊\nMasa aktif akun CapCut Pro kamu sudah berakhir. Yuk perpanjang lagi agar tetap bisa menikmati fitur premium!\n\nInfo lebih lanjut bisa langsung chat ya 🙏`,
+    template_send_account: `Halo {{nama}} 👋\n\nTerima kasih sudah berlangganan di Dorizz Store! Berikut adalah data akun kamu:\n\n📧 Email  : {{akun_email}}\n🔑 Password: {{akun_password}}\n📱 Tipe   : {{tipe}}\n⏱️ Durasi : {{durasi}} hari\n\nHarap simpan data ini dengan baik dan jangan dibagikan ke orang lain.\n\nJika ada kendala, langsung hubungi kami ya! 🙏`,
+    template_warranty: `Halo {{nama}} 👋\n\nKami telah menerima klaim garansi kamu dan sudah kami proses.\n\nBerikut akun pengganti untuk kamu:\n\n📧 Email  : {{akun_email}}\n🔑 Password: {{akun_password}}\n\nMohon maaf atas ketidaknyamanannya. Jika masih ada kendala, jangan ragu untuk menghubungi kami 🙏`,
+  };
+
+  const [showWASettings, setShowWASettings] = useState(false);
+  const [waTemplates, setWaTemplates] = useState<Record<string, string>>({});
+  const [waDraft, setWaDraft] = useState<Record<string, string>>({});
+  const [loadingWASettings, setLoadingWASettings] = useState(false);
+  const [savingWASettings, setSavingWASettings] = useState(false);
+  const [waActiveTab, setWaActiveTab] = useState("template_promo");
+  const [waSettingsMsg, setWaSettingsMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const fetchWASettings = useCallback(async () => {
+    setLoadingWASettings(true);
+    try {
+      const res = await fetch("/api/settings");
+      const json = await res.json();
+      const extracted: Record<string, string> = {};
+      WA_TEMPLATES.forEach(t => {
+        extracted[t.key] = json[t.key] || DEFAULT_TEMPLATES[t.key] || "";
+      });
+      setWaTemplates(extracted);
+      setWaDraft(extracted);
+    } catch (e) {
+      console.error("Gagal fetch WA settings:", e);
+    } finally {
+      setLoadingWASettings(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSaveWASettings = async () => {
+    setSavingWASettings(true);
+    setWaSettingsMsg(null);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(waDraft),
+      });
+      if (!res.ok) throw new Error("Gagal menyimpan");
+      setWaTemplates({ ...waDraft });
+      setWaSettingsMsg({ type: 'success', text: 'Template berhasil disimpan! ✓' });
+      setTimeout(() => setWaSettingsMsg(null), 3000);
+    } catch {
+      setWaSettingsMsg({ type: 'error', text: 'Gagal menyimpan template. Coba lagi.' });
+    } finally {
+      setSavingWASettings(false);
+    }
+  };
+
+  const waHasUnsavedChanges = WA_TEMPLATES.some(t => waDraft[t.key] !== waTemplates[t.key]);
+
+  function insertVariableIntoTemplate(key: string, variable: string) {
+    const el = document.getElementById(`wa-textarea-${key}`) as HTMLTextAreaElement | null;
+    if (!el) {
+      setWaDraft(d => ({ ...d, [key]: (d[key] || '') + variable }));
+      return;
+    }
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const current = waDraft[key] || '';
+    const newVal = current.substring(0, start) + variable + current.substring(end);
+    setWaDraft(d => ({ ...d, [key]: newVal }));
+    setTimeout(() => {
+      el.focus();
+      el.setSelectionRange(start + variable.length, start + variable.length);
+    }, 0);
+  }
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount);
@@ -476,6 +593,17 @@ export default function UsersPage() {
           >
             <TagIcon size={15} />
             Kelola Tag
+          </button>
+
+          {/* WA Template Settings Button */}
+          <button
+            onClick={() => { setShowWASettings(true); fetchWASettings(); }}
+            className="flex items-center gap-2 px-3 py-1.5 h-[38px] rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-sm text-[var(--text-secondary)] hover:text-white hover:border-[#25d366] transition-all"
+            style={{ borderColor: 'rgba(37,211,102,0.25)', color: '#25d366' }}
+            title="Pengaturan template pesan WhatsApp"
+          >
+            <MessageSquare size={15} />
+            Template WA
           </button>
 
           {/* Simpan Tag (N) - muncul saat ada pending changes */}
@@ -1216,6 +1344,237 @@ export default function UsersPage() {
                 Ya, Hapus Tag
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════
+          WA Template Settings Modal
+      ════════════════════════════════════════════ */}
+      {showWASettings && (
+        <div className="modal-overlay" style={{ zIndex: 55 }} onClick={() => { if (!savingWASettings) setShowWASettings(false); }}>
+          <div
+            className="modal-content"
+            style={{ maxWidth: 680, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="modal-header" style={{ flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 10,
+                  background: 'rgba(37,211,102,0.12)',
+                  border: '1px solid rgba(37,211,102,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <MessageSquare size={17} style={{ color: '#25d366' }} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-base">Template Pesan WhatsApp</h3>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)', marginTop: 1 }}>Atur template pesan WA yang dikirim ke pelanggan</p>
+                </div>
+              </div>
+              <button className="btn-icon" onClick={() => setShowWASettings(false)} disabled={savingWASettings}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {loadingWASettings ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0', gap: 10 }}>
+                <Loader2 size={22} className="animate-spin" style={{ color: '#25d366' }} />
+                <span style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Memuat template...</span>
+              </div>
+            ) : (
+              <>
+                {/* Tab navigation */}
+                <div style={{
+                  display: 'flex', gap: 2, padding: '0 20px',
+                  borderBottom: '1px solid rgba(99,102,241,0.1)',
+                  overflowX: 'auto', flexShrink: 0,
+                }}>
+                  {WA_TEMPLATES.map(t => (
+                    <button
+                      key={t.key}
+                      onClick={() => setWaActiveTab(t.key)}
+                      style={{
+                        padding: '10px 14px', fontSize: 12, fontWeight: 600,
+                        whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.15s',
+                        border: 'none', borderRadius: 0,
+                        borderBottom: waActiveTab === t.key ? `2px solid ${t.color}` : '2px solid transparent',
+                        background: 'transparent',
+                        color: waActiveTab === t.key ? t.color : 'var(--text-muted)',
+                        position: 'relative',
+                      }}
+                    >
+                      {t.label}
+                      {waDraft[t.key] !== waTemplates[t.key] && (
+                        <span style={{
+                          width: 5, height: 5, borderRadius: '50%', background: '#fbbf24',
+                          position: 'absolute', top: 8, right: 6,
+                        }} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab content */}
+                <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+                  {WA_TEMPLATES.filter(t => t.key === waActiveTab).map(t => (
+                    <div key={t.key} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {/* Info */}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
+                        borderRadius: 10, background: `${t.color}0f`,
+                        border: `1px solid ${t.color}30`,
+                      }}>
+                        <Info size={14} style={{ color: t.color, flexShrink: 0 }} />
+                        <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                          {t.description}
+                        </p>
+                      </div>
+
+                      {/* Variabel tersedia */}
+                      <div>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>
+                          Variabel Tersedia — klik untuk sisipkan
+                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {t.variables.map(v => (
+                            <button
+                              key={v}
+                              onClick={() => insertVariableIntoTemplate(t.key, `{{${v.replace(/[{}]/g, '')}}}`  )}
+                              style={{
+                                padding: '4px 10px', borderRadius: 7, fontSize: 12, fontWeight: 600,
+                                background: `${t.color}15`, border: `1px solid ${t.color}40`,
+                                color: t.color, cursor: 'pointer', fontFamily: 'monospace',
+                                transition: 'all 0.15s',
+                              }}
+                              title={`Sisipkan ${v}`}
+                            >
+                              {v}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Textarea */}
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                            Isi Pesan
+                          </label>
+                          <button
+                            onClick={() => setWaDraft(d => ({ ...d, [t.key]: DEFAULT_TEMPLATES[t.key] || '' }))}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 5, padding: '3px 10px',
+                              borderRadius: 6, fontSize: 11, color: 'var(--text-muted)',
+                              border: '1px solid rgba(255,255,255,0.1)', background: 'transparent',
+                              cursor: 'pointer', transition: 'color 0.15s',
+                            }}
+                            title="Reset ke template default"
+                          >
+                            <RotateCcw size={11} />
+                            Reset Default
+                          </button>
+                        </div>
+                        <textarea
+                          id={`wa-textarea-${t.key}`}
+                          value={waDraft[t.key] || ''}
+                          onChange={e => setWaDraft(d => ({ ...d, [t.key]: e.target.value }))}
+                          rows={10}
+                          style={{
+                            width: '100%', padding: '12px 14px', borderRadius: 12, resize: 'vertical',
+                            background: 'rgba(255,255,255,0.03)',
+                            border: `1px solid ${waDraft[t.key] !== waTemplates[t.key] ? 'rgba(251,191,36,0.4)' : 'rgba(99,102,241,0.2)'}`,
+                            color: 'var(--text-primary)', fontSize: 13, lineHeight: 1.6,
+                            fontFamily: 'inherit', outline: 'none', transition: 'border-color 0.2s',
+                            minHeight: 200,
+                          }}
+                          placeholder={`Tulis template pesan ${t.label} di sini...`}
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                            {(waDraft[t.key] || '').length} karakter
+                          </span>
+                          {waDraft[t.key] !== waTemplates[t.key] && (
+                            <span style={{ fontSize: 11, color: '#fbbf24' }}>● Belum disimpan</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Preview */}
+                      {waDraft[t.key] && (
+                        <div>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>
+                            Preview
+                          </p>
+                          <div style={{
+                            borderRadius: 12, padding: '14px 16px',
+                            background: 'rgba(37,211,102,0.05)',
+                            border: '1px solid rgba(37,211,102,0.15)',
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <MessageCircle size={14} style={{ color: 'white' }} />
+                              </div>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#25d366' }}>WhatsApp</span>
+                            </div>
+                            <div style={{
+                              background: 'rgba(37,211,102,0.1)', borderRadius: '0 10px 10px 10px',
+                              padding: '10px 14px', maxWidth: '85%',
+                            }}>
+                              <p style={{ fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.6, wordBreak: 'break-word' }}>
+                                {(waDraft[t.key] || '').replace(/\{\{nama\}\}/g, 'Budi Santoso').replace(/\{\{akun_email\}\}/g, 'example@mail.com').replace(/\{\{akun_password\}\}/g, 'P@ssw0rd123').replace(/\{\{tipe\}\}/g, 'CapCut Pro').replace(/\{\{durasi\}\}/g, '30')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer */}
+                <div className="modal-footer" style={{ flexShrink: 0, flexDirection: 'column', gap: 10, alignItems: 'stretch' }}>
+                  {waSettingsMsg && (
+                    <div style={{
+                      padding: '10px 14px', borderRadius: 10, fontSize: 13, fontWeight: 500,
+                      background: waSettingsMsg.type === 'success' ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                      border: `1px solid ${waSettingsMsg.type === 'success' ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                      color: waSettingsMsg.type === 'success' ? '#4ade80' : '#f87171',
+                      textAlign: 'center',
+                    }}>
+                      {waSettingsMsg.text}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => { setWaDraft({ ...waTemplates }); setShowWASettings(false); }}
+                      disabled={savingWASettings}
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={handleSaveWASettings}
+                      disabled={savingWASettings || !waHasUnsavedChanges}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 7,
+                        padding: '9px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                        background: waHasUnsavedChanges ? 'linear-gradient(135deg, #16a34a, #25d366)' : 'rgba(255,255,255,0.05)',
+                        border: 'none', color: waHasUnsavedChanges ? 'white' : 'var(--text-muted)',
+                        cursor: savingWASettings || !waHasUnsavedChanges ? 'not-allowed' : 'pointer',
+                        transition: 'all 0.2s',
+                        opacity: savingWASettings ? 0.7 : 1,
+                      }}
+                    >
+                      {savingWASettings ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                      {savingWASettings ? 'Menyimpan...' : waHasUnsavedChanges ? 'Simpan Semua Template' : 'Tersimpan'}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
