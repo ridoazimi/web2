@@ -9,6 +9,7 @@ import { usePrivacy } from "@/context/PrivacyContext";
 import { useMobileNav } from "@/context/MobileNavContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface TopbarProps {
   title: string;
@@ -113,7 +114,7 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
         </button>
 
         <div className="min-w-0">
-          <h2 className="text-base md:text-xl font-bold text-white leading-tight truncate">{title}</h2>
+          <h2 className="text-base md:text-xl font-bold text-[var(--text-primary)] leading-tight truncate">{title}</h2>
           {subtitle && (
             <p className="text-xs md:text-sm text-[var(--text-secondary)] mt-0.5 hidden sm:block">{subtitle}</p>
           )}
@@ -124,6 +125,8 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">
+        <ThemeToggle />
+
         {/* Privacy Toggle */}
         <button
           onClick={toggle}
@@ -172,7 +175,7 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
               >
                 <div className="flex items-center gap-2">
                   <ClipboardList size={15} className="text-[#818cf8]" />
-                  <p className="text-sm font-bold text-white">Tugas Hari Ini</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Tugas Hari Ini</p>
                 </div>
                 <p className="text-[11px] text-[var(--text-muted)] capitalize">{today}</p>
               </div>
@@ -214,7 +217,7 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
                             className={`text-sm font-medium leading-snug ${
                               a.status === "done"
                                 ? "line-through text-[var(--text-muted)]"
-                                : "text-white"
+                                : "text-[var(--text-primary)]"
                             }`}
                           >
                             {a.task.title}
@@ -273,7 +276,7 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
             </div>
             {/* Name + role — md+ only */}
             <div className="hidden md:block text-left">
-              <p className="text-xs font-semibold text-white leading-tight">{user?.name || "..."}</p>
+              <p className="text-xs font-semibold text-[var(--text-primary)] leading-tight">{user?.name || "..."}</p>
               <div className="flex items-center gap-1">
                 {isDeveloper
                   ? <><Shield size={9} className="text-amber-400" /><span className="text-[10px] text-amber-400 font-medium">Developer</span></>
@@ -292,7 +295,7 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
             >
               {/* User info */}
               <div className="px-4 py-3 border-b border-white/5">
-                <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{user?.name}</p>
                 <p className="text-xs text-[var(--text-muted)] truncate">{user?.email}</p>
                 <div className="flex items-center gap-1 mt-1">
                   {isDeveloper

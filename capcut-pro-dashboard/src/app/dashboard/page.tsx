@@ -114,7 +114,7 @@ function PenjualanTooltip({ active, payload }: any) {
       backdropFilter: "blur(16px)",
     }}>
       <p style={{ color: "#818cf8", fontSize: 11, fontWeight: 600, marginBottom: 2 }}>{d?.periodLabel || d?.label}</p>
-      <p style={{ color: "white", fontSize: 14, fontWeight: 700 }}>
+      <p style={{ color: "var(--text-primary)", fontSize: 14, fontWeight: 700 }}>
         {payload[0]?.value} transaksi
       </p>
     </div>
@@ -133,7 +133,7 @@ function OmsetTooltip({ active, payload }: any) {
       backdropFilter: "blur(16px)",
     }}>
       <p style={{ color: "#34d399", fontSize: 11, fontWeight: 600, marginBottom: 2 }}>{d?.periodLabel || d?.label}</p>
-      <p style={{ color: "white", fontSize: 14, fontWeight: 700 }}>
+      <p style={{ color: "var(--text-primary)", fontSize: 14, fontWeight: 700 }}>
         {formatCurrency(payload[0]?.value || 0)}
       </p>
     </div>
@@ -152,7 +152,7 @@ function UserTooltip({ active, payload }: any) {
       backdropFilter: "blur(16px)",
     }}>
       <p style={{ color: "#22d3ee", fontSize: 11, fontWeight: 600, marginBottom: 2 }}>{d?.periodLabel || d?.label}</p>
-      <p style={{ color: "white", fontSize: 14, fontWeight: 700 }}>
+      <p style={{ color: "var(--text-primary)", fontSize: 14, fontWeight: 700 }}>
         +{payload[0]?.value} pelanggan baru
       </p>
     </div>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
                     <stat.icon size={15} style={{ color: stat.color }} />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white leading-none">{stat.value}</p>
+                    <p className="text-sm font-bold text-[var(--text-primary)] leading-none">{stat.value}</p>
                     <p className="text-[10px] text-[var(--text-muted)] mt-0.5 leading-none">{stat.label}</p>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
                       <stat.icon size={20} style={{ color: stat.color }} />
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-2xl font-bold text-[var(--text-primary)]">{stat.value}</p>
                   <p className="text-sm text-[var(--text-secondary)] mt-1">{stat.label}</p>
                 </div>
               ))}
@@ -301,7 +301,7 @@ export default function DashboardPage() {
               {/* Header + Range Selector */}
               <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                 <div>
-                  <h3 className="font-semibold text-white text-base">Tren Performa Bisnis</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)] text-base">Tren Performa Bisnis</h3>
                   <p className="text-xs text-[var(--text-muted)] mt-0.5">
                     Penjualan, omset, dan penambahan pelanggan
                   </p>
@@ -344,21 +344,21 @@ export default function DashboardPage() {
                             <ShoppingCart size={11} style={{ color: "#818cf8" }} />
                             <span className="text-[10px] text-[var(--text-muted)]">Penjualan</span>
                           </div>
-                          <p className="text-sm font-bold text-white">{chartData.summary.totalPenjualan.toLocaleString("id-ID")}</p>
+                          <p className="text-sm font-bold text-[var(--text-primary)]">{chartData.summary.totalPenjualan.toLocaleString("id-ID")}</p>
                         </div>
                         <div className="flex-1 rounded-xl px-3 py-2" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)" }}>
                           <div className="flex items-center gap-1.5 mb-0.5">
                             <DollarSign size={11} style={{ color: "#34d399" }} />
                             <span className="text-[10px] text-[var(--text-muted)]">Omset</span>
                           </div>
-                          <p className="text-sm font-bold text-white">{formatCurrencyShort(chartData.summary.totalOmset)}</p>
+                          <p className="text-sm font-bold text-[var(--text-primary)]">{formatCurrencyShort(chartData.summary.totalOmset)}</p>
                         </div>
                         <div className="flex-1 rounded-xl px-3 py-2" style={{ background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.15)" }}>
                           <div className="flex items-center gap-1.5 mb-0.5">
                             <UserPlus size={11} style={{ color: "#22d3ee" }} />
                             <span className="text-[10px] text-[var(--text-muted)]">User Baru</span>
                           </div>
-                          <p className="text-sm font-bold text-white">{chartData.summary.totalNewUser.toLocaleString("id-ID")}</p>
+                          <p className="text-sm font-bold text-[var(--text-primary)]">{chartData.summary.totalNewUser.toLocaleString("id-ID")}</p>
                         </div>
                       </div>
 
@@ -369,7 +369,7 @@ export default function DashboardPage() {
                           <ShoppingCart size={13} style={{ color: "#818cf8" }} />
                           <span className="text-xs text-[var(--text-muted)]">Total Penjualan</span>
                         </div>
-                        <p className="text-xl font-bold text-white">{chartData.summary.totalPenjualan.toLocaleString("id-ID")}</p>
+                        <p className="text-xl font-bold text-[var(--text-primary)]">{chartData.summary.totalPenjualan.toLocaleString("id-ID")}</p>
                         <p className="text-xs text-[var(--text-muted)]">transaksi sukses</p>
                       </div>
                       <div className="rounded-xl px-4 py-3" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)" }}>
@@ -377,7 +377,7 @@ export default function DashboardPage() {
                           <DollarSign size={13} style={{ color: "#34d399" }} />
                           <span className="text-xs text-[var(--text-muted)]">Total Omset</span>
                         </div>
-                        <p className="text-xl font-bold text-white">{formatCurrency(chartData.summary.totalOmset)}</p>
+                        <p className="text-xl font-bold text-[var(--text-primary)]">{formatCurrency(chartData.summary.totalOmset)}</p>
                         <p className="text-xs text-[var(--text-muted)]">pendapatan kotor</p>
                       </div>
                       <div className="rounded-xl px-4 py-3" style={{ background: "rgba(34,211,238,0.08)", border: "1px solid rgba(34,211,238,0.15)" }}>
@@ -385,7 +385,7 @@ export default function DashboardPage() {
                           <UserPlus size={13} style={{ color: "#22d3ee" }} />
                           <span className="text-xs text-[var(--text-muted)]">User Baru</span>
                         </div>
-                        <p className="text-xl font-bold text-white">{chartData.summary.totalNewUser.toLocaleString("id-ID")}</p>
+                        <p className="text-xl font-bold text-[var(--text-primary)]">{chartData.summary.totalNewUser.toLocaleString("id-ID")}</p>
                         <p className="text-xs text-[var(--text-muted)]">pelanggan bergabung</p>
                       </div>
                       </div>
@@ -396,7 +396,7 @@ export default function DashboardPage() {
                   <div className="mb-8">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#818cf8" }} />
-                      <span className="text-sm font-semibold text-white">Grafik Penjualan</span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">Grafik Penjualan</span>
                       <span className="text-xs text-[var(--text-muted)]">(jumlah transaksi per periode)</span>
                     </div>
                     <ResponsiveContainer width="100%" height={200}>
@@ -432,7 +432,7 @@ export default function DashboardPage() {
                   <div className="mb-8">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#34d399" }} />
-                      <span className="text-sm font-semibold text-white">Grafik Omset</span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">Grafik Omset</span>
                       <span className="text-xs text-[var(--text-muted)]">(total revenue per periode)</span>
                     </div>
                     <ResponsiveContainer width="100%" height={200}>
@@ -476,7 +476,7 @@ export default function DashboardPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#22d3ee" }} />
-                      <span className="text-sm font-semibold text-white">Grafik Penambahan Pelanggan</span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)]">Grafik Penambahan Pelanggan</span>
                       <span className="text-xs text-[var(--text-muted)]">(user baru per periode)</span>
                     </div>
                     <ResponsiveContainer width="100%" height={200}>
@@ -527,7 +527,7 @@ export default function DashboardPage() {
               {/* Recent Transactions */}
               <div className="xl:col-span-2 glass-card overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(99,102,241,0.1)]">
-                  <h3 className="font-semibold text-white">Transaksi Terbaru</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)]">Transaksi Terbaru</h3>
                   <a href="/transactions" className="text-sm text-[#818cf8] hover:text-[#a5b4fc] transition-colors">
                     Lihat Semua →
                   </a>
@@ -568,7 +568,7 @@ export default function DashboardPage() {
               {/* Expiring Soon */}
               <div className="glass-card overflow-hidden">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[rgba(99,102,241,0.1)]">
-                  <h3 className="font-semibold text-white flex items-center gap-2">
+                  <h3 className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                     <AlertTriangle size={16} className="text-amber-400" />
                     Segera Expired
                   </h3>
@@ -583,7 +583,7 @@ export default function DashboardPage() {
                       <div key={idx} className="px-6 py-4 hover:bg-[rgba(99,102,241,0.04)] transition-colors">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <p className="font-medium text-white text-sm">{item.user?.name || "-"}</p>
+                            <p className="font-medium text-[var(--text-primary)] text-sm">{item.user?.name || "-"}</p>
                             <p className="text-xs text-[var(--text-muted)] mt-0.5">{maskPhone(item.user?.whatsapp)}</p>
                           </div>
                           <span className="badge badge-warning text-[11px]">{formatDate(item.warrantyExpiredAt)}</span>

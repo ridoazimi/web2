@@ -111,14 +111,14 @@ export default function Sidebar() {
               <ShoppingBag size={18} className="text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white tracking-tight">Dorizz Store</h1>
+              <h1 className="text-base font-bold text-[var(--text-primary)] tracking-tight">Dorizz Store</h1>
               <p className="text-[11px] text-[var(--text-muted)]">Management Dashboard</p>
             </div>
           </div>
           {/* Close button — mobile only */}
           <button
             onClick={close}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-[var(--text-muted)] hover:text-white hover:bg-white/10 transition-colors"
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/10 transition-colors"
           >
             <X size={18} />
           </button>

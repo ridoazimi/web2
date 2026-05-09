@@ -37,7 +37,7 @@ export default function ClaimWarrantyPage() {
         setIsValid(true);
       }
     } catch (error) {
-      setCheckResult({ valid: false, message: "Terjadi kesalahan saat memeriksa." });
+      setCheckResult({ valid: false, message: "Transaksi tidak ditemukan." });
     } finally {
       setChecking(false);
     }

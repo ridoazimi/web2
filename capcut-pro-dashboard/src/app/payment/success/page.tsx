@@ -79,7 +79,7 @@ export default async function PaymentSuccessPage({ searchParams }: { searchParam
               {isSuccess && !hasAccount ? "Pesanan Pre-order Diterima" : "Menyiapkan Akun Anda..."}
             </h1>
             <p className="text-[var(--text-secondary)] text-sm mb-6 leading-relaxed">
-              {isSuccess && !hasAccount 
+              {isSuccess && !hasAccount
                 ? "Pembayaran berhasil! Karena ini adalah layanan Pre-order, admin akan memproses akun Anda secara manual dalam 1-24 jam. Anda akan dihubungi via WhatsApp."
                 : "Pembayaran Anda sedang kami verifikasi. Akun sedang dialokasikan untuk Anda. Mohon tunggu, halaman ini akan memuat ulang otomatis."
               }
@@ -101,10 +101,10 @@ export default async function PaymentSuccessPage({ searchParams }: { searchParam
                 <span className="text-sm font-semibold">{transaction.productName}</span>
               </div>
             </div>
-            
+
             {isSuccess && !hasAccount && (
-              <Link 
-                href="https://wa.me/6281234567890" 
+              <Link
+                href="https://wa.me/6281234567890"
                 target="_blank"
                 className="mt-6 flex items-center justify-center w-full h-12 rounded-xl bg-[#25D366] text-white font-bold hover:shadow-[0_0_20px_rgba(37,211,102,0.4)] transition-all gap-2"
               >
@@ -259,12 +259,12 @@ export default async function PaymentSuccessPage({ searchParams }: { searchParam
                   Jika Anda mengalami kendala saat login atau memiliki pertanyaan seputar garansi, tim support kami siap membantu Anda.
                 </p>
                 <a
-                  href="https://whatsapp.com/channel/0029VbBCTMe6RGJ9rloaoe05"
+                  href="https://api.whatsapp.com/send/?phone=6285277815289&text=Halo%20admin"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-full h-12 gap-2 rounded-xl bg-[#25D366] text-white font-bold hover:shadow-[0_0_20px_rgba(37,211,102,0.4)] transition-all"
                 >
-                  Join Channel WhatsApp
+                  Hubungi Admin
                 </a>
               </div>
 

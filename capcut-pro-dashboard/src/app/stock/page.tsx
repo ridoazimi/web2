@@ -552,7 +552,7 @@ export default function StockPage() {
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg" style={{ background: "rgba(34,197,94,0.12)", color: "#4ade80" }}>{mobileTotal}</span>
             </div>
             {/* Stats row */}
-            <div className="grid grid-cols-2 gap-1 pt-1 border-t border-green-500/10">
+            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-green-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{mobileStatusCounts.available || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
@@ -560,6 +560,10 @@ export default function StockPage() {
               <div className="text-center border-l border-green-500/10">
                 <p className="text-lg font-bold text-slate-400">{mobileStatusCounts.sold || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+              </div>
+              <div className="text-center border-l border-green-500/10">
+                <p className="text-lg font-bold text-amber-400">{remainingSlotsMobile}</p>
+                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -590,7 +594,7 @@ export default function StockPage() {
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg" style={{ background: "rgba(59,130,246,0.12)", color: "#60a5fa" }}>{desktopTotal}</span>
             </div>
             {/* Stats row */}
-            <div className="grid grid-cols-2 gap-1 pt-1 border-t border-blue-500/10">
+            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-blue-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{desktopStatusCounts.available || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
@@ -598,6 +602,10 @@ export default function StockPage() {
               <div className="text-center border-l border-blue-500/10">
                 <p className="text-lg font-bold text-slate-400">{desktopStatusCounts.sold || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+              </div>
+              <div className="text-center border-l border-blue-500/10">
+                <p className="text-lg font-bold text-amber-400">{remainingSlotsDesktop}</p>
+                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -626,7 +634,7 @@ export default function StockPage() {
               </div>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg" style={{ background: "rgba(167,139,250,0.12)", color: "#a78bfa" }}>{saleTotal}</span>
             </div>
-            <div className="grid grid-cols-2 gap-1 pt-1 border-t border-purple-500/10">
+            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-purple-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{saleStatusCounts.available || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
@@ -634,6 +642,10 @@ export default function StockPage() {
               <div className="text-center border-l border-purple-500/10">
                 <p className="text-lg font-bold text-slate-400">{saleStatusCounts.sold || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+              </div>
+              <div className="text-center border-l border-purple-500/10">
+                <p className="text-lg font-bold text-amber-400">{remainingSlotsSale}</p>
+                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -662,7 +674,7 @@ export default function StockPage() {
               </div>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg" style={{ background: "rgba(244,114,182,0.12)", color: "#f472b6" }}>{warrantyTotal}</span>
             </div>
-            <div className="grid grid-cols-2 gap-1 pt-1 border-t border-pink-500/10">
+            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-pink-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{warrantyStatusCounts.available || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
@@ -670,6 +682,10 @@ export default function StockPage() {
               <div className="text-center border-l border-pink-500/10">
                 <p className="text-lg font-bold text-slate-400">{warrantyStatusCounts.sold || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+              </div>
+              <div className="text-center border-l border-pink-500/10">
+                <p className="text-lg font-bold text-amber-400">{remainingSlotsWarranty}</p>
+                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -690,7 +706,7 @@ export default function StockPage() {
               </div>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-lg" style={{ background: "rgba(129,140,248,0.12)", color: "#818cf8" }}>{(statusCounts.available || 0) + (statusCounts.sold || 0)}</span>
             </div>
-            <div className="grid grid-cols-2 gap-1 pt-1 border-t border-indigo-500/10">
+            <div className="grid grid-cols-3 gap-1 pt-1 border-t border-indigo-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{statusCounts.available || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
@@ -698,6 +714,10 @@ export default function StockPage() {
               <div className="text-center border-l border-indigo-500/10">
                 <p className="text-lg font-bold text-slate-400">{statusCounts.sold || 0}</p>
                 <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+              </div>
+              <div className="text-center border-l border-indigo-500/10">
+                <p className="text-lg font-bold text-amber-400">{remainingSlotsMobile + remainingSlotsDesktop}</p>
+                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
               </div>
             </div>
           </div>
