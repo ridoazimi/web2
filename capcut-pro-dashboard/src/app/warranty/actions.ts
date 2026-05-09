@@ -6,17 +6,33 @@ export async function checkTransactionValidity(orderId: string) {
   try {
     if (!orderId) return { valid: false, message: "Order ID tidak boleh kosong" };
 
-    const transaction = await prisma.transaction.findUnique({
-      where: { id: orderId },
-      include: {
-        user: true,
-        stockAccount: {
-          include: {
-            product: true
-          }
+    // Cek apakah orderId adalah UUID valid
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orderId);
+    
+    let transaction = null;
+    if (isUuid) {
+      transaction = await prisma.transaction.findUnique({
+        where: { id: orderId },
+        include: {
+          user: true,
+          stockAccount: { include: { product: true } }
         }
-      }
-    });
+      });
+    } else {
+      // Jika bukan UUID, coba cari di paymentData -> order_id (untuk KlikQRIS)
+      transaction = await prisma.transaction.findFirst({
+        where: {
+          paymentData: {
+            path: ['order_id'],
+            equals: orderId
+          }
+        },
+        include: {
+          user: true,
+          stockAccount: { include: { product: true } }
+        }
+      });
+    }
 
     if (!transaction) {
       return { valid: false, message: "Transaksi tidak ditemukan. Pastikan Order ID benar." };
@@ -45,6 +61,7 @@ export async function checkTransactionValidity(orderId: string) {
 
     return { 
       valid: true, 
+      transactionId: transaction.id, // Kembalikan UUID asli
       productName: transaction.productName,
       purchaseDate: transaction.purchaseDate,
       warrantyExpiredAt: transaction.warrantyExpiredAt,
@@ -69,9 +86,17 @@ export async function submitWarrantyClaim(formData: FormData) {
 
     if (!orderId) return { success: false, message: "Order ID tidak boleh kosong" };
 
+    // Validasi ulang transaksi untuk mendapatkan UUID asli
+    const checkResult = await checkTransactionValidity(orderId);
+    if (!checkResult.valid || !checkResult.transactionId) {
+      return { success: false, message: checkResult.message || "Transaksi tidak valid" };
+    }
+
+    const realTransactionId = checkResult.transactionId;
+
     // Cek apakah sudah ada klaim pending
     const existingPending = await prisma.warrantyClaim.findFirst({
-      where: { transactionId: orderId, status: "pending" }
+      where: { transactionId: realTransactionId, status: "pending" }
     });
 
     if (existingPending) {
@@ -80,27 +105,31 @@ export async function submitWarrantyClaim(formData: FormData) {
 
     let evidenceUrl = null;
     if (photo && photo.size > 0) {
-      // Create uploads directory if not exists
-      const uploadsDir = path.join(process.cwd(), "storage/uploads/warranty");
       try {
+        const uploadsDir = path.join(process.cwd(), "storage/uploads/warranty");
         await mkdir(uploadsDir, { recursive: true });
-      } catch (err) {}
 
-      const bytes = await photo.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+        const bytes = await photo.arrayBuffer();
+        const buffer = Buffer.from(bytes);
 
-      // Generate unique filename
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      const filename = `${uniqueSuffix}-${photo.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-      const filePath = path.join(uploadsDir, filename);
+        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+        const filename = `${uniqueSuffix}-${photo.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+        const filePath = path.join(uploadsDir, filename);
 
-      await writeFile(filePath, buffer);
-      evidenceUrl = `/api/uploads/warranty/${filename}`;
+        await writeFile(filePath, buffer);
+        evidenceUrl = `/api/uploads/warranty/${filename}`;
+        console.log(`[Warranty Upload] Success: ${evidenceUrl}`);
+      } catch (uploadErr) {
+        console.error("[Warranty Upload] Failed:", uploadErr);
+        // Tetap lanjut meski upload gagal? Atau stop? 
+        // Sebaiknya stop jika bukti foto wajib.
+        return { success: false, message: "Gagal mengunggah foto bukti. Silakan coba lagi." };
+      }
     }
 
     await prisma.warrantyClaim.create({
       data: {
-        transaction: { connect: { id: orderId } },
+        transaction: { connect: { id: realTransactionId } },
         ...(oldAccountId ? { oldAccount: { connect: { id: oldAccountId } } } : {}),
         claimReason: issue,
         evidenceUrl: evidenceUrl,
@@ -109,8 +138,8 @@ export async function submitWarrantyClaim(formData: FormData) {
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Submit Warranty Error:", error);
-    return { success: false, message: "Terjadi kesalahan saat menyimpan klaim." };
+    return { success: false, message: `Gagal menyimpan klaim: ${error.message || "Kesalahan internal"}` };
   }
 }

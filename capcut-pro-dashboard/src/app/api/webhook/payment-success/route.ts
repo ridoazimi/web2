@@ -21,17 +21,27 @@ export async function POST(req: NextRequest) {
     console.log("[Webhook Payment Success] Received:", JSON.stringify(payload, null, 2));
 
     const transactionId = payload.order_id || payload.transaction_id;
-    const status = payload.status; // misal "PAID", "SUCCESS", atau true
+    const status = payload.status; 
+    
     if (!transactionId) {
+      console.error("[Webhook Payment Success] Missing order_id in payload:", payload);
       return NextResponse.json({ error: "Missing order_id" }, { status: 400 });
     }
 
     // Ambil data transaksi
-    const transaction = await prisma.transaction.findUnique({
-      where: { id: transactionId },
-      include: { user: true }
-    });
+    // Cek apakah transactionId adalah UUID valid untuk query ke DB
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(transactionId);
+    
+    let transaction = null;
+    if (isUuid) {
+      transaction = await prisma.transaction.findUnique({
+        where: { id: transactionId },
+        include: { user: true }
+      });
+    }
+
     if (!transaction) {
+      console.warn(`[Webhook Payment Success] Transaksi dengan ID ${transactionId} tidak ditemukan.`);
       return NextResponse.json({ error: "Transaksi tidak ditemukan" }, { status: 404 });
     }
 
@@ -40,27 +50,42 @@ export async function POST(req: NextRequest) {
     const receivedSignature = payload.signature;
     const dbPaymentData = transaction.paymentData as any;
     const expectedSignature = dbPaymentData?.signature;
+
     if (!expectedSignature || receivedSignature !== expectedSignature) {
       console.error("[Webhook Payment Success] Invalid Signature! Expected:", expectedSignature, "Received:", receivedSignature);
+      // Catatan: Jika di sandbox signature sering berubah, mungkin perlu log saja atau bypass di env tertentu
       return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
     }
+
     // Hanya proses jika status menunjukkan keberhasilan
-    // Jika payload.status adalah boolean true (dari KlikQRIS) atau string success/paid
     const isPaid = status === true || status === "PAID" || status === "SUCCESS" || payload.status_pembayaran === "LUNAS";
     if (!isPaid) {
+      console.log(`[Webhook] Status pembayaran ${status} untuk trx ${transactionId}, diabaikan.`);
       return NextResponse.json({ message: "Status belum lunas, diabaikan." }, { status: 200 });
     }
+
+    // Validasi nominal (opsional tapi disarankan)
+    const payloadAmount = Number(payload.amount || payload.total_amount || 0);
+    const trxAmount = Number(transaction.amount);
+    if (payloadAmount > 0 && payloadAmount < trxAmount) {
+      console.error(`[Webhook] Nominal tidak sesuai untuk ${transactionId}. Expected >= ${trxAmount}, got ${payloadAmount}`);
+      return NextResponse.json({ error: "Nominal tidak sesuai" }, { status: 400 });
+    }
+
     if (transaction.status === "success") {
       return NextResponse.json({ message: "Transaksi sudah diproses sebelumnya" }, { status: 200 });
     }
+
     if (!transaction.user) {
       return NextResponse.json({ error: "User tidak ditemukan dalam transaksi" }, { status: 400 });
     }
+
     const user = transaction.user;
     const productTitle = transaction.productName || "CapCut Pro";
     const productData = await prisma.product.findFirst({
       where: { name: productTitle }
     });
+
     const productType = parseProductType(productTitle);
     const durationDays = productData?.duration || parseDuration(productTitle) || 30;
 
@@ -87,12 +112,13 @@ export async function POST(req: NextRequest) {
         ) ?? null;
       }
 
-      const purchaseDate = new Date();
+      // Gunakan tanggal pembayaran dari payload jika ada, jika tidak gunakan waktu sekarang
+      const purchaseDate = payload.payment_date ? new Date(payload.payment_date) : new Date();
       const warrantyExpiredAt = calcWarrantyExpiry(purchaseDate, durationDays);
 
       // 2. Update Transaksi (Selalu Sukses jika sudah lunas, meski stok kosong/pre-order)
       const updatedTrx = await tx.transaction.update({
-        where: { id: transactionId },
+        where: { id: transaction.id },
         data: {
           status: "success",
           stockAccountId: account?.id || null,

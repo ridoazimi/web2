@@ -52,10 +52,13 @@ export async function createProduct(formData: FormData) {
     const name = formData.get("name") as string;
     const slug = formData.get("slug") as string;
     const description = formData.get("description") as string;
-    const price = parseFloat(formData.get("price") as string);
+    const priceStr = formData.get("price") as string;
+    const price = parseFloat(priceStr || "0");
     const category = formData.get("category") as string;
-    const maxSlots = parseInt(formData.get("maxSlots") as string);
-    const duration = parseInt(formData.get("duration") as string);
+    const maxSlotsStr = formData.get("maxSlots") as string;
+    const maxSlots = parseInt(maxSlotsStr || "3");
+    const durationStr = formData.get("duration") as string;
+    const duration = parseInt(durationStr || "30");
     const isActive = formData.get("isActive") === "true";
     const rules = formData.get("rules") as string;
     const messageTemplate = formData.get("messageTemplate") as string;
@@ -63,17 +66,23 @@ export async function createProduct(formData: FormData) {
     let imageUrl = formData.get("imageUrl") as string || "";
 
     if (imageFile && imageFile.size > 0) {
-      const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
       try {
+        const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
         await mkdir(uploadsDir, { recursive: true });
-      } catch (err) {}
 
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-      const filePath = path.join(uploadsDir, filename);
-      await writeFile(filePath, buffer);
-      imageUrl = `/api/uploads/products/${filename}`;
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+        const filePath = path.join(uploadsDir, filename);
+        
+        await writeFile(filePath, buffer);
+        imageUrl = `/api/uploads/products/${filename}`;
+        console.log(`[Product Upload] Success: ${imageUrl}`);
+      } catch (uploadErr) {
+        console.error("[Product Upload] Failed:", uploadErr);
+        // If upload fails, we can either throw or continue with empty imageUrl
+        throw new Error("Gagal mengunggah gambar produk. Pastikan server memiliki izin menulis.");
+      }
     }
 
     const product = await prisma.product.create({
@@ -94,9 +103,9 @@ export async function createProduct(formData: FormData) {
     revalidatePath("/dashboard/products");
     revalidatePath("/");
     return product;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating product:", error);
-    throw error;
+    throw new Error(error.message || "Gagal membuat produk");
   }
 }
 
@@ -108,10 +117,13 @@ export async function updateProduct(id: string, formData: FormData) {
     const name = formData.get("name") as string;
     const slug = formData.get("slug") as string;
     const description = formData.get("description") as string;
-    const price = parseFloat(formData.get("price") as string);
+    const priceStr = formData.get("price") as string;
+    const price = parseFloat(priceStr || "0");
     const category = formData.get("category") as string;
-    const maxSlots = parseInt(formData.get("maxSlots") as string);
-    const duration = parseInt(formData.get("duration") as string);
+    const maxSlotsStr = formData.get("maxSlots") as string;
+    const maxSlots = parseInt(maxSlotsStr || "3");
+    const durationStr = formData.get("duration") as string;
+    const duration = parseInt(durationStr || "30");
     const isActive = formData.get("isActive") === "true";
     const rules = formData.get("rules") as string;
     const messageTemplate = formData.get("messageTemplate") as string;
@@ -119,17 +131,22 @@ export async function updateProduct(id: string, formData: FormData) {
     let imageUrl = formData.get("imageUrl") as string || "";
 
     if (imageFile && imageFile.size > 0) {
-      const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
       try {
+        const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
         await mkdir(uploadsDir, { recursive: true });
-      } catch (err) {}
 
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-      const filePath = path.join(uploadsDir, filename);
-      await writeFile(filePath, buffer);
-      imageUrl = `/api/uploads/products/${filename}`;
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+        const filePath = path.join(uploadsDir, filename);
+        
+        await writeFile(filePath, buffer);
+        imageUrl = `/api/uploads/products/${filename}`;
+        console.log(`[Product Update Upload] Success: ${imageUrl}`);
+      } catch (uploadErr) {
+        console.error("[Product Update Upload] Failed:", uploadErr);
+        throw new Error("Gagal mengunggah gambar produk baru.");
+      }
     }
 
     const product = await prisma.product.update({
@@ -142,7 +159,7 @@ export async function updateProduct(id: string, formData: FormData) {
         category,
         maxSlots,
         duration,
-        imageUrl,
+        ...(imageUrl ? { imageUrl } : {}), // Only update if new image uploaded
         isActive,
         rules,
         messageTemplate,
