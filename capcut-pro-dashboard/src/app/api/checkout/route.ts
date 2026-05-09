@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { productId, name, email, whatsapp, affiliateCode } = await req.json();
+    const { productId, name, email, whatsapp, affiliateCode, voucherCode } = await req.json();
 
     if (!productId || !name || !email || !whatsapp) {
       return NextResponse.json({ error: "Mohon lengkapi semua data" }, { status: 400 });
@@ -45,11 +45,43 @@ export async function POST(req: Request) {
       });
     }
 
+    // Handle Voucher
+    let discount = 0;
+    let finalAmount = Number(product.price);
+
+    if (voucherCode) {
+      const voucher = await prisma.voucher.findUnique({
+        where: { code: voucherCode.toUpperCase() }
+      });
+
+      if (voucher && voucher.isActive) {
+        // Simple validation again on server
+        const isExpired = voucher.expiryDate && new Date() > new Date(voucher.expiryDate);
+        const isFull = voucher.maxUsage !== null && (voucher.currentUsage || 0) >= voucher.maxUsage;
+        const isMinPurchaseMet = finalAmount >= Number(voucher.minPurchase);
+
+        if (!isExpired && !isFull && isMinPurchaseMet) {
+          if (voucher.type === "PERCENTAGE") {
+            discount = (finalAmount * Number(voucher.value)) / 100;
+          } else {
+            discount = Number(voucher.value);
+          }
+          finalAmount = Math.max(0, finalAmount - discount);
+
+          // Update usage count
+          await prisma.voucher.update({
+            where: { id: voucher.id },
+            data: { currentUsage: { increment: 1 } }
+          });
+        }
+      }
+    }
+
     // Buat Transaksi
     const transaction = await prisma.transaction.create({
       data: {
         userId: user.id,
-        amount: product.price,
+        amount: finalAmount,
         productName: product.name,
         status: "pending",
         source: "website",
@@ -75,7 +107,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           order_id: transaction.id,
-          amount: Math.round(Number(product.price)),
+          amount: Math.round(finalAmount),
           id_merchant: klikQrisMerchantId,
           keterangan: `Pembayaran ${product.name} - ${email}`
         })
@@ -105,7 +137,7 @@ export async function POST(req: Request) {
         success: true,
         transactionId: transaction.id,
         productName: product.name,
-        price: Number(product.price),
+        price: finalAmount,
         paymentData: (qrisData && qrisData.status === true) ? qrisData.data : null
       });
 

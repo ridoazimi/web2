@@ -26,7 +26,7 @@ export interface AuthPayload {
   id: string;
   email: string;
   name: string;
-  role: "developer" | "admin";
+  role: "developer" | "admin" | "superadmin";
 }
 
 export interface AdminUserWithPermissions {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Check, ShieldCheck, Loader2 } from "lucide-react";
+import { validateVoucher } from "@/app/dashboard/vouchers/actions";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -20,12 +21,44 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
   const [error, setError] = useState("");
   const [qrisData, setQrisData] = useState<any>(null);
 
+  const [voucherData, setVoucherData] = useState<any>(null);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [validatingVoucher, setValidatingVoucher] = useState(false);
+  const [voucherError, setVoucherError] = useState("");
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCode) return;
+    setValidatingVoucher(true);
+    setVoucherError("");
+    
+    try {
+      const res = await validateVoucher(voucherCode, Number(product.price));
+      
+      if (res.success) {
+        setVoucherData(res);
+      } else {
+        setVoucherError(res.error || "Gagal menerapkan voucher");
+        setVoucherData(null);
+      }
+    } catch (err) {
+      setVoucherError("Terjadi kesalahan");
+    } finally {
+      setValidatingVoucher(false);
+    }
+  };
+
+  const calculateTotal = () => {
+    const price = Number(product.price);
+    if (!voucherData) return price;
+    return Math.max(0, price - (voucherData.discount || 0));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +72,8 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId: product.id,
-          ...formData
+          ...formData,
+          voucherCode: voucherData?.code || null
         })
       });
 
@@ -170,14 +204,37 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2.5 ml-1">Kode Promo / Affiliate (Opsional)</label>
-                    <input
-                      type="text"
-                      value={formData.affiliateCode}
-                      onChange={e => setFormData({ ...formData, affiliateCode: e.target.value })}
-                      placeholder="Punya kode referal?"
-                      className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-4 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-all"
-                    />
+                    <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-2.5 ml-1">Kode Voucher (Opsional)</label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="text"
+                          value={voucherCode}
+                          onChange={e => setVoucherCode(e.target.value.toUpperCase())}
+                          placeholder="Punya kode voucher?"
+                          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-4 text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-primary)] transition-all pr-10"
+                        />
+                        {voucherData && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400">
+                            <Check size={20} />
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleApplyVoucher}
+                        disabled={validatingVoucher || !voucherCode}
+                        className="px-6 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] font-bold text-sm hover:border-[var(--accent-primary)] transition-all disabled:opacity-50"
+                      >
+                        {validatingVoucher ? <Loader2 size={16} className="animate-spin" /> : "Gunakan"}
+                      </button>
+                    </div>
+                    {voucherError && <p className="text-xs text-red-400 mt-2 ml-1">{voucherError}</p>}
+                    {voucherData && (
+                      <p className="text-xs text-emerald-400 mt-2 ml-1 font-medium">
+                        Voucher berhasil diterapkan! Potongan {voucherData.type === 'PERCENTAGE' ? `${voucherData.value}%` : formatCurrency(voucherData.discount)}
+                      </p>
+                    )}
                   </div>
 
                   {error && (
@@ -250,11 +307,17 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                       <span className="shrink-0">Subtotal</span>
                       <span className="font-medium text-white truncate">{formatCurrency(Number(product.price))}</span>
                     </div>
+                    {voucherData && (
+                      <div className="flex justify-between items-center gap-4 text-sm text-emerald-400">
+                        <span className="shrink-0">Diskon ({voucherData.code})</span>
+                        <span className="font-medium truncate">-{formatCurrency(voucherData.discount)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-wrap items-center justify-between pt-6 border-t border-[var(--border-color)] gap-4">
                     <span className="font-medium text-[var(--text-secondary)] shrink-0">Total Bayar</span>
-                    <span className="text-2xl md:text-3xl font-black text-[var(--accent-primary)] truncate">{formatCurrency(Number(product.price))}</span>
+                    <span className="text-2xl md:text-3xl font-black text-[var(--accent-primary)] truncate">{formatCurrency(calculateTotal())}</span>
                   </div>
                 </div>
 

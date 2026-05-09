@@ -37,6 +37,7 @@ const navItems: { href: string; label: string; icon: React.ElementType; permissi
 ];
 
 const marketingItems: { href: string; label: string; icon: React.ElementType; permission?: PermissionKey }[] = [
+  { href: "/dashboard/vouchers", label: "Voucher", icon: Scissors, permission: "page_vouchers" },
   { href: "/followup", label: "Follow-Up", icon: CalendarClock, permission: "page_followup" },
   { href: "/affiliates", label: "Affiliate", icon: UserPlus, permission: "page_affiliates" },
   { href: "/retention", label: "Analisis Retensi", icon: RefreshCw, permission: "page_retention" },

@@ -7,7 +7,7 @@ interface AuthUser {
   id: string;
   email: string;
   name: string;
-  role: "developer" | "admin";
+  role: "developer" | "admin" | "superadmin";
   status: string;
   permissions: Record<string, boolean> | null;
 }
@@ -16,6 +16,7 @@ interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
   isDeveloper: boolean;
+  isSuperAdmin: boolean;
   hasPermission: (key: PermissionKey) => boolean;
   logout: () => Promise<void>;
   refetch: () => void;
@@ -25,6 +26,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   isDeveloper: false,
+  isSuperAdmin: false,
   hasPermission: () => false,
   logout: async () => {},
   refetch: () => {},
@@ -60,14 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hasPermission = (key: PermissionKey): boolean => {
     if (!user) return false;
-    if (user.role === "developer") return true;
+    if (user.role === "developer" || user.role === "superadmin") return true;
     return user.permissions?.[key] === true;
   };
 
   const isDeveloper = user?.role === "developer";
+  const isSuperAdmin = user?.role === "superadmin" || isDeveloper;
 
   return (
-    <AuthContext.Provider value={{ user, loading, isDeveloper, hasPermission, logout, refetch: fetchUser }}>
+    <AuthContext.Provider value={{ user, loading, isDeveloper, isSuperAdmin, hasPermission, logout, refetch: fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -41,8 +41,7 @@ export async function getProducts() {
 }
 
 
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { uploadImage } from "@/lib/upload";
 
 export async function createProduct(formData: FormData) {
   const auth = await requirePermission("page_marketplace");
@@ -67,21 +66,11 @@ export async function createProduct(formData: FormData) {
 
     if (imageFile && imageFile.size > 0) {
       try {
-        const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
-        await mkdir(uploadsDir, { recursive: true });
-
-        const bytes = await imageFile.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-        const filePath = path.join(uploadsDir, filename);
-        
-        await writeFile(filePath, buffer);
-        imageUrl = `/api/uploads/products/${filename}`;
+        imageUrl = await uploadImage(imageFile, "products");
         console.log(`[Product Upload] Success: ${imageUrl}`);
       } catch (uploadErr) {
         console.error("[Product Upload] Failed:", uploadErr);
-        // If upload fails, we can either throw or continue with empty imageUrl
-        throw new Error("Gagal mengunggah gambar produk. Pastikan server memiliki izin menulis.");
+        throw new Error("Gagal mengunggah gambar produk.");
       }
     }
 
@@ -132,16 +121,7 @@ export async function updateProduct(id: string, formData: FormData) {
 
     if (imageFile && imageFile.size > 0) {
       try {
-        const uploadsDir = path.join(process.cwd(), "storage/uploads/products");
-        await mkdir(uploadsDir, { recursive: true });
-
-        const bytes = await imageFile.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const filename = `${Date.now()}-${imageFile.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-        const filePath = path.join(uploadsDir, filename);
-        
-        await writeFile(filePath, buffer);
-        imageUrl = `/api/uploads/products/${filename}`;
+        imageUrl = await uploadImage(imageFile, "products");
         console.log(`[Product Update Upload] Success: ${imageUrl}`);
       } catch (uploadErr) {
         console.error("[Product Update Upload] Failed:", uploadErr);

@@ -74,8 +74,7 @@ export async function checkTransactionValidity(orderId: string) {
   }
 }
 
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { uploadImage } from "@/lib/upload";
 
 export async function submitWarrantyClaim(formData: FormData) {
   try {
@@ -106,23 +105,10 @@ export async function submitWarrantyClaim(formData: FormData) {
     let evidenceUrl = null;
     if (photo && photo.size > 0) {
       try {
-        const uploadsDir = path.join(process.cwd(), "storage/uploads/warranty");
-        await mkdir(uploadsDir, { recursive: true });
-
-        const bytes = await photo.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        const filename = `${uniqueSuffix}-${photo.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-        const filePath = path.join(uploadsDir, filename);
-
-        await writeFile(filePath, buffer);
-        evidenceUrl = `/api/uploads/warranty/${filename}`;
+        evidenceUrl = await uploadImage(photo, "warranty");
         console.log(`[Warranty Upload] Success: ${evidenceUrl}`);
       } catch (uploadErr) {
         console.error("[Warranty Upload] Failed:", uploadErr);
-        // Tetap lanjut meski upload gagal? Atau stop? 
-        // Sebaiknya stop jika bukti foto wajib.
         return { success: false, message: "Gagal mengunggah foto bukti. Silakan coba lagi." };
       }
     }
