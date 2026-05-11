@@ -188,23 +188,42 @@ export default function WarrantyDashboardPage() {
   }
 
   // Buka WhatsApp
-  function openWhatsApp(phone: string | null | undefined, customerName: string) {
+  function openWhatsApp(claim: WarrantyItem) {
+    const phone = claim.transaction?.user?.whatsapp;
+    const customerName = claim.transaction?.user?.name || "Pelanggan";
     const waNumber = formatWhatsAppNumber(phone);
+
     if (!waNumber) {
       alert("Nomor WhatsApp tidak tersedia untuk pelanggan ini.");
       return;
     }
-    const message = encodeURIComponent(
-      `Halo ${customerName}, kami dari Dorriz Store ingin menginformasikan terkait pengajuan garansi Anda.`
-    );
-    window.open(`https://wa.me/${waNumber}?text=${message}`, "_blank");
+
+    let statusText = "SEDANG DIPROSES";
+    if (claim.status === "resolved") statusText = "DISETUJUI";
+    else if (claim.status === "rejected") statusText = "DITOLAK";
+
+    let message = `Halo ${customerName}, kami dari Dorriz Store ingin menginformasikan terkait pengajuan garansi Anda.\n\n`;
+    message += `ID Transaksi: *${claim.transaction?.lynkIdRef || claim.transaction?.id || "-"}*\n`;
+    message += `Status: *${statusText}*\n`;
+
+    if (claim.status === "resolved" && claim.newAccount) {
+      message += `\nBerikut adalah data akun baru Anda:\n`;
+      message += `📧 Email: ${claim.newAccount.accountEmail}\n`;
+      message += `🔑 Password: ${claim.newAccount.accountPassword}\n\n`;
+      message += `Silakan login kembali dan pastikan data sudah sesuai. Terima kasih!`;
+    } else if (claim.status === "rejected") {
+      message += `\nMohon maaf, pengajuan garansi Anda belum dapat kami setujui. Jika ada pertanyaan lebih lanjut, silakan hubungi kami kembali.`;
+    } else {
+      message += `\nMohon ditunggu ya kak, tim kami sedang memproses pengajuan Anda.`;
+    }
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, "_blank");
   }
 
   // Render action buttons for pending claims
   function renderActionButtons(claim: WarrantyItem, isCard = false) {
     const isLoading = actionLoading === claim.id;
-    const phone = claim.transaction?.user?.whatsapp;
-    const customerName = claim.transaction?.user?.name || "Pelanggan";
 
     function openTransactionModal(transaction: WarrantyItem['transaction']) {
       setSelectedTransaction(transaction);
@@ -232,7 +251,7 @@ export default function WarrantyDashboardPage() {
           </button>
           <button
             className="inline-flex items-center justify-center gap-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500 hover:text-white border border-teal-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200"
-            onClick={() => openWhatsApp(phone, customerName)}
+            onClick={() => openWhatsApp(claim)}
             title="Chat WhatsApp"
           >
             <MessageCircle size={13} /> WA
@@ -245,7 +264,7 @@ export default function WarrantyDashboardPage() {
     return (
       <button
         className="inline-flex items-center justify-center gap-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500 hover:text-white border border-teal-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-200"
-        onClick={() => openWhatsApp(phone, customerName)}
+        onClick={() => openWhatsApp(claim)}
         title="Chat WhatsApp"
       >
         <MessageCircle size={13} /> WA
