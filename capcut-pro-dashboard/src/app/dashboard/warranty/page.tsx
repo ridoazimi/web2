@@ -32,6 +32,8 @@ interface WarrantyItem {
     lynkIdRef: string | null;
     stockAccount: { productId: string | null } | null;
     user: { name: string; whatsapp: string | null } | null;
+    purchaseDate: string | null;
+    warrantyExpiredAt: string | null;
   } | null;
 }
 
@@ -76,6 +78,8 @@ export default function WarrantyDashboardPage() {
   const [availableAccounts, setAvailableAccounts] = useState<any[]>([]);
   const [selectedNewAccountId, setSelectedNewAccountId] = useState<string>("");
   const [loadingAccounts, setLoadingAccounts] = useState(false);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<WarrantyItem['transaction']>(null);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -202,6 +206,11 @@ export default function WarrantyDashboardPage() {
     const phone = claim.transaction?.user?.whatsapp;
     const customerName = claim.transaction?.user?.name || "Pelanggan";
 
+    function openTransactionModal(transaction: WarrantyItem['transaction']) {
+      setSelectedTransaction(transaction);
+      setShowTransactionModal(true);
+    }
+
     if (claim.status === "pending") {
       return (
         <div className={`flex ${isCard ? 'flex-col' : 'flex-row'} gap-1.5`}>
@@ -291,7 +300,17 @@ export default function WarrantyDashboardPage() {
                         <tr><td colSpan={8} className="text-center py-8 text-[var(--text-muted)]">Belum ada klaim garansi</td></tr>
                       ) : claims.map((claim) => (
                         <tr key={claim.id}>
-                          <td className="font-mono text-sm text-[#818cf8]">{claim.transaction?.lynkIdRef || claim.transaction?.id?.substring(0, 8) || "-"}</td>
+                          <td className="font-mono text-sm">
+                            <button 
+                              onClick={() => {
+                                setSelectedTransaction(claim.transaction);
+                                setShowTransactionModal(true);
+                              }}
+                              className="text-[#818cf8] hover:underline transition-all"
+                            >
+                              {claim.transaction?.lynkIdRef || claim.transaction?.id || "-"}
+                            </button>
+                          </td>
                           <td><p className="font-medium">{claim.transaction?.user?.name || "-"}</p><p className="text-xs text-[var(--text-muted)]">{maskPhone(claim.transaction?.user?.whatsapp)}</p></td>
                           <td>
                             <div className="flex items-center gap-1.5 text-xs">
@@ -333,7 +352,17 @@ export default function WarrantyDashboardPage() {
                         {getClaimBadge(claim.status)}
                       </div>
                       <div className="space-y-1.5 pt-2.5 border-t border-[rgba(99,102,241,0.08)]">
-                        <div className="data-card-row"><span className="data-card-label">ID Transaksi</span><span className="data-card-value font-mono text-xs text-[#818cf8]">{claim.transaction?.lynkIdRef || claim.transaction?.id?.substring(0, 8) || "-"}</span></div>
+                        <div className="data-card-row"><span className="data-card-label">ID Transaksi</span>
+                          <button 
+                            onClick={() => {
+                              setSelectedTransaction(claim.transaction);
+                              setShowTransactionModal(true);
+                            }}
+                            className="data-card-value font-mono text-xs text-[#818cf8] hover:underline"
+                          >
+                            {claim.transaction?.lynkIdRef || claim.transaction?.id?.substring(0, 8) || "-"}
+                          </button>
+                        </div>
                         <div className="data-card-row"><span className="data-card-label">Akun Lama</span><span className="data-card-value font-mono text-xs text-rose-400">{claim.oldAccount?.accountEmail || "—"}</span></div>
                         <div className="data-card-row"><span className="data-card-label">Akun Baru</span><span className="data-card-value font-mono text-xs text-emerald-400">{claim.newAccount?.accountEmail || "—"}</span></div>
                         <div className="data-card-row"><span className="data-card-label">Alasan</span><span className="data-card-value">{claim.claimReason || "-"}</span></div>
@@ -541,6 +570,93 @@ export default function WarrantyDashboardPage() {
           </div>
         </div>
       )}
+      {/* Modal Detail Transaksi */}
+      {showTransactionModal && selectedTransaction && (
+        <div className="modal-overlay" onClick={() => setShowTransactionModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 450 }}>
+            <div className="modal-header">
+              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+                <LayoutList size={20} className="text-[#818cf8]" /> Detail Transaksi
+              </h3>
+              <button className="btn-icon" onClick={() => setShowTransactionModal(false)}><X size={18} /></button>
+            </div>
+            <div className="modal-body space-y-5">
+              <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[rgba(99,102,241,0.1)] space-y-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs text-[var(--text-muted)]">ID Transaksi</span>
+                  <span className="text-sm font-mono text-[#818cf8] break-all">{selectedTransaction.id}</span>
+                  {selectedTransaction.lynkIdRef && (
+                    <span className="text-xs text-indigo-400">Ref: {selectedTransaction.lynkIdRef}</span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[rgba(255,255,255,0.05)]">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-[var(--text-muted)]">Tanggal Order</span>
+                    <span className="text-sm text-white">
+                      {selectedTransaction.purchaseDate 
+                        ? new Date(selectedTransaction.purchaseDate).toLocaleDateString("id-ID", {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })
+                        : "-"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs text-[var(--text-muted)]">Sisa Masa Aktif</span>
+                    <span className="text-sm font-semibold text-emerald-400">
+                      {(() => {
+                        if (!selectedTransaction.warrantyExpiredAt) return "-";
+                        const expiry = new Date(selectedTransaction.warrantyExpiredAt);
+                        const now = new Date();
+                        const diffTime = expiry.getTime() - now.getTime();
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        
+                        if (diffDays < 0) return "Expired";
+                        return `${diffDays} Hari Lagi`;
+                      })()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 pt-2 border-t border-[rgba(255,255,255,0.05)]">
+                  <span className="text-xs text-[var(--text-muted)]">Garansi Berakhir</span>
+                  <span className="text-sm text-rose-400">
+                    {selectedTransaction.warrantyExpiredAt 
+                      ? new Date(selectedTransaction.warrantyExpiredAt).toLocaleDateString("id-ID", {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })
+                      : "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs text-[var(--text-muted)] px-1">Data Pelanggan</p>
+                <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[rgba(99,102,241,0.1)] space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[var(--text-muted)]">Nama</span>
+                    <span className="text-white font-medium">{selectedTransaction.user?.name || "-"}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[var(--text-muted)]">WhatsApp</span>
+                    <span className="text-white">{selectedTransaction.user?.whatsapp || "-"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary w-full" onClick={() => setShowTransactionModal(false)}>Tutup</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
+
   );
 }
