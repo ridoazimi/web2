@@ -135,7 +135,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
 
           {usedTrx.length === 0 ? (
             <div className="py-8 text-center">
-              <Users size={32} className="mx-auto text-[var(--text-muted)] mb-2 opacity-40" />
+              <Users size={32} className="mx-auto text-(--text-muted) mb-2 opacity-40" />
               <p className="text-sm text-(--text-muted)">Belum ada pengguna di akun ini</p>
             </div>
           ) : (
@@ -146,7 +146,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
                   <button
                     key={i}
                     onClick={() => setActiveTab(i)}
-                    className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                     style={{
                       background: activeTab === i ? "rgba(129,140,248,0.2)" : "rgba(255,255,255,0.04)",
                       border: `1px solid ${activeTab === i ? "rgba(129,140,248,0.4)" : "rgba(255,255,255,0.08)"}`,
@@ -175,7 +175,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
                     {/* User Info Card */}
                     <div className="rounded-xl p-4" style={{ background: "rgba(129,140,248,0.06)", border: "1px solid rgba(129,140,248,0.15)" }}>
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-[rgba(129,140,248,0.2)] flex items-center justify-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-[rgba(129,140,248,0.2)] flex items-center justify-center shrink-0">
                           <User size={14} className="text-[#818cf8]" />
                         </div>
                         <p className="text-xs font-semibold text-[#818cf8] uppercase tracking-wider">Info Pengguna</p>
@@ -199,28 +199,28 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
                     {/* Transaction Info Card */}
                     <div className="rounded-xl p-4" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)" }}>
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-7 h-7 rounded-full bg-[rgba(34,197,94,0.15)] flex items-center justify-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-[rgba(34,197,94,0.15)] flex items-center justify-center shrink-0">
                           <ShoppingBag size={14} className="text-emerald-400" />
                         </div>
                         <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Info Transaksi</p>
                       </div>
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-[var(--text-muted)]">Produk</span>
-                          <span className="text-sm text-[var(--text-secondary)]">{trx.productName || "CapCut Pro"}</span>
+                          <span className="text-xs text-(--text-muted)">Produk</span>
+                          <span className="text-sm text-(--text-secondary)">{trx.productName || "CapCut Pro"}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-[var(--text-muted)]">Nominal</span>
+                          <span className="text-xs text-(--text-muted)">Nominal</span>
                           <span className="text-sm font-semibold text-emerald-400">{formatCurrency(trx.amount)}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-[var(--text-muted)] flex items-center gap-1"><CalendarDays size={10} /> Tanggal Beli</span>
-                          <span className="text-sm text-[var(--text-secondary)]">{formatDate(trx.purchaseDate)}</span>
+                          <span className="text-xs text-(--text-muted) flex items-center gap-1"><CalendarDays size={10} /> Tanggal Beli</span>
+                          <span className="text-sm text-(--text-secondary)">{formatDate(trx.purchaseDate)}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-[var(--text-muted)] flex items-center gap-1"><Shield size={10} /> Garansi s/d</span>
+                          <span className="text-xs text-(--text-muted) flex items-center gap-1"><Shield size={10} /> Garansi s/d</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-[var(--text-secondary)]">{formatDate(trx.warrantyExpiredAt)}</span>
+                            <span className="text-sm text-(--text-secondary)">{formatDate(trx.warrantyExpiredAt)}</span>
                             {daysLeft !== null && (
                               <span
                                 className="text-[10px] font-bold px-1.5 py-0.5 rounded-md"
@@ -235,7 +235,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
                           </div>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-[var(--text-muted)]">Status Trx</span>
+                          <span className="text-xs text-(--text-muted)">Status Trx</span>
                           <span
                             className="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase"
                             style={{
@@ -295,11 +295,12 @@ export default function StockPage() {
   const [usageTypeFilter, setUsageTypeFilter] = useState("Semua");
   const [showSingleModal, setShowSingleModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
-  const [singleForm, setSingleForm] = useState({ email: "", password: "", duration: 30, productId: "", maxSlots: 3, usageType: "sale" });
+  const [singleForm, setSingleForm] = useState({ email: "", password: "", duration: 30, productId: "", maxSlots: 3, usageType: "sale", productType: "mobile" });
   const [bulkText, setBulkText] = useState("");
   const [bulkDuration, setBulkDuration] = useState(30);
   const [bulkProductId, setBulkProductId] = useState("");
   const [bulkUsageType, setBulkUsageType] = useState("sale");
+  const [bulkProductType, setBulkProductType] = useState("mobile");
   const [products, setProducts] = useState<any[]>([]);
   const [bulkMaxSlots, setBulkMaxSlots] = useState(3);
   const [submitting, setSubmitting] = useState(false);
@@ -427,6 +428,7 @@ export default function StockPage() {
           productId: singleForm.productId === "" ? null : singleForm.productId,
           maxSlots: singleForm.maxSlots,
           usageType: singleForm.usageType,
+          productType: singleForm.productType,
         }),
       });
       const data = await res.json();
@@ -442,7 +444,7 @@ export default function StockPage() {
     }
     setSubmitting(false);
     setShowSingleModal(false);
-    setSingleForm({ email: "", password: "", duration: 30, productId: "", maxSlots: 3, usageType: "sale" });
+    setSingleForm({ email: "", password: "", duration: 30, productId: "", maxSlots: 3, usageType: "sale", productType: "mobile" });
     fetchData(1, false);
   }
 
@@ -463,7 +465,8 @@ export default function StockPage() {
           durationDays: bulkDuration, 
           productId: bulkProductId === "" ? null : bulkProductId, 
           maxSlots: bulkMaxSlots, 
-          usageType: bulkUsageType 
+          usageType: bulkUsageType,
+          productType: bulkProductType
         }),
       });
       const data = await res.json();
@@ -510,7 +513,8 @@ export default function StockPage() {
       ...singleForm, 
       productId, 
       duration: p?.duration || 30,
-      maxSlots: p?.maxSlots || 3 
+      maxSlots: p?.maxSlots || 3,
+      productType: p?.maxSlots === 2 ? "desktop" : "mobile"
     });
   }
   function handleBulkProductChange(productId: string) {
@@ -518,6 +522,7 @@ export default function StockPage() {
     setBulkProductId(productId);
     setBulkDuration(p?.duration || 30);
     setBulkMaxSlots(p?.maxSlots || 3);
+    setBulkProductType(p?.maxSlots === 2 ? "desktop" : "mobile");
   }
 
   return (
@@ -542,7 +547,7 @@ export default function StockPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-green-500/15 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-green-500/15 flex items-center justify-center shrink-0">
                   <Smartphone size={16} className="text-green-400" />
                 </div>
                 <div>
@@ -555,15 +560,15 @@ export default function StockPage() {
             <div className="grid grid-cols-3 gap-1 pt-1 border-t border-green-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{mobileStatusCounts.available || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
+                <p className="text-[9px] text-(--text-muted)">Ready</p>
               </div>
               <div className="text-center border-l border-green-500/10">
                 <p className="text-lg font-bold text-slate-400">{mobileStatusCounts.sold || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+                <p className="text-[9px] text-(--text-muted)">Sold</p>
               </div>
               <div className="text-center border-l border-green-500/10">
                 <p className="text-lg font-bold text-amber-400">{remainingSlotsMobile}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
+                <p className="text-[9px] text-(--text-muted)">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -584,7 +589,7 @@ export default function StockPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center shrink-0">
                   <Monitor size={16} className="text-blue-400" />
                 </div>
                 <div>
@@ -597,15 +602,15 @@ export default function StockPage() {
             <div className="grid grid-cols-3 gap-1 pt-1 border-t border-blue-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{desktopStatusCounts.available || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
+                <p className="text-[9px] text-(--text-muted)">Ready</p>
               </div>
               <div className="text-center border-l border-blue-500/10">
                 <p className="text-lg font-bold text-slate-400">{desktopStatusCounts.sold || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+                <p className="text-[9px] text-(--text-muted)">Sold</p>
               </div>
               <div className="text-center border-l border-blue-500/10">
                 <p className="text-lg font-bold text-amber-400">{remainingSlotsDesktop}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
+                <p className="text-[9px] text-(--text-muted)">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -625,7 +630,7 @@ export default function StockPage() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-500/15 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-purple-500/15 flex items-center justify-center shrink-0">
                   <ShoppingBag size={16} className="text-purple-400" />
                 </div>
                 <div>
@@ -637,15 +642,15 @@ export default function StockPage() {
             <div className="grid grid-cols-3 gap-1 pt-1 border-t border-purple-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{saleStatusCounts.available || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
+                <p className="text-[9px] text-(--text-muted)">Ready</p>
               </div>
               <div className="text-center border-l border-purple-500/10">
                 <p className="text-lg font-bold text-slate-400">{saleStatusCounts.sold || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+                <p className="text-[9px] text-(--text-muted)">Sold</p>
               </div>
               <div className="text-center border-l border-purple-500/10">
                 <p className="text-lg font-bold text-amber-400">{remainingSlotsSale}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
+                <p className="text-[9px] text-(--text-muted)">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -665,7 +670,7 @@ export default function StockPage() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-pink-500/15 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-pink-500/15 flex items-center justify-center shrink-0">
                   <Shield size={16} className="text-pink-400" />
                 </div>
                 <div>
@@ -677,15 +682,15 @@ export default function StockPage() {
             <div className="grid grid-cols-3 gap-1 pt-1 border-t border-pink-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{warrantyStatusCounts.available || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
+                <p className="text-[9px] text-(--text-muted)">Ready</p>
               </div>
               <div className="text-center border-l border-pink-500/10">
                 <p className="text-lg font-bold text-slate-400">{warrantyStatusCounts.sold || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+                <p className="text-[9px] text-(--text-muted)">Sold</p>
               </div>
               <div className="text-center border-l border-pink-500/10">
                 <p className="text-lg font-bold text-amber-400">{remainingSlotsWarranty}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
+                <p className="text-[9px] text-(--text-muted)">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -697,7 +702,7 @@ export default function StockPage() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-500/15 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/15 flex items-center justify-center shrink-0">
                   <LayoutGrid size={16} className="text-indigo-400" />
                 </div>
                 <div>
@@ -709,15 +714,15 @@ export default function StockPage() {
             <div className="grid grid-cols-3 gap-1 pt-1 border-t border-indigo-500/10">
               <div className="text-center">
                 <p className="text-lg font-bold text-emerald-400">{statusCounts.available || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Ready</p>
+                <p className="text-[9px] text-(--text-muted)">Ready</p>
               </div>
               <div className="text-center border-l border-indigo-500/10">
                 <p className="text-lg font-bold text-slate-400">{statusCounts.sold || 0}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Sold</p>
+                <p className="text-[9px] text-(--text-muted)">Sold</p>
               </div>
               <div className="text-center border-l border-indigo-500/10">
                 <p className="text-lg font-bold text-amber-400">{remainingSlotsMobile + remainingSlotsDesktop}</p>
-                <p className="text-[9px] text-[var(--text-muted)]">Slot Sisa</p>
+                <p className="text-[9px] text-(--text-muted)">Slot Sisa</p>
               </div>
             </div>
           </div>
@@ -729,7 +734,7 @@ export default function StockPage() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="search-box flex-1 min-w-[160px] max-w-md">
               <Search size={16} className="search-icon" />
-              <input type="text" placeholder="Cari email akun..." className="form-input !pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <input type="text" placeholder="Cari email akun..." className="form-input pl-10!" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
             <div className="flex gap-2 ml-auto">
               <button className="btn-secondary" onClick={() => setShowBulkModal(true)}><Upload size={16} /> <span className="hidden sm:inline">Bulk Import</span></button>
@@ -739,7 +744,7 @@ export default function StockPage() {
           {/* Row 2: Filters */}
           <div className="flex items-center gap-3 flex-wrap">
             <select
-              className="form-input !py-2 !px-3 text-sm max-w-[180px] cursor-pointer"
+              className="form-input py-2! px-3! text-sm max-w-[180px] cursor-pointer"
               value={productIdFilter}
               onChange={(e) => { setProductIdFilter(e.target.value); setProductTypeFilter("Semua"); }}
             >
@@ -750,7 +755,7 @@ export default function StockPage() {
             </select>
             
             <select
-              className="form-input !py-2 !px-3 text-sm max-w-[180px] cursor-pointer"
+              className="form-input py-2! px-3! text-sm max-w-[180px] cursor-pointer"
               value={usageTypeFilter}
               onChange={(e) => setUsageTypeFilter(e.target.value)}
             >
@@ -760,7 +765,7 @@ export default function StockPage() {
             </select>
             
             <select
-              className="form-input !py-2 !px-3 text-sm max-w-[180px] cursor-pointer"
+              className="form-input py-2! px-3! text-sm max-w-[180px] cursor-pointer"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -774,7 +779,7 @@ export default function StockPage() {
 
         {/* View Toggle mobile */}
         <div className="flex items-center justify-between lg:hidden">
-          <p className="text-xs text-[var(--text-muted)]">Total {total} akun</p>
+          <p className="text-xs text-(--text-muted)">Total {total} akun</p>
           <div className="flex gap-1">
             <button className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`} onClick={() => setViewMode('table')}><LayoutList size={13} /> Tabel</button>
             <button className={`view-toggle-btn ${viewMode === 'card' ? 'active' : ''}`} onClick={() => setViewMode('card')}><LayoutGrid size={13} /> Card</button>
@@ -786,7 +791,7 @@ export default function StockPage() {
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Loader2 size={24} className="animate-spin text-[#818cf8]" />
-              <span className="ml-2 text-[var(--text-secondary)]">Memuat...</span>
+              <span className="ml-2 text-(--text-secondary)">Memuat...</span>
             </div>
           ) : (
             <>
@@ -809,12 +814,12 @@ export default function StockPage() {
                     </thead>
                     <tbody>
                       {accounts.length === 0 ? (
-                        <tr><td colSpan={10} className="text-center py-8 text-[var(--text-muted)]">Belum ada stok akun</td></tr>
+                        <tr><td colSpan={10} className="text-center py-8 text-(--text-muted)">Belum ada stok akun</td></tr>
                       ) : accounts.map((item) => {
                         const usedTrx = item.transactions.filter(t => t.user !== null);
                         return (
                           <tr key={item.id}>
-                            <td><span className="flex flex-col"><span className="flex items-center gap-1.5 text-xs font-bold">{(item.product?.maxSlots || item.maxSlots) === 2 ? <><Monitor size={14} className="text-blue-400" />Desktop</> : <><Smartphone size={14} className="text-green-400" />Mobile</>}</span><span className="text-[10px] text-[var(--text-muted)] truncate max-w-[100px]">{item.product?.name || "-"}</span></span></td>
+                            <td><span className="flex flex-col"><span className="flex items-center gap-1.5 text-xs font-bold">{(item.product?.maxSlots || item.maxSlots) === 2 ? <><Monitor size={14} className="text-blue-400" />Desktop</> : <><Smartphone size={14} className="text-green-400" />Mobile</>}</span><span className="text-[10px] text-(--text-muted) truncate max-w-[100px]">{item.product?.name || "-"}</span></span></td>
                             <td>
                               <button 
                                 onClick={() => toggleUsageType(item.id, item.usageType || "sale")}
@@ -835,7 +840,7 @@ export default function StockPage() {
                             <td className="font-mono text-sm">{item.accountEmail}</td>
                             <td>
                               <div className="flex items-center gap-2">
-                                <span className="font-mono text-sm text-[var(--text-secondary)]">••••••••</span>
+                                <span className="font-mono text-sm text-(--text-secondary)">••••••••</span>
                                 <button className="btn-icon" style={{ width: 28, height: 28 }} title="Copy Password" onClick={() => copyPassword(item.id, item.accountPassword)}>
                                   {copiedId === item.id ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
                                 </button>
@@ -846,7 +851,7 @@ export default function StockPage() {
                                 <div className="w-12 h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
                                   <div className="h-full rounded-full transition-all" style={{ width: `${(item.usedSlots || 0) / (item.maxSlots || 3) * 100}%`, background: (item.usedSlots || 0) >= (item.maxSlots || 3) ? "#ef4444" : "#22c55e" }} />
                                 </div>
-                                <span className="text-xs font-medium text-[var(--text-secondary)]">{item.usedSlots || 0}/{item.maxSlots || 3}</span>
+                                <span className="text-xs font-medium text-(--text-secondary)">{item.usedSlots || 0}/{item.maxSlots || 3}</span>
                               </div>
                             </td>
                             <td className="text-sm">{item.durationDays || 30} Hari</td>
@@ -865,10 +870,10 @@ export default function StockPage() {
                                   {usedTrx.length} Pengguna
                                 </button>
                               ) : (
-                                <span className="text-sm text-[var(--text-muted)]">—</span>
+                                <span className="text-sm text-(--text-muted)">—</span>
                               )}
                             </td>
-                            <td className="text-[var(--text-secondary)] text-sm">{item.createdAt ? new Date(item.createdAt).toLocaleDateString("id-ID") : "—"}</td>
+                            <td className="text-(--text-secondary) text-sm">{item.createdAt ? new Date(item.createdAt).toLocaleDateString("id-ID") : "—"}</td>
                             <td className="sticky-col-body">{getStockBadge(item.status, item.usedSlots, item.maxSlots)}</td>
                             <td>
                               <button
@@ -890,14 +895,14 @@ export default function StockPage() {
 
               {viewMode === 'card' && (
                 <div className="data-card-grid">
-                  {accounts.length === 0 ? <p className="text-center py-8 text-[var(--text-muted)]">Belum ada stok akun</p> : accounts.map((item) => {
+                  {accounts.length === 0 ? <p className="text-center py-8 text-(--text-muted)">Belum ada stok akun</p> : accounts.map((item) => {
                     const usedTrx = item.transactions.filter(t => t.user !== null);
                     return (
                       <div key={item.id} className="data-card">
                         <div className="flex items-start justify-between mb-3">
                           <div className="min-w-0 flex-1 mr-2">
                             <p className="font-mono text-sm text-white truncate">{item.accountEmail}</p>
-                            <span className="flex items-center gap-1 text-xs font-medium mt-1 text-[var(--text-muted)]">
+                            <span className="flex items-center gap-1 text-xs font-medium mt-1 text-(--text-muted)">
                               {(item.product?.maxSlots || item.maxSlots) === 2 ? <><Monitor size={12} className="text-blue-400" />Desktop</> : <><Smartphone size={12} className="text-green-400" />Mobile</>}
                             </span>
                              <div className="mt-1.5">
@@ -916,7 +921,7 @@ export default function StockPage() {
                                  )}
                                </button>
                              </div>
-                            <p className="text-[10px] text-[var(--text-muted)] mt-1">{item.product?.name || "-"}</p>
+                            <p className="text-[10px] text-(--text-muted) mt-1">{item.product?.name || "-"}</p>
                           </div>
                           {getStockBadge(item.status, item.usedSlots, item.maxSlots)}
                         </div>
@@ -927,7 +932,7 @@ export default function StockPage() {
                               <div className="w-16 h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
                                 <div className="h-full rounded-full" style={{ width: `${(item.usedSlots || 0) / (item.maxSlots || 3) * 100}%`, background: (item.usedSlots || 0) >= (item.maxSlots || 3) ? "#ef4444" : "#22c55e" }} />
                               </div>
-                              <span className="text-xs text-[var(--text-secondary)]">{item.usedSlots || 0}/{item.maxSlots || 3}</span>
+                              <span className="text-xs text-(--text-secondary)">{item.usedSlots || 0}/{item.maxSlots || 3}</span>
                             </div>
                           </div>
                           <div className="data-card-row"><span className="data-card-label">Durasi</span><span className="data-card-value">{item.durationDays || 30} Hari</span></div>
@@ -985,7 +990,7 @@ export default function StockPage() {
                     {loadingMore ? "Memuat..." : `Tampilkan ${Math.min(limit, total - accounts.length)} akun berikutnya`}
                   </button>
                 ) : !loading && accounts.length > 0 ? (
-                  <span className="text-xs text-[var(--text-muted)] flex items-center gap-1.5">
+                  <span className="text-xs text-(--text-muted) flex items-center gap-1.5">
                     <Check size={12} className="text-emerald-400" /> Semua data sudah ditampilkan
                   </span>
                 ) : null}
@@ -1029,24 +1034,37 @@ export default function StockPage() {
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setSingleForm({ ...singleForm, maxSlots: n })}
-                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${singleForm.maxSlots === n ? "border-[var(--accent)] bg-[rgba(99,102,241,0.15)] text-[var(--accent)]" : "border-[rgba(255,255,255,0.1)] text-[var(--text-muted)] hover:border-[rgba(255,255,255,0.2)]"}`}>
+                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${singleForm.maxSlots === n ? "border-(--accent) bg-[rgba(99,102,241,0.15)] text-(--accent)" : "border-[rgba(255,255,255,0.1)] text-(--text-muted) hover:border-[rgba(255,255,255,0.2)]"}`}>
                       {n}
                     </button>
                   ))}
                 </div>
-                <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                <p className="text-[10px] text-(--text-muted) mt-1">
                   {products.find(p => p.id === singleForm.productId)?.maxSlots === 2 ? "Rekomendasi: 2 slot untuk Laptop/Mac/Desktop" : "Rekomendasi: 3 slot untuk HP/iPad/Tablet"}
                 </p>
+              </div>
+              <div>
+                <label className="form-label">Tipe Perangkat</label>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setSingleForm({ ...singleForm, productType: "mobile" })}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.productType === "mobile" ? "border-green-500 bg-green-500/10 text-green-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    <Smartphone size={14} /> Mobile
+                  </button>
+                  <button type="button" onClick={() => setSingleForm({ ...singleForm, productType: "desktop" })}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.productType === "desktop" ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    <Monitor size={14} /> Desktop
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="form-label">Peruntukan Stok</label>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSingleForm({ ...singleForm, usageType: "sale" })}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[rgba(255,255,255,0.1)] text-[var(--text-muted)]"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
                     <ShoppingBag size={14} /> Stok Jualan
                   </button>
                   <button type="button" onClick={() => setSingleForm({ ...singleForm, usageType: "warranty" })}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[rgba(255,255,255,0.1)] text-[var(--text-muted)]"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
                     <Shield size={14} /> Stok Garansi
                   </button>
                 </div>
@@ -1061,7 +1079,7 @@ export default function StockPage() {
                     value={singleForm.duration || ""} 
                     onChange={(e) => setSingleForm({ ...singleForm, duration: parseInt(e.target.value) || 0 })} 
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[var(--text-muted)] pointer-events-none">Hari</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-(--text-muted) pointer-events-none">Hari</span>
                 </div>
               </div>
             </div>
@@ -1082,7 +1100,7 @@ export default function StockPage() {
               <button className="btn-icon" onClick={() => setShowBulkModal(false)}><X size={18} /></button>
             </div>
             <div className="modal-body space-y-4">
-              <p className="text-sm text-[var(--text-secondary)]">Paste daftar akun dengan format: <code className="text-[#818cf8]">email:password</code> (satu per baris)</p>
+              <p className="text-sm text-(--text-secondary)">Paste daftar akun dengan format: <code className="text-[#818cf8]">email:password</code> (satu per baris)</p>
               <div><label className="form-label">Daftar Akun</label><textarea className="form-input" rows={8} placeholder={"akun1@mail.com:password1\nakun2@mail.com:password2"} value={bulkText} onChange={(e) => setBulkText(e.target.value)} /></div>
               <div>
                 <label className="form-label">Produk Terkait</label>
@@ -1098,25 +1116,41 @@ export default function StockPage() {
                 </select>
               </div>
               <div>
+                <label className="form-label">Tipe Perangkat</label>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setBulkProductType("mobile")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkProductType === "mobile" ? "border-green-500 bg-green-500/10 text-green-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    <Smartphone size={14} /> Mobile
+                  </button>
+                  <button type="button" onClick={() => setBulkProductType("desktop")}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkProductType === "desktop" ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    <Monitor size={14} /> Desktop
+                  </button>
+                </div>
+              </div>
+              <div>
                 <label className="form-label">Slot Pengguna</label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setBulkMaxSlots(n)}
-                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${bulkMaxSlots === n ? "border-[var(--accent)] bg-[rgba(99,102,241,0.15)] text-[var(--accent)]" : "border-[rgba(255,255,255,0.1)] text-[var(--text-muted)]"}`}>
+                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${bulkMaxSlots === n ? "border-(--accent) bg-[rgba(99,102,241,0.15)] text-(--accent)" : "border-[rgba(255,255,255,0.1)] text-(--text-muted) hover:border-[rgba(255,255,255,0.2)]"}`}>
                       {n}
                     </button>
                   ))}
                 </div>
+                <p className="text-[10px] text-(--text-muted) mt-1">
+                  {products.find(p => p.id === bulkProductId)?.maxSlots === 2 ? "Rekomendasi: 2 slot untuk Laptop/Mac/Desktop" : "Rekomendasi: 3 slot untuk HP/iPad/Tablet"}
+                </p>
               </div>
               <div>
                 <label className="form-label">Peruntukan Stok</label>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setBulkUsageType("sale")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[rgba(255,255,255,0.1)] text-[var(--text-muted)]"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
                     <ShoppingBag size={14} /> Stok Jualan
                   </button>
                   <button type="button" onClick={() => setBulkUsageType("warranty")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[rgba(255,255,255,0.1)] text-[var(--text-muted)]"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
                     <Shield size={14} /> Stok Garansi
                   </button>
                 </div>

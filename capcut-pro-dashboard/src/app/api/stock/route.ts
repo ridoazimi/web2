@@ -71,12 +71,13 @@ export async function GET(req: NextRequest) {
         usedSlots: true,
         maxSlots: true,
         usageType: true,
-        product: { select: { maxSlots: true } }
+        productType: true,
+        product: { select: { maxSlots: true, name: true } }
       }
     });
 
-    const mobileAccounts = allAccounts.filter(a => (a.product?.maxSlots || a.maxSlots || 3) === 3);
-    const desktopAccounts = allAccounts.filter(a => (a.product?.maxSlots || a.maxSlots || 3) === 2);
+    const mobileAccounts = allAccounts.filter(a => a.productType === "mobile");
+    const desktopAccounts = allAccounts.filter(a => a.productType === "desktop");
     const saleAccounts = allAccounts.filter(a => a.usageType === "sale");
     const warrantyAccounts = allAccounts.filter(a => a.usageType === "warranty");
 
@@ -182,7 +183,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { accounts, durationDays = 30, productId, maxSlots, usageType = "sale" } = body;
+    const { accounts, durationDays = 30, productId, maxSlots, usageType = "sale", productType = "mobile" } = body;
 
     // Get maxSlots from product if not provided
     let slots = maxSlots;
@@ -192,7 +193,7 @@ export async function POST(req: NextRequest) {
     }
     if (!slots) slots = 3;
 
-    let data: { accountEmail: string; accountPassword: string; durationDays: number; productId: string | null; maxSlots: number; usedSlots: number; usageType: string }[];
+    let data: { accountEmail: string; accountPassword: string; durationDays: number; productId: string | null; maxSlots: number; usedSlots: number; usageType: string; productType: string }[];
 
     if (Array.isArray(accounts)) {
       data = accounts.map((acc: { email: string; password: string }) => ({
@@ -203,23 +204,25 @@ export async function POST(req: NextRequest) {
         maxSlots: slots,
         usedSlots: 0,
         usageType: usageType,
+        productType: productType,
       }));
     } else if (body.email && body.password) {
-      data = [{ 
-        accountEmail: body.email, 
-        accountPassword: body.password, 
-        durationDays, 
+      data = [{
+        accountEmail: body.email,
+        accountPassword: body.password,
+        durationDays,
         productId: body.productId || null,
-        maxSlots: slots, 
+        maxSlots: slots,
         usedSlots: 0,
         usageType: usageType,
+        productType: productType,
       }];
     } else {
       return NextResponse.json({ error: "Data akun tidak valid" }, { status: 400 });
     }
 
-    const result = await prisma.stockAccount.createMany({ 
-      data: data as any 
+    const result = await prisma.stockAccount.createMany({
+      data: data as any
     });
 
     return NextResponse.json({ created: result.count }, { status: 201 });

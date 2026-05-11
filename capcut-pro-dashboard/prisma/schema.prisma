@@ -38,7 +38,7 @@ model StockAccount {
   updatedAt         DateTime?       @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   productId         String?         @map("product_id") @db.Uuid
   product           Product?        @relation(fields: [productId], references: [id], onUpdate: NoAction)
-  // productType       String?         @default("mobile") @map("product_type") @db.VarChar(50)
+  productType       String?         @default("mobile") @map("product_type") @db.VarChar(50)
   usageType         String?         @default("sale") @map("usage_type") @db.VarChar(50)
   maxSlots          Int?            @default(3) @map("max_slots")
   usedSlots         Int?            @default(0) @map("used_slots")
