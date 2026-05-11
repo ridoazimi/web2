@@ -127,40 +127,37 @@ export async function POST(req: NextRequest) {
     }
 
     // ===== 3. SHARING ACCOUNT: Cari stok yang masih ada slot kosong =====
-    // Cari akun yang masih ada slot kosong (status "available")
-    const maxSlotsForType = product?.maxSlots || (productType === "desktop" ? 2 : 3);
+
 
     // FIX #1: Gunakan $transaction untuk atomic slot assignment
     const txResult = await prisma.$transaction(async (tx) => {
-      // Cari kandidat akun yang matching durasi + tipe
+      // Cari kandidat akun berdasarkan relasi product (bukan product_type)
       let candidateAccounts = await tx.stockAccount.findMany({
         where: {
-          productId,
           status: "available",
-          durationDays,
+          usageType: "sale",
+          product: {
+            name: { contains: productTitle, mode: "insensitive" }
+          }
         },
         orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
       });
 
-      // Fallback 1: tipe sama, tanpa filter durasi
+      // Fallback by productId jika tidak ketemu by name
       if (candidateAccounts.length === 0 && productId) {
         candidateAccounts = await tx.stockAccount.findMany({
-          where: { productId, status: "available" },
+          where: { 
+            productId, 
+            status: "available",
+            usageType: "sale"
+          },
           orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
         });
       }
 
-      // Fallback 2: tipe apapun
-      if (candidateAccounts.length === 0) {
-        candidateAccounts = await tx.stockAccount.findMany({
-          where: { status: "available" },
-          orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
-        });
-      }
-
-      // Pilih akun yang masih ada sisa slot
+      // Pilih akun yang masih ada sisa slot berdasarkan kolom max_slots di tabel stock
       const account = candidateAccounts.find(acc =>
-        (acc.usedSlots ?? 0) < (acc.maxSlots ?? maxSlotsForType)
+        (acc.usedSlots ?? 0) < (acc.maxSlots ?? 3)
       ) ?? null;
 
       if (!account) return null;
@@ -184,15 +181,16 @@ export async function POST(req: NextRequest) {
       });
 
       // ===== 5. FIX #1: Atomic update slot =====
+      const accountMaxSlots = account.maxSlots ?? 3;
       const newUsedSlots = (account.usedSlots ?? 0) + 1;
-      const accountMaxSlots = account.maxSlots ?? maxSlotsForType;
+
       const updated = await tx.stockAccount.updateMany({
         where: {
           id: account.id,
           usedSlots: { lt: accountMaxSlots }, // Atomic guard
         },
         data: {
-          usedSlots: newUsedSlots,
+          usedSlots: { increment: 1 },
           status: newUsedSlots >= accountMaxSlots ? "sold" : "available",
         },
       });

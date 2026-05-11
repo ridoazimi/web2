@@ -163,6 +163,7 @@ export default function TransactionsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   function copyUUID(id: string) {
     navigator.clipboard.writeText(id);
@@ -248,6 +249,27 @@ export default function TransactionsPage() {
     const next = page + 1;
     setPage(next);
     fetchData(next, true);
+  }
+
+  async function handleConfirmPending(trxId: string) {
+    if (!confirm("Konfirmasi transaksi ini secara manual? Transaksi akan ditandai sukses, mengambil stok, dan mengirim data akun ke pelanggan.")) return;
+    setActionLoading(trxId);
+    try {
+      const res = await fetch(`/api/transactions/${trxId}/confirm`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (res.ok) {
+        alert(json.message || "Transaksi berhasil dikonfirmasi!");
+        fetchData(page, false);
+      } else {
+        alert(json.error || "Gagal mengonfirmasi transaksi");
+      }
+    } catch (err) {
+      alert("Koneksi error");
+    } finally {
+      setActionLoading(null);
+    }
   }
 
 
@@ -755,6 +777,7 @@ export default function TransactionsPage() {
                         <th>Dibuat</th>
                         <th>Sumber</th>
                         <th className="sticky-col-head">Status</th>
+                        <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -790,6 +813,18 @@ export default function TransactionsPage() {
                             <td className="text-xs text-[var(--text-muted)]">{formatDateTime(trx.createdAt ?? null)}</td>
                             <td>{getSourceBadge(trx.source)}</td>
                             <td className="sticky-col-body">{getStatusBadge(trx.status)}</td>
+                            <td>
+                              {trx.status === "pending" && (
+                                <button
+                                  onClick={() => handleConfirmPending(trx.id)}
+                                  disabled={actionLoading === trx.id}
+                                  className="inline-flex items-center justify-center gap-1 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-200 disabled:opacity-50"
+                                >
+                                  {actionLoading === trx.id ? <Loader2 size={10} className="animate-spin" /> : <CheckCircle size={10} />}
+                                  Confirm
+                                </button>
+                              )}
+                            </td>
                           </tr>
                         ))
                       )}
@@ -846,6 +881,18 @@ export default function TransactionsPage() {
                             <span className="data-card-value">{maskPhone(trx.user?.whatsapp)}</span>
                           </div>
                         </div>
+                        {trx.status === "pending" && (
+                          <div className="mt-3 pt-3 border-t border-[rgba(99,102,241,0.08)]">
+                            <button
+                              onClick={() => handleConfirmPending(trx.id)}
+                              disabled={actionLoading === trx.id}
+                              className="w-full inline-flex items-center justify-center gap-1 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 disabled:opacity-50"
+                            >
+                              {actionLoading === trx.id ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
+                              Konfirmasi Pembayaran
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}

@@ -89,28 +89,42 @@ export async function POST(req: NextRequest) {
     const productType = parseProductType(productTitle);
     const durationDays = productData?.duration || parseDuration(productTitle) || 30;
 
-    console.log(`[Webhook] Processing ${productTitle} (${productType}) for ${durationDays} days`);
+    console.log(`[Webhook] Processing ${productTitle} for ${durationDays} days`);
     
     // ===== 1. PROSES TRANSAKSI & CARI STOK =====
-    const maxSlotsForType = productType === "desktop" ? 2 : 3;
+
 
     const txResult = await prisma.$transaction(async (tx) => {
       // 1. Ambil kandidat akun available (jika ada productId)
       let account = null;
-      if (productData?.id) {
-        let candidateAccounts = await tx.stockAccount.findMany({
+      // 1. Ambil kandidat akun available berdasarkan relasi product (bukan product_type)
+      let candidateAccounts = await tx.stockAccount.findMany({
+        where: {
+          status: "available",
+          usageType: "sale",
+          product: {
+            name: { contains: productTitle, mode: "insensitive" }
+          }
+        },
+        orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
+      });
+
+      // Fallback by productId jika tidak ketemu by name
+      if (candidateAccounts.length === 0 && productData?.id) {
+        candidateAccounts = await tx.stockAccount.findMany({
           where: {
             productId: productData.id,
             status: "available",
+            usageType: "sale",
           },
           orderBy: [{ usedSlots: "asc" }, { createdAt: "asc" }],
         });
-
-        // Pilih akun yang masih ada sisa slot
-        account = candidateAccounts.find(acc =>
-          (acc.usedSlots ?? 0) < (acc.maxSlots ?? maxSlotsForType)
-        ) ?? null;
       }
+
+      // Pilih akun yang masih ada sisa slot berdasarkan kolom max_slots di tabel stock
+      account = candidateAccounts.find(acc =>
+        (acc.usedSlots ?? 0) < (acc.maxSlots ?? 3)
+      ) ?? null;
 
       // Gunakan tanggal pembayaran dari payload jika ada, jika tidak gunakan waktu sekarang
       const purchaseDate = payload.payment_date ? new Date(payload.payment_date) : new Date();
@@ -129,8 +143,8 @@ export async function POST(req: NextRequest) {
 
       // 3. Jika ada akun, update slotnya
       if (account) {
+        const accountMaxSlots = account.maxSlots ?? 3;
         const newUsedSlots = (account.usedSlots ?? 0) + 1;
-        const accountMaxSlots = account.maxSlots ?? maxSlotsForType;
         
         const updatedAccount = await tx.stockAccount.updateMany({
           where: {
@@ -138,7 +152,7 @@ export async function POST(req: NextRequest) {
             usedSlots: { lt: accountMaxSlots }
           },
           data: {
-            usedSlots: newUsedSlots,
+            usedSlots: { increment: 1 },
             status: newUsedSlots >= accountMaxSlots ? "sold" : "available",
           },
         });
