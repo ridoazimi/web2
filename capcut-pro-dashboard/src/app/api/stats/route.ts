@@ -17,6 +17,7 @@ export async function GET() {
       activeUsers,
       recentTransactions,
       expiringUsers,
+      pendingWarrantyClaims,
     ] = await Promise.all([
       prisma.transaction.count(),
       prisma.user.count(),
@@ -64,6 +65,9 @@ export async function GET() {
         orderBy: { warrantyExpiredAt: "asc" },
         take: 20,
       }),
+
+      // Pending Warranty Claims (Moved to the end to match variable order)
+      prisma.warrantyClaim.count({ where: { status: "pending" } }),
     ]);
 
     return NextResponse.json({
@@ -73,6 +77,7 @@ export async function GET() {
       activeUsers,
       recentTransactions,
       expiringUsers,
+      pendingWarrantyClaims,
     });
   } catch (error) {
     console.error("GET /api/stats error:", error);

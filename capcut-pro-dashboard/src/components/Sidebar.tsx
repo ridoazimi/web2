@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useMobileNav } from "@/context/MobileNavContext";
 import { useAuth } from "@/context/AuthContext";
@@ -50,6 +51,27 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { isOpen, close } = useMobileNav();
   const { hasPermission, isDeveloper } = useAuth();
+  const [pendingClaimsCount, setPendingClaimsCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch stats to get pending claims count
+    const fetchStats = async () => {
+      try {
+        const res = await fetch("/api/stats");
+        const data = await res.json();
+        if (data.pendingWarrantyClaims !== undefined) {
+          setPendingClaimsCount(data.pendingWarrantyClaims);
+        }
+      } catch (err) {
+        console.error("Failed to fetch pending claims count:", err);
+      }
+    };
+
+    fetchStats();
+    // Refresh every 5 minutes
+    const interval = setInterval(fetchStats, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLinkClick = () => close();
 
@@ -80,7 +102,12 @@ export default function Sidebar() {
         onClick={handleLinkClick}
       >
         <item.icon size={18} />
-        {item.label}
+        <span className="flex-1">{item.label}</span>
+        {item.label === "Klaim Garansi" && pendingClaimsCount > 0 && (
+          <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center animate-pulse">
+            {pendingClaimsCount}
+          </span>
+        )}
       </Link>
     );
   }

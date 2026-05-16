@@ -343,3 +343,11 @@ model Voucher {
 
   @@map("vouchers")
 }
+
+model DataNomor {
+  id       Int     @id @default(autoincrement())
+  nomor    String  @db.VarChar(50)
+  statusAi String? @default("off") @map("status_ai") @db.VarChar(10)
+
+  @@map("data_nomor")
+}
