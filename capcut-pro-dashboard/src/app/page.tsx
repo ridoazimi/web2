@@ -11,7 +11,7 @@ import { ShoppingCart, Star, Zap, ChevronRight, ShieldCheck, Sparkles, ArrowRigh
 export const revalidate = 60; // Cache this page for 60 seconds
 
 export default async function MarketplacePage() {
-  const products = await getProducts();
+  const products = await getProducts(true);
 
 
 

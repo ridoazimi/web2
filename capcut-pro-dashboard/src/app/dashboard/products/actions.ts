@@ -4,9 +4,10 @@ import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth";
 
-export async function getProducts() {
+export async function getProducts(activeOnly: boolean = false) {
   try {
     const products = await prisma.product.findMany({
+      where: activeOnly ? { isActive: true } : {},
       orderBy: { createdAt: "desc" },
     });
 
