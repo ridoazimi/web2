@@ -1,4 +1,5 @@
 "use server";
+// Trigger rebuild for new prisma schema
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
@@ -86,6 +87,7 @@ export async function createProduct(formData: FormData) {
         duration,
         imageUrl,
         isActive,
+        stockStatus: formData.get("stockStatus") as string || "INTEGRATED",
         rules,
         messageTemplate,
       },
@@ -142,6 +144,7 @@ export async function updateProduct(id: string, formData: FormData) {
         duration,
         ...(imageUrl ? { imageUrl } : {}), // Only update if new image uploaded
         isActive,
+        stockStatus: formData.get("stockStatus") as string || "INTEGRATED",
         rules,
         messageTemplate,
       },

@@ -36,6 +36,7 @@ interface Product {
   duration: number | null;
   availableStock?: number;
   isActive: boolean;
+  stockStatus: string;
   rules: string | null;
   messageTemplate: string | null;
 }
@@ -62,6 +63,7 @@ export default function ProductsPage() {
     duration: "30",
     imageUrl: "",
     isActive: true,
+    stockStatus: "INTEGRATED",
     rules: "",
     messageTemplate: ""
   });
@@ -98,6 +100,7 @@ export default function ProductsPage() {
         duration: (product.duration || 30).toString(),
         imageUrl: product.imageUrl || "",
         isActive: product.isActive,
+        stockStatus: product.stockStatus || "INTEGRATED",
         rules: product.rules || "",
         messageTemplate: product.messageTemplate || ""
       });
@@ -114,6 +117,7 @@ export default function ProductsPage() {
         duration: "30",
         imageUrl: "",
         isActive: true,
+        stockStatus: "INTEGRATED",
         rules: "",
         messageTemplate: ""
       });
@@ -136,6 +140,7 @@ export default function ProductsPage() {
       data.append("maxSlots", formData.maxSlots);
       data.append("duration", formData.duration);
       data.append("isActive", formData.isActive.toString());
+      data.append("stockStatus", formData.stockStatus);
       data.append("rules", formData.rules);
       data.append("messageTemplate", formData.messageTemplate);
       data.append("imageUrl", formData.imageUrl);
@@ -277,11 +282,14 @@ export default function ProductsPage() {
                         {formatCurrency(Number(product.price))}
                       </td>
                       <td>
-                        <span className={`font-medium ${
-                          (product.availableStock || 0) > 0 ? 'text-emerald-400' : 'text-red-400'
-                        }`}>
-                          {(product.availableStock || 0)} Slot
-                        </span>
+                        <div className="flex flex-col">
+                          <span className={`font-medium ${(product.availableStock || 0) > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {(product.availableStock || 0)} Slot
+                          </span>
+                          <span className="text-[10px] text-[var(--text-muted)]">
+                            {product.stockStatus === "PREORDER" ? "⚡ Pre-order" : "📦 Integrated"}
+                          </span>
+                        </div>
                       </td>
                       <td>
 
@@ -483,6 +491,39 @@ Pass: [password]
                   <p className="text-[10px] text-[var(--text-muted)] mt-1">
                     Gunakan placeholder: [customer_name], [product_name], [email], [password], [expiry_date]
                   </p>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="form-label">Tipe Integrasi Stok</label>
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] flex-1">
+                      <input 
+                        type="radio" 
+                        name="stockStatus"
+                        value="INTEGRATED"
+                        className="w-4 h-4 accent-[var(--accent-primary)]"
+                        checked={formData.stockStatus === "INTEGRATED"}
+                        onChange={(e) => setFormData({...formData, stockStatus: e.target.value})}
+                      />
+                      <div>
+                        <p className="text-sm font-bold text-white">Terintegrasi Stok</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">Otomatis tidak bisa dibeli jika stok kosong</p>
+                      </div>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] flex-1">
+                      <input 
+                        type="radio" 
+                        name="stockStatus"
+                        value="PREORDER"
+                        className="w-4 h-4 accent-[var(--accent-primary)]"
+                        checked={formData.stockStatus === "PREORDER"}
+                        onChange={(e) => setFormData({...formData, stockStatus: e.target.value})}
+                      />
+                      <div>
+                        <p className="text-sm font-bold text-white">Pre-order</p>
+                        <p className="text-[10px] text-[var(--text-muted)]">Bisa dibeli kapan saja (stok tersedia/kosong)</p>
+                      </div>
+                    </label>
+                  </div>
                 </div>
                 <div className="md:col-span-2">
                   <label className="flex items-center gap-2 cursor-pointer">

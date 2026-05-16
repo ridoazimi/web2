@@ -64,51 +64,66 @@ export default async function MarketplacePage() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
-                {products.map((product: any) => (
-                  <Link
-                    key={product.id}
-                    href={`/checkout/${product.slug}`}
-                    className="group bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col"
-                  >
-                    <div className="aspect-square relative w-full overflow-hidden bg-slate-100">
-                      {product.imageUrl && (
-                        <Image
-                          src={product.imageUrl}
-                          alt={product.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      )}
-                      {!product.imageUrl && (
-                        <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/10 to-transparent flex items-center justify-center">
-                          <ShoppingCart className="text-[var(--accent-primary)]/30" size={40} />
-                        </div>
-                      )}
-                      {product.availableStock === 0 && (
-                        <div className="absolute inset-0 bg-amber-500/20 backdrop-blur-[1px] flex items-center justify-center">
-                          <span className="bg-amber-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase shadow-lg border border-white/20">Pre-order</span>
-                        </div>
-                      )}
-                    </div>
+                {products.map((product: any) => {
+                  const isPreOrder = product.stockStatus === "PREORDER";
+                  const isOutOfStock = !isPreOrder && (product.availableStock || 0) === 0;
 
-                    <div className="p-3 flex flex-col flex-1">
-                      <span className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-wider mb-1">
-                        {product.category}
-                      </span>
-                      <h3 className="text-sm md:text-base font-bold text-[var(--text-primary)] mb-2 leading-tight flex-1 break-words whitespace-normal">
-                        {product.name}
-                      </h3>
-                      <div className="mt-auto">
-                        <p className={`text-[10px] font-bold mb-1 ${product.availableStock === 0 ? 'text-amber-500' : 'text-[var(--text-secondary)]'}`}>
-                          {product.availableStock === 0 ? '⚡ Pre-order: 1-24 Jam' : `Tersedia: ${product.availableStock} Slot`}
-                        </p>
-                        <p className="text-sm md:text-lg font-black text-[var(--text-primary)]">
-                          {formatCurrency(Number(product.price))}
-                        </p>
+                  return (
+                    <Link
+                      key={product.id}
+                      href={isOutOfStock ? "#" : `/checkout/${product.slug}`}
+                      className={`group bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col ${isOutOfStock ? 'opacity-75 cursor-default' : ''}`}
+                    >
+                      <div className="aspect-square relative w-full overflow-hidden bg-slate-100">
+                        {product.imageUrl && (
+                          <Image
+                            src={product.imageUrl}
+                            alt={product.name}
+                            fill
+                            className={`object-cover transition-transform duration-500 ${!isOutOfStock ? 'group-hover:scale-105' : ''}`}
+                          />
+                        )}
+                        {!product.imageUrl && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/10 to-transparent flex items-center justify-center">
+                            <ShoppingCart className="text-[var(--accent-primary)]/30" size={40} />
+                          </div>
+                        )}
+                        
+                        {isPreOrder && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <span className="bg-amber-500 text-white text-[9px] font-black px-2 py-1 rounded-md uppercase shadow-sm border border-white/20">Pre-order</span>
+                          </div>
+                        )}
+
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-20">
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="bg-red-600 text-white text-[10px] font-black px-4 py-2 rounded-full uppercase shadow-xl border border-white/20">Stok Habis</span>
+                              <p className="text-[9px] text-white/80 font-medium">Cek berkala ya!</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </Link>
-                ))}
+
+                      <div className="p-3 flex flex-col flex-1">
+                        <span className="text-[10px] font-bold text-[var(--accent-primary)] uppercase tracking-wider mb-1">
+                          {product.category}
+                        </span>
+                        <h3 className="text-sm md:text-base font-bold text-[var(--text-primary)] mb-2 leading-tight flex-1 break-words whitespace-normal">
+                          {product.name}
+                        </h3>
+                        <div className="mt-auto">
+                          <p className={`text-[10px] font-bold mb-1 ${isOutOfStock ? 'text-red-400' : isPreOrder ? 'text-amber-500' : 'text-emerald-500'}`}>
+                            {isOutOfStock ? '❌ Stok Habis' : isPreOrder ? '⚡ Pre-order: 1-24 Jam' : `Tersedia: ${product.availableStock} Slot`}
+                          </p>
+                          <p className="text-sm md:text-lg font-black text-[var(--text-primary)]">
+                            {formatCurrency(Number(product.price))}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </section>
