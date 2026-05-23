@@ -85,6 +85,7 @@ export async function POST(req: Request) {
         productName: product.name,
         status: "pending",
         source: "website",
+        voucherCode: voucherCode ? voucherCode.toUpperCase() : null,
       }
     });
 

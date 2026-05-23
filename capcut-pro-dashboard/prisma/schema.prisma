@@ -65,6 +65,7 @@ model Transaction {
   paymentData          Json?                 @map("payment_data")
   messageLogs          MessageLog[]
   isManual             Boolean?              @default(false) @map("is_manual")
+  voucherCode          String?               @map("voucher_code") @db.VarChar(50)
   stockAccount         StockAccount?         @relation(fields: [stockAccountId], references: [id], onUpdate: NoAction)
   user                 User?                 @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
   warrantyClaims       WarrantyClaim[]

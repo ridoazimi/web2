@@ -80,6 +80,8 @@ export default function WarrantyDashboardPage() {
   const [loadingAccounts, setLoadingAccounts] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<WarrantyItem['transaction']>(null);
+  const [showReasonModal, setShowReasonModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState<string | null>(null);
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -338,7 +340,18 @@ export default function WarrantyDashboardPage() {
                               <span className="text-emerald-400 font-mono">{claim.newAccount?.accountEmail || "—"}</span>
                             </div>
                           </td>
-                          <td className="text-[var(--text-secondary)] text-sm max-w-[160px] truncate">{claim.claimReason || "-"}</td>
+                           <td 
+                             className={`text-[var(--text-secondary)] text-sm max-w-[160px] truncate ${claim.claimReason ? 'cursor-pointer hover:text-[#818cf8] transition-colors' : ''}`}
+                             onClick={() => {
+                               if (claim.claimReason) {
+                                 setSelectedReason(claim.claimReason);
+                                 setShowReasonModal(true);
+                               }
+                             }}
+                             title={claim.claimReason ? "Klik untuk melihat alasan lengkap" : undefined}
+                           >
+                             {claim.claimReason || "-"}
+                           </td>
                           <td>
                             {claim.evidenceUrl ? (
                               <a href={claim.evidenceUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline text-xs flex items-center gap-1">
@@ -384,7 +397,21 @@ export default function WarrantyDashboardPage() {
                         </div>
                         <div className="data-card-row"><span className="data-card-label">Akun Lama</span><span className="data-card-value font-mono text-xs text-rose-400">{claim.oldAccount?.accountEmail || "—"}</span></div>
                         <div className="data-card-row"><span className="data-card-label">Akun Baru</span><span className="data-card-value font-mono text-xs text-emerald-400">{claim.newAccount?.accountEmail || "—"}</span></div>
-                        <div className="data-card-row"><span className="data-card-label">Alasan</span><span className="data-card-value">{claim.claimReason || "-"}</span></div>
+                        <div className="data-card-row">
+                          <span className="data-card-label">Alasan</span>
+                          <span 
+                            className={`data-card-value max-w-[200px] truncate ${claim.claimReason ? 'cursor-pointer hover:text-[#818cf8] transition-colors' : ''}`}
+                            onClick={() => {
+                              if (claim.claimReason) {
+                                setSelectedReason(claim.claimReason);
+                                setShowReasonModal(true);
+                              }
+                            }}
+                            title={claim.claimReason ? "Klik untuk melihat alasan lengkap" : undefined}
+                          >
+                            {claim.claimReason || "-"}
+                          </span>
+                        </div>
                         <div className="data-card-row"><span className="data-card-label">Bukti Foto</span><span className="data-card-value">
                           {claim.evidenceUrl ? <a href={claim.evidenceUrl} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline text-xs flex items-center gap-1"><Search size={12} /> Buka Foto</a> : "-"}
                         </span></div>
@@ -671,6 +698,31 @@ export default function WarrantyDashboardPage() {
             </div>
             <div className="modal-footer">
               <button className="btn-secondary w-full" onClick={() => setShowTransactionModal(false)}>Tutup</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Detail Alasan Klaim */}
+      {showReasonModal && selectedReason && (
+        <div className="modal-overlay" onClick={() => { setShowReasonModal(false); setSelectedReason(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 450 }}>
+            <div className="modal-header">
+              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+                <AlertTriangle size={20} className="text-amber-400" /> Detail Alasan Klaim
+              </h3>
+              <button className="btn-icon" onClick={() => { setShowReasonModal(false); setSelectedReason(null); }}><X size={18} /></button>
+            </div>
+            <div className="modal-body space-y-4">
+              <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[rgba(255,255,255,0.05)] space-y-2">
+                <span className="text-xs text-[var(--text-muted)]">Alasan Lengkap</span>
+                <p className="text-sm text-white whitespace-pre-wrap break-words leading-relaxed">
+                  {selectedReason}
+                </p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary w-full" onClick={() => { setShowReasonModal(false); setSelectedReason(null); }}>Tutup</button>
             </div>
           </div>
         </div>

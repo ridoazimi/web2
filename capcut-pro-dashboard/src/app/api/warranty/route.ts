@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/lib/auth";
+import { sendBarantumMessage } from "@/lib/barantum";
 
 const WARRANTY_WEBHOOK_URL =
   "https://appsheetindonesia-dorrizstore.qxifii.easypanel.host/webhook/25ef64ae-a473-4f33-9549-d4a86138d14e";
@@ -209,6 +210,23 @@ export async function POST(req: NextRequest) {
       tanggal_klaim: new Date().toISOString(),
     });
 
+    // 7. Kirim pesan WhatsApp otomatis ke user via Barantum jika nomor WA ada (fire-and-forget)
+    if (transaction.user?.whatsapp) {
+      const customerName = transaction.user.name ?? "Pelanggan";
+      const trxId = transaction.lynkIdRef || transaction.id || "-";
+      const waMessage = `Halo ${customerName}, kami dari Dorizz Store ingin menginformasikan terkait pengajuan garansi Anda.\n\n` +
+        `ID Transaksi: *${trxId}*\n` +
+        `Status: *DISETUJUI*\n\n` +
+        `Berikut adalah data akun baru Anda:\n` +
+        `📧 Email: ${newAccount.accountEmail}\n` +
+        `🔑 Password: ${newAccount.accountPassword}\n\n` +
+        `Silakan login kembali dan pastikan data sudah sesuai. Terima kasih!`;
+      
+      sendBarantumMessage(transaction.user.whatsapp, waMessage).catch((err) => {
+        console.error("[Barantum Send Message Error POST]:", err);
+      });
+    }
+
     return NextResponse.json({
       claim,
       newAccount: {
@@ -366,6 +384,23 @@ export async function PATCH(req: NextRequest) {
       alasan_klaim: claim.claimReason || "Tidak disebutkan",
       tanggal_klaim: new Date().toISOString(),
     });
+
+    // Kirim pesan WhatsApp otomatis ke user via Barantum jika nomor WA ada (fire-and-forget)
+    if (transaction.user?.whatsapp) {
+      const customerName = transaction.user.name ?? "Pelanggan";
+      const trxId = transaction.lynkIdRef || transaction.id || "-";
+      const waMessage = `Halo ${customerName}, kami dari Dorizz Store ingin menginformasikan terkait pengajuan garansi Anda.\n\n` +
+        `ID Transaksi: *${trxId}*\n` +
+        `Status: *DISETUJUI*\n\n` +
+        `Berikut adalah data akun baru Anda:\n` +
+        `📧 Email: ${newAccount.accountEmail}\n` +
+        `🔑 Password: ${newAccount.accountPassword}\n\n` +
+        `Silakan login kembali dan pastikan data sudah sesuai. Terima kasih!`;
+
+      sendBarantumMessage(transaction.user.whatsapp, waMessage).catch((err) => {
+        console.error("[Barantum Send Message Error PATCH]:", err);
+      });
+    }
 
     return NextResponse.json({
       newAccount: {

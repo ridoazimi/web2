@@ -47,6 +47,7 @@ interface Transaction {
   createdAt: string | null;
   user: { id: string; name: string; email: string; whatsapp: string | null } | null;
   stockAccount: { id: string; accountEmail: string; status: string | null } | null;
+  voucherCode: string | null;
 }
 
 const statusFilters = ["Semua", "success", "pending", "failed"];
@@ -164,6 +165,41 @@ export default function TransactionsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedTrxForStatus, setSelectedTrxForStatus] = useState<Transaction | null>(null);
+  const [newStatusSelection, setNewStatusSelection] = useState<string>("success");
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  function openStatusModal(trx: Transaction) {
+    setSelectedTrxForStatus(trx);
+    setNewStatusSelection(trx.status || "success");
+    setShowStatusModal(true);
+  }
+
+  async function handleUpdateStatus() {
+    if (!selectedTrxForStatus) return;
+    setUpdatingStatus(true);
+    try {
+      const res = await fetch(`/api/transactions/${selectedTrxForStatus.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatusSelection }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        alert(json.message || "Status transaksi berhasil diperbarui!");
+        setShowStatusModal(false);
+        setSelectedTrxForStatus(null);
+        fetchData(page, false);
+      } else {
+        alert(json.error || "Gagal memperbarui status transaksi");
+      }
+    } catch {
+      alert("Koneksi error");
+    } finally {
+      setUpdatingStatus(false);
+    }
+  }
 
   function copyUUID(id: string) {
     navigator.clipboard.writeText(id);
@@ -771,6 +807,7 @@ export default function TransactionsPage() {
                         <th>WhatsApp</th>
                         <th>Akun CapCut</th>
                         <th>Produk</th>
+                        <th>Voucher</th>
                         <th>Nominal</th>
                         <th>Tanggal Beli</th>
                         <th>Aktif Sampai</th>
@@ -782,7 +819,7 @@ export default function TransactionsPage() {
                     </thead>
                     <tbody>
                       {transactions.length === 0 ? (
-                        <tr><td colSpan={12} className="text-center py-8 text-[var(--text-muted)]">Belum ada transaksi</td></tr>
+                        <tr><td colSpan={13} className="text-center py-8 text-[var(--text-muted)]">Belum ada transaksi</td></tr>
                       ) : (
                         transactions.map((trx) => (
                           <tr key={trx.id}>
@@ -802,6 +839,13 @@ export default function TransactionsPage() {
                             <td className="text-sm text-[var(--text-secondary)]">{maskPhone(trx.user?.whatsapp)}</td>
                             <td className="font-mono text-xs">{trx.stockAccount?.accountEmail || "-"}</td>
                             <td className="text-sm font-medium text-[#c7d2fe]">{trx.productName || <span className="text-[var(--text-muted)] italic text-xs">CapCut Pro (Default)</span>}</td>
+                            <td className="font-mono text-xs">
+                              {trx.voucherCode ? (
+                                <span className="badge badge-purple">{trx.voucherCode}</span>
+                              ) : (
+                                <span className="text-[var(--text-muted)]">-</span>
+                              )}
+                            </td>
                             <td className="font-semibold">{formatCurrency(Number(trx.amount))}</td>
                             <td className="text-[var(--text-secondary)] text-sm">{formatDateTime(trx.purchaseDate)}</td>
                             <td className="text-sm">
@@ -822,6 +866,14 @@ export default function TransactionsPage() {
                                 >
                                   {actionLoading === trx.id ? <Loader2 size={10} className="animate-spin" /> : <CheckCircle size={10} />}
                                   Confirm
+                                </button>
+                              )}
+                              {trx.status === "success" && (
+                                <button
+                                  onClick={() => openStatusModal(trx)}
+                                  className="inline-flex items-center justify-center gap-1 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white border border-indigo-500/20 px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-200"
+                                >
+                                  Ubah Status
                                 </button>
                               )}
                             </td>
@@ -858,6 +910,16 @@ export default function TransactionsPage() {
                             <span className="data-card-value text-[#c7d2fe]">{trx.productName || "CapCut Pro"}</span>
                           </div>
                           <div className="data-card-row">
+                            <span className="data-card-label">Voucher</span>
+                            <span className="data-card-value font-mono text-xs">
+                              {trx.voucherCode ? (
+                                <span className="badge badge-purple text-[10px]">{trx.voucherCode}</span>
+                              ) : (
+                                "-"
+                              )}
+                            </span>
+                          </div>
+                          <div className="data-card-row">
                             <span className="data-card-label">Akun</span>
                             <span className="data-card-value font-mono text-xs">{trx.stockAccount?.accountEmail || "-"}</span>
                           </div>
@@ -890,6 +952,16 @@ export default function TransactionsPage() {
                             >
                               {actionLoading === trx.id ? <Loader2 size={13} className="animate-spin" /> : <CheckCircle size={13} />}
                               Konfirmasi Pembayaran
+                            </button>
+                          </div>
+                        )}
+                        {trx.status === "success" && (
+                          <div className="mt-3 pt-3 border-t border-[rgba(99,102,241,0.08)]">
+                            <button
+                              onClick={() => openStatusModal(trx)}
+                              className="w-full inline-flex items-center justify-center gap-1 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500 hover:text-white border border-indigo-500/20 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
+                            >
+                              Ubah Status
                             </button>
                           </div>
                         )}
@@ -1491,6 +1563,52 @@ export default function TransactionsPage() {
                   Kirim Akun {accountType === 'mobile' ? 'Mobile' : 'Desktop'}
                 </button>
               ) : null}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Ubah Status Transaksi */}
+      {showStatusModal && selectedTrxForStatus && (
+        <div className="modal-overlay" onClick={() => { setShowStatusModal(false); setSelectedTrxForStatus(null); }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 400 }}>
+            <div className="modal-header">
+              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+                Ubah Status Transaksi
+              </h3>
+              <button className="btn-icon" onClick={() => { setShowStatusModal(false); setSelectedTrxForStatus(null); }}><X size={18} /></button>
+            </div>
+            <div className="modal-body space-y-4">
+              <div className="bg-[var(--bg-primary)] p-3 rounded-xl space-y-1 text-sm text-[var(--text-secondary)]">
+                <p><strong>Nama:</strong> {selectedTrxForStatus.user?.name || "-"}</p>
+                <p><strong>Produk:</strong> {selectedTrxForStatus.productName || "CapCut Pro"}</p>
+                <p><strong>Nominal:</strong> {formatCurrency(Number(selectedTrxForStatus.amount))}</p>
+                <p><strong>Status Saat Ini:</strong> {getStatusBadge(selectedTrxForStatus.status)}</p>
+              </div>
+              <div className="space-y-2">
+                <label className="form-label">Pilih Status Baru</label>
+                <select
+                  className="form-input"
+                  value={newStatusSelection}
+                  onChange={(e) => setNewStatusSelection(e.target.value)}
+                >
+                  <option value="success">Sukses</option>
+                  <option value="pending">Pending</option>
+                  <option value="failed">Gagal</option>
+                </select>
+              </div>
+              {newStatusSelection !== "success" && (
+                <div className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/5 text-xs text-rose-400">
+                  ⚠️ Mengubah status dari Sukses ke {newStatusSelection === "pending" ? "Pending" : "Gagal"} akan melepaskan/mengurangi slot akun yang dialokasikan jika ada.
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => { setShowStatusModal(false); setSelectedTrxForStatus(null); }}>Batal</button>
+              <button className="btn-primary" onClick={handleUpdateStatus} disabled={updatingStatus}>
+                {updatingStatus ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                Simpan
+              </button>
             </div>
           </div>
         </div>

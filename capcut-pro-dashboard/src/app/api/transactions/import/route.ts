@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
       purchaseDate: Date;
       warrantyExpiredAt: Date;
       productName: string | null;
+      voucherCode: string | null;
     }
     const parsedRows: ParsedTrx[] = [];
 
@@ -96,6 +97,9 @@ export async function POST(req: NextRequest) {
         continue; // lewati transaksi non-success
       }
       
+      const rawVoucherCode = trx["voucher code"] || trx.voucher_code || null;
+      const voucherCode = typeof rawVoucherCode === 'string' && rawVoucherCode ? rawVoucherCode.trim().toUpperCase() : null;
+
       const purchasedDateStr = trx["purchased date"] || trx.purchased_date || trx.tanggal || trx.date || trx["tanggal pembelian"] || null;
 
       if (!email || !lynkId) {
@@ -138,7 +142,7 @@ export async function POST(req: NextRequest) {
       const days = durFromName > 0 ? durFromName : 30;
       const warrantyExpiredAt = calcWarrantyExpiry(purchaseDate, days);
 
-      parsedRows.push({ lynkId, email, name, phone, amount, purchaseDate, warrantyExpiredAt, productName });
+      parsedRows.push({ lynkId, email, name, phone, amount, purchaseDate, warrantyExpiredAt, productName, voucherCode });
     }
 
     // ===== STEP 2: Bulk fetch existing data =====
@@ -231,6 +235,7 @@ export async function POST(req: NextRequest) {
                 source: "lynkid",
                 purchaseDate: row.purchaseDate,
                 warrantyExpiredAt: row.warrantyExpiredAt,
+                voucherCode: row.voucherCode,
               },
             });
 

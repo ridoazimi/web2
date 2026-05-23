@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
+import { sendBarantumMessage } from "@/lib/barantum";
 
 export async function checkTransactionValidity(orderId: string) {
   try {
@@ -66,7 +67,9 @@ export async function checkTransactionValidity(orderId: string) {
       purchaseDate: transaction.purchaseDate,
       warrantyExpiredAt: transaction.warrantyExpiredAt,
       oldAccountId: transaction.stockAccountId,
-      rules: rules
+      rules: rules,
+      customerName: transaction.user?.name || "Pelanggan",
+      customerWhatsapp: transaction.user?.whatsapp || "-"
     };
   } catch (error) {
     console.error("Check Transaction Error:", error);
@@ -122,6 +125,28 @@ export async function submitWarrantyClaim(formData: FormData) {
         status: "pending"
       }
     });
+
+    // Kirim notifikasi WhatsApp ke Admin via Barantum jika nomor admin dikonfigurasi
+    const adminPhone = process.env.ADMIN_WHATSAPP_NUMBER;
+    if (adminPhone) {
+      const customerName = checkResult.customerName || "Pelanggan";
+      const customerWhatsapp = checkResult.customerWhatsapp || "-";
+      const productName = checkResult.productName || "CapCut Pro";
+      const refId = orderId; // Input yang dimasukkan customer (bisa Ref ID atau UUID)
+
+      const adminMessage = `🚨 *NOTIFIKASI KLAIM GARANSI BARU* 🚨\n\n` +
+        `Ada pengajuan klaim garansi baru dari pelanggan:\n\n` +
+        `👤 *Nama:* ${customerName}\n` +
+        `📞 *WhatsApp:* ${customerWhatsapp}\n` +
+        `📦 *Produk:* ${productName}\n` +
+        `🆔 *Order ID/Ref:* ${refId}\n` +
+        `📝 *Alasan:* ${issue}\n\n` +
+        `Silakan cek dashboard admin untuk memproses klaim ini.`;
+
+      sendBarantumMessage(adminPhone, adminMessage).catch((err) => {
+        console.error("[Barantum Admin Notification Error]:", err);
+      });
+    }
 
     return { success: true };
   } catch (error: any) {
