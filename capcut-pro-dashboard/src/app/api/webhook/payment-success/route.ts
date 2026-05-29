@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
         .replace(/\[password\]/g, account?.accountPassword || "(Sedang diproses/Pre-order)")
         .replace(/\[whatsapp\]/g, waNumber);
 
-      await fetch("https://appsheetindonesia-dorrizstore.qxifii.easypanel.host/webhook/bf7fc32f-47cd-43c8-9b62-626948d502b7", {
+      await fetch("https://dorizz-n8n.7mewuf.easypanel.host/webhook/bf7fc32f-47cd-43c8-9b62-626948d502b7", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
