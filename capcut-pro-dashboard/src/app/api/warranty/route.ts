@@ -4,7 +4,7 @@ import { requirePermission } from "@/lib/auth";
 import { sendBarantumMessage } from "@/lib/barantum";
 
 const WARRANTY_WEBHOOK_URL =
-  "https://appsheetindonesia-dorrizstore.qxifii.easypanel.host/webhook/25ef64ae-a473-4f33-9549-d4a86138d14e";
+  "https://dorizz-n8n.7mewuf.easypanel.host/webhook/25ef64ae-a473-4f33-9549-d4a86138d14e";
 
 async function sendWarrantyWebhook(payload: {
   nama: string;
