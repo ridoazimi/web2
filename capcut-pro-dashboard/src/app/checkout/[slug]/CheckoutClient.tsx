@@ -20,6 +20,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [qrisData, setQrisData] = useState<any>(null);
+  const [isVerified, setIsVerified] = useState(false);
 
   const [voucherData, setVoucherData] = useState<any>(null);
   const [voucherCode, setVoucherCode] = useState("");
@@ -63,6 +64,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isVerified) return;
     setError("");
     setLoading(true);
 
@@ -243,10 +245,24 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                     </div>
                   )}
 
+                  {/* Verification Checklist */}
+                  <div className="flex items-start gap-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] p-4 rounded-xl">
+                    <input
+                      type="checkbox"
+                      id="verification-checkbox"
+                      checked={isVerified}
+                      onChange={(e) => setIsVerified(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--accent-primary)] focus:ring-[var(--accent-primary)] cursor-pointer accent-[var(--accent-primary)]"
+                    />
+                    <label htmlFor="verification-checkbox" className="text-xs text-[var(--text-secondary)] leading-relaxed cursor-pointer select-none">
+                      Pastikan Nomor yang dimasukkan sudah benar dan aktif di Whatsapp. Data akun capcut akan dikirim ke nomor tersebut. Kesalahan input tidak dapat direfund.
+                    </label>
+                  </div>
+
                   <button
                     type="submit"
-                    disabled={loading}
-                    className="w-full h-14 rounded-xl bg-[var(--accent-primary)] text-black font-bold hover:shadow-[0_0_20px_var(--accent-glow)] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-70 disabled:cursor-not-allowed"
+                    disabled={loading || !isVerified}
+                    className="w-full h-14 rounded-xl bg-[var(--accent-primary)] text-black font-bold hover:shadow-[0_0_20px_var(--accent-glow)] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:hover:shadow-none disabled:cursor-not-allowed"
                   >
                     {loading ? <Loader2 size={20} className="animate-spin" /> : <ShieldCheck size={20} />}
                     {loading ? "Memproses..." : "Lanjutkan Pembayaran"}
