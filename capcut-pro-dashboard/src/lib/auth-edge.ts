@@ -38,3 +38,20 @@ export async function verifyAffiliateTokenEdge(token: string): Promise<Affiliate
     return null;
   }
 }
+
+export interface SalesPayloadEdge {
+  id: string;
+  code: string;
+  name: string;
+  role: "sales";
+}
+
+export async function verifySalesTokenEdge(token: string): Promise<SalesPayloadEdge | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    if ((payload as Record<string, unknown>).role !== "sales") return null;
+    return payload as unknown as SalesPayloadEdge;
+  } catch {
+    return null;
+  }
+}

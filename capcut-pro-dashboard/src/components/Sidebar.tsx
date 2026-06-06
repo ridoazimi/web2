@@ -41,6 +41,7 @@ const marketingItems: { href: string; label: string; icon: React.ElementType; pe
   { href: "/dashboard/vouchers", label: "Voucher", icon: Scissors, permission: "page_vouchers" },
   { href: "/followup", label: "Follow-Up", icon: CalendarClock, permission: "page_followup" },
   { href: "/affiliates", label: "Affiliate", icon: UserPlus, permission: "page_affiliates" },
+  { href: "/sales", label: "Tim Sales", icon: Users, permission: "page_sales" },
   { href: "/retention", label: "Analisis Retensi", icon: RefreshCw, permission: "page_retention" },
   { href: "/absensi", label: "Absensi & Tugas", icon: ClipboardList, permission: "page_absensi" },
 ];

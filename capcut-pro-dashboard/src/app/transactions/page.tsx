@@ -48,6 +48,7 @@ interface Transaction {
   user: { id: string; name: string; email: string; whatsapp: string | null } | null;
   stockAccount: { id: string; accountEmail: string; status: string | null } | null;
   voucherCode: string | null;
+  sales: { id: string; name: string; code: string } | null;
 }
 
 const statusFilters = ["Semua", "success", "pending", "failed"];
@@ -813,13 +814,14 @@ export default function TransactionsPage() {
                         <th>Aktif Sampai</th>
                         <th>Dibuat</th>
                         <th>Sumber</th>
+                        <th>Sales</th>
                         <th className="sticky-col-head">Status</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {transactions.length === 0 ? (
-                        <tr><td colSpan={13} className="text-center py-8 text-[var(--text-muted)]">Belum ada transaksi</td></tr>
+                        <tr><td colSpan={15} className="text-center py-8 text-[var(--text-muted)]">Belum ada transaksi</td></tr>
                       ) : (
                         transactions.map((trx) => (
                           <tr key={trx.id}>
@@ -856,6 +858,13 @@ export default function TransactionsPage() {
                             </td>
                             <td className="text-xs text-[var(--text-muted)]">{formatDateTime(trx.createdAt ?? null)}</td>
                             <td>{getSourceBadge(trx.source)}</td>
+                            <td>
+                              {trx.sales ? (
+                                <span className="badge badge-primary" title={trx.sales.name}>{trx.sales.code}</span>
+                              ) : (
+                                <span className="text-[var(--text-muted)]">-</span>
+                              )}
+                            </td>
                             <td className="sticky-col-body">{getStatusBadge(trx.status)}</td>
                             <td>
                               {trx.status === "pending" && (
@@ -937,6 +946,16 @@ export default function TransactionsPage() {
                           <div className="data-card-row">
                             <span className="data-card-label">Sumber</span>
                             <span className="data-card-value">{getSourceBadge(trx.source)}</span>
+                          </div>
+                          <div className="data-card-row">
+                            <span className="data-card-label">Sales</span>
+                            <span className="data-card-value">
+                              {trx.sales ? (
+                                <span className="badge badge-primary text-[10px]" title={trx.sales.name}>{trx.sales.code}</span>
+                              ) : (
+                                "-"
+                              )}
+                            </span>
                           </div>
                           <div className="data-card-row">
                             <span className="data-card-label">WA</span>

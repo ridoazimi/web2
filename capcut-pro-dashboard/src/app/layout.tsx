@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { ThemeProvider } from "@/context/ThemeContext";
+import SalesTracker from "@/components/SalesTracker";
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dorizzstore.com"),
   title: "Dorizz Store Dashboard",
   description: "Dashboard Pengelola Dorizz Store - Manajemen Transaksi, Pelanggan, dan Stok Akun",
 };
@@ -24,6 +26,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
+          <SalesTracker />
           <LayoutWrapper>{children}</LayoutWrapper>
         </ThemeProvider>
       </body>

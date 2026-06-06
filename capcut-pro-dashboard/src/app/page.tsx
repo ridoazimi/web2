@@ -1,12 +1,39 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getProducts } from "./dashboard/products/actions";
 import { ShoppingCart, Star, Zap, ChevronRight, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import type { Metadata } from "next";
 
-
+export const metadata: Metadata = {
+  title: "Dorizz Store - Toko Akun Premium Murah, Cepat & Terpercaya",
+  description: "Beli akun premium murah dan legal hanya di Dorizz Store. Menyediakan berbagai akun premium seperti CapCut Pro, Canva Pro, Netflix, dan Spotify dengan pengiriman instan 24 jam dan garansi penuh.",
+  keywords: ["dorizz store", "beli akun premium", "capcut pro murah", "canva pro murah", "netflix premium", "spotify premium", "toko akun premium"],
+  authors: [{ name: "Dorizz Store" }],
+  openGraph: {
+    title: "Dorizz Store - Toko Akun Premium Murah, Cepat & Terpercaya",
+    description: "Beli akun premium murah dan legal hanya di Dorizz Store. Menyediakan berbagai akun premium seperti CapCut Pro, Canva Pro, Netflix, dan Spotify dengan pengiriman instan 24 jam.",
+    url: "https://dorizzstore.com",
+    siteName: "Dorizz Store",
+    images: [
+      {
+        url: "/images/logo.png",
+        width: 500,
+        height: 500,
+        alt: "Dorizz Store Logo",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Dorizz Store - Toko Akun Premium Murah, Cepat & Terpercaya",
+    description: "Beli akun premium murah dan legal hanya di Dorizz Store. Menyediakan berbagai akun premium seperti CapCut Pro, Canva Pro, Netflix, dan Spotify.",
+    images: ["/images/logo.png"],
+  },
+};
 
 export const revalidate = 60; // Cache this page for 60 seconds
 
@@ -46,9 +73,9 @@ export default async function MarketplacePage() {
               />
             </div>
             {/* Handle / Tagline */}
-            <p className="text-xl md:text-3xl font-bold text-[var(--hero-accent)] mb-6 tracking-wide drop-shadow-sm">
+            <h1 className="text-xl md:text-3xl font-bold text-[var(--hero-accent)] mb-6 tracking-wide drop-shadow-sm">
               @dorizzstore
-            </p>
+            </h1>
           </div>
         </section>
         <div className="-mt-1 w-full overflow-hidden leading-none">
@@ -71,6 +98,7 @@ export default async function MarketplacePage() {
                   return (
                     <Link
                       key={product.id}
+                      id={`product-link-${product.slug}`}
                       href={isOutOfStock ? "#" : `/checkout/${product.slug}`}
                       className={`group bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl overflow-hidden hover:shadow-md transition-all flex flex-col ${isOutOfStock ? 'opacity-75 cursor-default' : ''}`}
                     >

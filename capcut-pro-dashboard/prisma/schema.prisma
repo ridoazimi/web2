@@ -70,6 +70,8 @@ model Transaction {
   user                 User?                 @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: NoAction)
   warrantyClaims       WarrantyClaim[]
   affiliateCommissions AffiliateCommission[]
+  salesId              String?               @map("sales_id") @db.Uuid
+  sales                SalesTeam?            @relation(fields: [salesId], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
   @@map("transactions")
 }
@@ -351,4 +353,19 @@ model DataNomor {
   statusAi String? @default("off") @map("status_ai") @db.VarChar(10)
 
   @@map("data_nomor")
+}
+
+model SalesTeam {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String        @db.VarChar(255)
+  code      String        @unique @db.VarChar(100) // Kode unik sales (e.g. rido123)
+  password  String?       @db.VarChar(255)
+  whatsapp  String?       @db.VarChar(50)
+  status    String        @default("active") @db.VarChar(50) // active | inactive
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  transactions Transaction[]
+
+  @@map("sales_teams")
 }

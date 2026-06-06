@@ -71,6 +71,7 @@ export async function GET(req: NextRequest) {
         include: {
           user: { select: { id: true, name: true, email: true, whatsapp: true } },
           stockAccount: { select: { id: true, accountEmail: true, status: true } },
+          sales: { select: { id: true, name: true, code: true } },
         },
         orderBy: { purchaseDate: "desc" },
         skip,

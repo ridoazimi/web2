@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyTokenEdge, verifyAffiliateTokenEdge } from "@/lib/auth-edge";
+import { verifyTokenEdge, verifyAffiliateTokenEdge, verifySalesTokenEdge } from "@/lib/auth-edge";
 
 // Routes that don't require authentication
 const PUBLIC_PATHS = [
@@ -25,6 +25,9 @@ const PUBLIC_PATHS = [
   "/affiliate/setup",
   "/api/affiliate-portal/auth/login",
   "/api/affiliate-portal/auth/setup",
+  // Sales portal public paths
+  "/sales-portal/login",
+  "/api/sales-portal/auth/login",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -70,6 +73,32 @@ export async function middleware(req: NextRequest) {
       }
       const res = NextResponse.redirect(new URL("/affiliate/login", req.url));
       res.cookies.delete("affiliate_token");
+      return res;
+    }
+
+    return NextResponse.next();
+  }
+
+  // ── Sales Portal Routes ──────────────────────────────────────────────────
+  // Match: /sales-portal (exact), /sales-portal/*, /api/sales-portal/*
+  const isSalesPortal = pathname === "/sales-portal" || pathname.startsWith("/sales-portal/") || pathname.startsWith("/api/sales-portal");
+  if (isSalesPortal) {
+    const token = req.cookies.get("sales_token")?.value;
+
+    if (!token) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      return NextResponse.redirect(new URL("/sales-portal/login", req.url));
+    }
+
+    const sales = await verifySalesTokenEdge(token);
+    if (!sales) {
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Token tidak valid" }, { status: 401 });
+      }
+      const res = NextResponse.redirect(new URL("/sales-portal/login", req.url));
+      res.cookies.delete("sales_token");
       return res;
     }
 

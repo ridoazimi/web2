@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { productId, name, email, whatsapp, affiliateCode, voucherCode } = await req.json();
+    const { productId, name, email, whatsapp, affiliateCode, voucherCode, salesCode } = await req.json();
 
     if (!productId || !name || !email || !whatsapp) {
       return NextResponse.json({ error: "Mohon lengkapi semua data" }, { status: 400 });
@@ -19,6 +19,28 @@ export async function POST(req: Request) {
       const affiliate = await prisma.affiliate.findFirst({ where: { inviteToken: affiliateCode } });
       if (affiliate) {
         affiliateId = affiliate.id;
+      }
+    }
+
+    let resolvedSalesCode = salesCode;
+    if (!resolvedSalesCode) {
+      const cookiesHeader = req.headers.get("cookie") || "";
+      const match = cookiesHeader.match(/sales_code=([^;]+)/);
+      if (match) {
+        resolvedSalesCode = decodeURIComponent(match[1]);
+      }
+    }
+
+    let salesId = null;
+    if (resolvedSalesCode) {
+      const sales = await prisma.salesTeam.findFirst({
+        where: {
+          code: resolvedSalesCode,
+          status: "active"
+        }
+      });
+      if (sales) {
+        salesId = sales.id;
       }
     }
 
@@ -86,6 +108,7 @@ export async function POST(req: Request) {
         status: "pending",
         source: "website",
         voucherCode: voucherCode ? voucherCode.toUpperCase() : null,
+        salesId: salesId,
       }
     });
 
@@ -99,7 +122,7 @@ export async function POST(req: Request) {
 
     let qrisData: any = { status: false };
     try {
-      const qrisResponse = await fetch("https://klikqris.com/api/qris/create", {
+      const qrisResponse = await fetch("https://klikqris.com/api/sandbox/qris/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

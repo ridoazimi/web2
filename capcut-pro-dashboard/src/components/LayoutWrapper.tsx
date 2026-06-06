@@ -9,7 +9,7 @@ import { PrivacyProvider } from "@/context/PrivacyContext";
 import { MobileNavProvider } from "@/context/MobileNavContext";
 import { ReactNode } from "react";
 
-const PUBLIC_PAGES = ["/", "/checkout", "/login", "/register", "/affiliate/login", "/affiliate/setup", "/payment", "/terms", "/privacy", "/warranty"];
+const PUBLIC_PAGES = ["/", "/checkout", "/login", "/register", "/affiliate/login", "/affiliate/setup", "/sales-portal", "/sales-portal/login", "/sales-portal/dashboard", "/payment", "/terms", "/privacy", "/warranty"];
 
 
 

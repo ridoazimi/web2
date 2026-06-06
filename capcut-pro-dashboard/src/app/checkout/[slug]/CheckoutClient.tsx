@@ -75,7 +75,8 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
         body: JSON.stringify({
           productId: product.id,
           ...formData,
-          voucherCode: voucherData?.code || null
+          voucherCode: voucherData?.code || null,
+          salesCode: typeof window !== "undefined" ? localStorage.getItem("sales_code") : null
         })
       });
 
@@ -136,6 +137,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
               </p>
 
               <button
+                id="checkout-reload-btn"
                 onClick={() => window.location.reload()}
                 className="mt-8 text-sm text-[var(--accent-primary)] font-semibold hover:underline"
               >
@@ -165,7 +167,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
               </Link>
 
               <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-3xl p-6 md:p-10 shadow-xl">
-                <h1 className="text-2xl md:text-3xl font-bold mb-2">Detail Pemesanan</h1>
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">Checkout {product.name}</h1>
                 <p className="text-[var(--text-secondary)] mb-8 text-sm md:text-base leading-relaxed">Lengkapi data di bawah ini untuk proses pengiriman akun secara instan.</p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -175,6 +177,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                       <input
                         type="text"
                         required
+                        id="checkout-name-input"
                         value={formData.name}
                         onChange={e => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Masukkan nama lengkap Anda"
@@ -186,6 +189,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                       <input
                         type="email"
                         required
+                        id="checkout-email-input"
                         value={formData.email}
                         onChange={e => setFormData({ ...formData, email: e.target.value })}
                         placeholder="email@contoh.com"
@@ -197,6 +201,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                       <input
                         type="tel"
                         required
+                        id="checkout-whatsapp-input"
                         value={formData.whatsapp}
                         onChange={e => setFormData({ ...formData, whatsapp: e.target.value })}
                         placeholder="081234567890"
@@ -211,6 +216,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                       <div className="relative flex-1">
                         <input
                           type="text"
+                          id="checkout-voucher-input"
                           value={voucherCode}
                           onChange={e => setVoucherCode(e.target.value.toUpperCase())}
                           placeholder="Punya kode voucher?"
@@ -224,6 +230,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
                       </div>
                       <button
                         type="button"
+                        id="checkout-voucher-submit-btn"
                         onClick={handleApplyVoucher}
                         disabled={validatingVoucher || !voucherCode}
                         className="px-6 rounded-xl bg-[var(--bg-card)] border border-[var(--border-color)] font-bold text-sm hover:border-[var(--accent-primary)] transition-all disabled:opacity-50"
@@ -261,6 +268,7 @@ export default function CheckoutClient({ product, initialRef }: { product: any, 
 
                   <button
                     type="submit"
+                    id="checkout-submit-btn"
                     disabled={loading || !isVerified}
                     className="w-full h-14 rounded-xl bg-[var(--accent-primary)] text-black font-bold hover:shadow-[0_0_20px_var(--accent-glow)] transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50 disabled:hover:shadow-none disabled:cursor-not-allowed"
                   >
