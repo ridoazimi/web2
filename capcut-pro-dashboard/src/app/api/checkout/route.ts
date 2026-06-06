@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 
     let qrisData: any = { status: false };
     try {
-      const qrisResponse = await fetch("https://klikqris.com/api/sandbox/qris/create", {
+      const qrisResponse = await fetch("https://klikqris.com/api/qris/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
