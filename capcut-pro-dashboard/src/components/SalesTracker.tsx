@@ -10,7 +10,7 @@ export default function SalesTracker() {
         const salesCode = params.get("sl");
 
         if (salesCode) {
-          // Set 30 days expiration
+          // Set 3 days expiration
           const expirationDate = new Date();
           expirationDate.setDate(expirationDate.getDate() + 3);
 
@@ -21,7 +21,7 @@ export default function SalesTracker() {
           // Save to document cookie (accessible on request headers)
           document.cookie = `sales_code=${encodeURIComponent(
             salesCode
-          )}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Lax`;
+          )}; max-age=${3 * 24 * 60 * 60}; path=/; SameSite=Lax`;
 
           // Clean up the ?sl= query param from URL bar
           params.delete("sl");
