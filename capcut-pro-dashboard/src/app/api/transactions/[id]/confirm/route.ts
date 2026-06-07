@@ -68,6 +68,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         (acc.usedSlots ?? 0) < (acc.maxSlots ?? 3)
       ) ?? null;
 
+      if (!account) {
+        throw new Error("STOK_KOSONG");
+      }
+
       const purchaseDate = new Date();
       const warrantyExpiredAt = calcWarrantyExpiry(purchaseDate, durationDays);
 
@@ -75,30 +79,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         where: { id: transaction.id },
         data: {
           status: "success",
-          stockAccountId: account?.id || null,
+          stockAccountId: account.id,
           purchaseDate,
           warrantyExpiredAt,
         },
       });
 
-      if (account) {
-        const accountMaxSlots = account.maxSlots ?? 3;
-        const newUsedSlots = (account.usedSlots ?? 0) + 1;
-        
-        const updatedAccount = await tx.stockAccount.updateMany({
-          where: {
-            id: account.id,
-            usedSlots: { lt: accountMaxSlots }
-          },
-          data: {
-            usedSlots: { increment: 1 },
-            status: newUsedSlots >= accountMaxSlots ? "sold" : "available",
-          },
-        });
+      const accountMaxSlots = account.maxSlots ?? 3;
+      const newUsedSlots = (account.usedSlots ?? 0) + 1;
+      
+      const updatedAccount = await tx.stockAccount.updateMany({
+        where: {
+          id: account.id,
+          usedSlots: { lt: accountMaxSlots }
+        },
+        data: {
+          usedSlots: { increment: 1 },
+          status: newUsedSlots >= accountMaxSlots ? "sold" : "available",
+        },
+      });
 
-        if (updatedAccount.count === 0) {
-          throw new Error("SLOT_PENUH_RETRY");
-        }
+      if (updatedAccount.count === 0) {
+        throw new Error("SLOT_PENUH_RETRY");
       }
 
       return { account, transaction: updatedTrx };
@@ -119,8 +121,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .replace(/\[nama\]/g, user.name)
         .replace(/\[id_trx\]/g, transaction.id)
         .replace(/\[product\]/g, productTitle)
-        .replace(/\[email\]/g, account?.accountEmail || "(Sedang diproses/Pre-order)")
-        .replace(/\[password\]/g, account?.accountPassword || "(Sedang diproses/Pre-order)")
+        .replace(/\[email\]/g, account.accountEmail)
+        .replace(/\[password\]/g, account.accountPassword)
         .replace(/\[whatsapp\]/g, waNumber);
 
       await fetch("https://appsheetindonesia-dorrizstore.qxifii.easypanel.host/webhook/bf7fc32f-47cd-43c8-9b62-626948d502b7", {
@@ -130,8 +132,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           "nama user": user.name,
           "email user": user.email,
           "whatsapp user": waNumber,
-          "akun capcut user": account?.accountEmail || "Pre-order",
-          "passowrd capcut user": account?.accountPassword || "Pre-order",
+          "akun capcut user": account.accountEmail,
+          "passowrd capcut user": account.accountPassword,
           "pesan": processedMessage
         })
       });
@@ -142,10 +144,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({
       success: true,
       message: "Transaksi berhasil dikonfirmasi secara manual",
-      account: account?.accountEmail || null
+      account: account.accountEmail
     });
 
   } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg === "STOK_KOSONG") {
+      return NextResponse.json({ error: "Gagal konfirmasi: Stok akun CapCut kosong atau habis. Silakan tambahkan akun baru di menu Stok terlebih dahulu." }, { status: 400 });
+    }
+    if (msg === "SLOT_PENUH_RETRY") {
+      return NextResponse.json({ error: "Gagal konfirmasi: Akun CapCut terpilih baru saja penuh karena transaksi bersamaan. Silakan coba lagi." }, { status: 409 });
+    }
     console.error("[Manual Confirm] Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
