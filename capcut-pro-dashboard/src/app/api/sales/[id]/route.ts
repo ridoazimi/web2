@@ -73,7 +73,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   try {
     const { id } = await params;
     const body = await req.json();
-    const { name, code, whatsapp, status, password } = body;
+    const { name, code, whatsapp, status, password, category } = body;
 
     // Validate existence
     const existingSales = await prisma.salesTeam.findUnique({ where: { id } });
@@ -98,6 +98,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         whatsapp: whatsapp !== undefined ? whatsapp : undefined,
         status: status !== undefined ? status : undefined,
         password: password !== undefined ? password : undefined,
+        category: category !== undefined ? (category || null) : undefined,
       }
     });
 

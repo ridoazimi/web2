@@ -58,6 +58,7 @@ export async function GET(req: NextRequest) {
         code: sales.code,
         whatsapp: sales.whatsapp,
         status: sales.status,
+        category: sales.category,
         createdAt: sales.createdAt,
         totalClosing,
         totalAllClosing,

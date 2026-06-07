@@ -28,6 +28,7 @@ interface SalesItem {
   whatsapp: string | null;
   status: string;
   password?: string | null;
+  category?: string | null;
   createdAt: string;
   totalClosing: number;
   totalAllClosing: number;
@@ -60,6 +61,8 @@ type SortOption = "newest" | "closingDesc" | "closingAsc" | "revenueDesc" | "rev
 export default function SalesPage() {
   const { maskPhone } = usePrivacy();
   const [sales, setSales] = useState<SalesItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
@@ -77,7 +80,8 @@ export default function SalesPage() {
     code: "",
     whatsapp: "",
     password: "",
-    status: "active"
+    status: "active",
+    category: ""
   });
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -88,17 +92,21 @@ export default function SalesPage() {
     try {
       const params = new URLSearchParams();
       if (search) params.set("search", search);
+      if (selectedCategory) params.set("category", selectedCategory);
       if (startDate) params.set("startDate", startDate);
       if (endDate) params.set("endDate", endDate);
       const res = await fetch(`/api/sales?${params}`);
       const data = await res.json();
       setSales(data.sales || []);
+      if (data.categories) {
+        setCategories(data.categories);
+      }
     } catch (err) {
       console.error("Failed to fetch sales team:", err);
     } finally {
       setLoading(false);
     }
-  }, [search, startDate, endDate]);
+  }, [search, selectedCategory, startDate, endDate]);
 
   useEffect(() => {
     fetchSales();
@@ -117,7 +125,7 @@ export default function SalesPage() {
   // CRUD actions
   const handleOpenCreate = () => {
     setEditingSales(null);
-    setFormData({ name: "", code: "", whatsapp: "", password: "", status: "active" });
+    setFormData({ name: "", code: "", whatsapp: "", password: "", status: "active", category: "" });
     setShowForm(true);
   };
 
@@ -128,7 +136,8 @@ export default function SalesPage() {
       code: salesMember.code,
       whatsapp: salesMember.whatsapp || "",
       password: salesMember.password || "",
-      status: salesMember.status
+      status: salesMember.status,
+      category: salesMember.category || ""
     });
     setShowForm(true);
   };
@@ -279,7 +288,20 @@ export default function SalesPage() {
               />
             </div>
 
-            <div className="flex items-center gap-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl px-3 py-1.5 min-w-[200px] h-[42px]">
+            <div className="flex items-center gap-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl px-3 py-1.5 min-w-[150px] h-[42px]">
+              <select
+                className="bg-transparent text-sm text-[var(--text-secondary)] outline-none w-full appearance-none cursor-pointer"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="" className="bg-[#0d111c]">Semua Kategori</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat} className="bg-[#0d111c]">{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl px-3 py-1.5 min-w-[180px] h-[42px]">
               <ArrowUpDown size={14} className="text-[var(--text-muted)]" />
               <select
                 className="bg-transparent text-sm text-[var(--text-secondary)] outline-none w-full appearance-none cursor-pointer"
@@ -354,6 +376,7 @@ export default function SalesPage() {
                 <thead>
                   <tr>
                     <th>Nama</th>
+                    <th>Kategori</th>
                     <th>Kode Tracking</th>
                     <th>WhatsApp</th>
                     <th>Status</th>
@@ -368,6 +391,13 @@ export default function SalesPage() {
                   {sortedSales.map((s) => (
                     <tr key={s.id}>
                       <td className="font-medium text-white">{s.name}</td>
+                      <td>
+                        {s.category ? (
+                          <span className="badge badge-info">{s.category}</span>
+                        ) : (
+                          <span className="text-[var(--text-muted)] text-xs">—</span>
+                        )}
+                      </td>
                       <td>
                         <span className="badge badge-purple font-mono">{s.code}</span>
                       </td>
@@ -446,7 +476,12 @@ export default function SalesPage() {
             <div className="modal-content" style={{ maxWidth: 768 }} onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <div>
-                  <h3 className="text-lg font-bold text-white">Detail Performa: {showDetail.name}</h3>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    Detail Performa: {showDetail.name}
+                    {showDetail.category && (
+                      <span className="badge badge-info text-[10px]">{showDetail.category}</span>
+                    )}
+                  </h3>
                   <p className="text-xs text-[var(--text-muted)]">Kode Sales: {showDetail.code} • WA: {showDetail.whatsapp || "-"}</p>
                 </div>
                 <button className="btn-icon" onClick={() => setShowDetail(null)}><X size={18} /></button>
@@ -632,6 +667,16 @@ export default function SalesPage() {
                   <p className="text-[10px] text-[var(--text-muted)] mt-1">
                     Digunakan sales untuk login ke dashboard performa mereka di masa mendatang.
                   </p>
+                </div>
+                <div>
+                  <label className="form-label">Kategori (contoh: endorse, organic)</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Contoh: endorse, organic, dll"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  />
                 </div>
                 {editingSales && (
                   <div>

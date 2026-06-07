@@ -21,16 +21,18 @@ export async function GET(req: NextRequest) {
     const where: Record<string, unknown> = {};
 
     if (search) {
+      const trimmedSearch = search.trim();
       const searchConditions: Record<string, unknown>[] = [
-        { lynkIdRef: { contains: search, mode: "insensitive" } },
-        { user: { name: { contains: search, mode: "insensitive" } } },
-        { user: { email: { contains: search, mode: "insensitive" } } },
-        { user: { whatsapp: { contains: search, mode: "insensitive" } } },
+        { lynkIdRef: { contains: trimmedSearch, mode: "insensitive" } },
+        { user: { name: { contains: trimmedSearch, mode: "insensitive" } } },
+        { user: { email: { contains: trimmedSearch, mode: "insensitive" } } },
+        { user: { whatsapp: { contains: trimmedSearch, mode: "insensitive" } } },
       ];
       // Also search by transaction UUID (id)
-      // UUID format check - if search looks like a UUID prefix or full UUID
-      if (/^[0-9a-f-]{4,}$/i.test(search)) {
-        searchConditions.push({ id: { startsWith: search, mode: "insensitive" } });
+      // Check if search is a valid full UUID format to prevent database query cast crashes
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidRegex.test(trimmedSearch)) {
+        searchConditions.push({ id: trimmedSearch });
       }
       where.OR = searchConditions;
     }

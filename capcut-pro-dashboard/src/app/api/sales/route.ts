@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") || "";
+    const category = searchParams.get("category") || "";
     const startDate = searchParams.get("startDate") || "";
     const endDate = searchParams.get("endDate") || "";
 
@@ -22,6 +23,9 @@ export async function GET(req: NextRequest) {
         { code: { contains: search, mode: "insensitive" } },
         { whatsapp: { contains: search, mode: "insensitive" } },
       ];
+    }
+    if (category) {
+      where.category = category;
     }
 
     const txWhere: any = {};
@@ -66,7 +70,15 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ sales: result });
+    // Fetch distinct categories
+    const distinctCategories = await prisma.salesTeam.findMany({
+      where: { category: { not: null } },
+      select: { category: true },
+      distinct: ["category"]
+    });
+    const categories = distinctCategories.map(c => c.category).filter(Boolean);
+
+    return NextResponse.json({ sales: result, categories });
   } catch (error) {
     console.error("GET /api/sales error:", error);
     return NextResponse.json({ error: "Gagal mengambil data sales" }, { status: 500 });
@@ -80,7 +92,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { name, code, whatsapp, status, password } = body;
+    const { name, code, whatsapp, status, password, category } = body;
 
     if (!name || !code) {
       return NextResponse.json({ error: "Nama dan Kode Sales wajib diisi" }, { status: 400 });
@@ -100,7 +112,8 @@ export async function POST(req: NextRequest) {
         code: code.trim().toLowerCase(), // sanitize code to be lowercase and trimmed
         whatsapp,
         status: status || "active",
-        password: password || null
+        password: password || null,
+        category: category || null
       }
     });
 

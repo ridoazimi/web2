@@ -14,6 +14,42 @@ import {
   Link2,
   Globe,
 } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
+import { useTheme } from "@/context/ThemeContext";
+
+function maskName(name: string | null | undefined): string {
+  if (!name) return "—";
+  const trimmed = name.trim();
+  const words = trimmed.split(" ");
+  const maskedWords = words.map(word => {
+    if (word.length <= 2) return word;
+    return word.slice(0, 2) + "****";
+  });
+  return maskedWords.join(" ");
+}
+
+function maskWhatsapp(phone: string | null | undefined): string {
+  if (!phone) return "—";
+  const cleaned = phone.trim();
+  if (cleaned.startsWith("+62")) {
+    return cleaned.slice(0, 5) + "****";
+  }
+  if (cleaned.startsWith("62")) {
+    return cleaned.slice(0, 4) + "****";
+  }
+  return cleaned.slice(0, 4) + "****";
+}
+
+function maskEmail(email: string | null | undefined): string {
+  if (!email) return "—";
+  const parts = email.split("@");
+  if (parts.length !== 2) return email.slice(0, 3) + "****";
+  const [local, domain] = parts;
+  if (local.length <= 2) {
+    return local + "****@" + domain;
+  }
+  return local.slice(0, 2) + "****@" + domain;
+}
 
 interface TransactionItem {
   id: string;
@@ -38,6 +74,7 @@ interface SalesProfile {
   code: string;
   whatsapp: string | null;
   status: string;
+  category: string | null;
   createdAt: string;
   totalClosing: number;
   totalAllClosing: number;
@@ -47,6 +84,7 @@ interface SalesProfile {
 
 export default function SalesDashboardPage() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [profile, setProfile] = useState<SalesProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"success" | "all">("success");
@@ -117,7 +155,7 @@ export default function SalesDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#06080F]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--bg-primary)]">
         <Loader2 className="animate-spin text-[var(--accent-primary)] mb-4" size={40} />
         <p className="text-sm text-[var(--text-muted)]">Memuat dashboard sales...</p>
       </div>
@@ -135,7 +173,7 @@ export default function SalesDashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#06080F] text-white">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-200">
       {/* Dynamic Background Glows */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-5 blur-3xl" style={{ background: "radial-gradient(circle, #20D5D2, transparent)" }} />
@@ -143,7 +181,7 @@ export default function SalesDashboardPage() {
       </div>
 
       {/* Navbar Header */}
-      <header className="relative z-10 border-b border-[var(--border-color)] bg-[#0A0D17]/80 backdrop-blur-md">
+      <header className="relative z-10 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/80 backdrop-blur-md transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
@@ -152,14 +190,15 @@ export default function SalesDashboardPage() {
               <Briefcase size={20} className="text-white" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-white tracking-tight">Sales Portal</h1>
+              <h1 className="text-base font-bold text-[var(--text-primary)] tracking-tight">Sales Portal</h1>
               <p className="text-[10px] text-[var(--text-muted)]">Dorizz Store Sales Tracking</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <div className="hidden sm:flex flex-col text-right">
-              <span className="text-sm font-semibold text-white">{profile.name}</span>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{profile.name}</span>
               <span className="text-xs text-[var(--text-muted)] font-mono">Kode: {profile.code}</span>
             </div>
             <button
@@ -188,7 +227,7 @@ export default function SalesDashboardPage() {
                   <User size={20} />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">{profile.name}</h2>
+                  <h2 className="text-lg font-bold text-[var(--text-primary)]">{profile.name}</h2>
                   <p className="text-xs text-[var(--text-muted)]">Bergabung sejak {new Date(profile.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
                 </div>
               </div>
@@ -196,7 +235,11 @@ export default function SalesDashboardPage() {
               <div className="border-t border-[var(--border-color)] pt-4 space-y-2 text-sm text-[var(--text-secondary)]">
                 <div className="flex justify-between">
                   <span>No. WhatsApp:</span>
-                  <span className="font-mono text-white">{profile.whatsapp || "—"}</span>
+                  <span className="font-mono text-[var(--text-primary)]">{profile.whatsapp || "—"}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Kategori Sales:</span>
+                  <span className="badge badge-info !py-0.5 !px-2.5">{profile.category || "Umum"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Status Akun:</span>
@@ -209,7 +252,7 @@ export default function SalesDashboardPage() {
           {/* Right Column: Dynamic Link generator */}
           <div className="lg:col-span-8 glass-card p-6 flex flex-col justify-between">
             <div>
-              <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-wider flex items-center gap-1.5">
+              <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1 uppercase tracking-wider flex items-center gap-1.5">
                 <Globe size={15} className="text-[var(--accent-primary)]" />
                 Tautan Pelacakan Pribadi Anda
               </h3>
@@ -223,7 +266,7 @@ export default function SalesDashboardPage() {
                 type="text"
                 readOnly
                 value={trackingUrl}
-                className="form-input flex-1 font-mono text-xs bg-[#06080F] border-[var(--border-color)] text-[var(--text-secondary)] h-12 select-all"
+                className="form-input flex-1 font-mono text-xs bg-[var(--bg-primary)] border-[var(--border-color)] text-[var(--text-secondary)] h-12 select-all focus:border-[var(--accent-primary)] focus:ring-1 focus:ring-[var(--accent-primary)]"
               />
               <button
                 onClick={handleCopyLink}
@@ -244,7 +287,7 @@ export default function SalesDashboardPage() {
             className={`glass-card p-5 flex items-center gap-4 cursor-pointer border-2 transition-all ${
               activeTab === "success" 
                 ? "border-[rgba(32,213,210,0.4)] shadow-[var(--shadow-glow)]" 
-                : "border-[var(--border-color)] hover:bg-[#141927]"
+                : "border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
             }`}
           >
             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400">
@@ -260,14 +303,14 @@ export default function SalesDashboardPage() {
             className={`glass-card p-5 flex items-center gap-4 cursor-pointer border-2 transition-all ${
               activeTab === "all" 
                 ? "border-indigo-500/50 shadow-indigo-500/10" 
-                : "border-[var(--border-color)] hover:bg-[#141927]"
+                : "border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
             }`}
           >
             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400">
               <Briefcase size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{profile.totalAllClosing}</p>
+              <p className="text-2xl font-bold text-[var(--text-primary)]">{profile.totalAllClosing}</p>
               <p className="text-xs text-[var(--text-muted)] font-semibold uppercase tracking-wider">Semua Closing (Semua Status)</p>
             </div>
           </div>
@@ -286,7 +329,7 @@ export default function SalesDashboardPage() {
         <div className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
                 {activeTab === "success" ? "Riwayat Closing Sukses" : "Semua Riwayat Closing"}
                 <span className="badge badge-purple font-mono">{filteredTransactions.length}</span>
               </h3>
@@ -299,7 +342,7 @@ export default function SalesDashboardPage() {
                 <span className="text-[10px] text-[var(--text-muted)] font-semibold uppercase whitespace-nowrap">Dari</span>
                 <input
                   type="date"
-                  className="bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 [color-scheme:dark]"
+                  className={`bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 ${theme === 'dark' ? '[color-scheme:dark]' : '[color-scheme:light]'}`}
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
@@ -309,7 +352,7 @@ export default function SalesDashboardPage() {
                 <span className="text-[10px] text-[var(--text-muted)] font-semibold uppercase whitespace-nowrap">Sampai</span>
                 <input
                   type="date"
-                  className="bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 [color-scheme:dark]"
+                  className={`bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 ${theme === 'dark' ? '[color-scheme:dark]' : '[color-scheme:light]'}`}
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -334,7 +377,7 @@ export default function SalesDashboardPage() {
                 <button
                   onClick={() => setActiveTab("success")}
                   className={`text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
-                    activeTab === "success" ? "bg-[rgba(32,213,210,0.15)] text-[var(--accent-primary)] font-bold" : "text-[var(--text-muted)] hover:text-white"
+                    activeTab === "success" ? "bg-[rgba(32,213,210,0.15)] text-[var(--accent-primary)] font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   Sukses
@@ -342,7 +385,7 @@ export default function SalesDashboardPage() {
                 <button
                   onClick={() => setActiveTab("all")}
                   className={`text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
-                    activeTab === "all" ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--text-muted)] hover:text-white"
+                    activeTab === "all" ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   Semua Status
@@ -376,10 +419,10 @@ export default function SalesDashboardPage() {
                   <tbody>
                     {filteredTransactions.map((t) => (
                       <tr key={t.id}>
-                        <td className="font-bold text-white">{t.productName || "CapCut Pro"}</td>
-                        <td>{t.user?.name || "—"}</td>
-                        <td className="font-mono text-xs">{t.user?.whatsapp || "—"}</td>
-                        <td className="font-mono text-xs">{t.user?.email || "—"}</td>
+                        <td className="font-bold text-[var(--text-primary)]">{t.productName || "CapCut Pro"}</td>
+                        <td>{maskName(t.user?.name)}</td>
+                        <td className="font-mono text-xs">{maskWhatsapp(t.user?.whatsapp)}</td>
+                        <td className="font-mono text-xs">{maskEmail(t.user?.email)}</td>
                         <td>
                           {t.purchaseDate 
                             ? new Date(t.purchaseDate).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) 
@@ -400,11 +443,11 @@ export default function SalesDashboardPage() {
                             {t.status === 'success' ? 'Sukses' : t.status === 'pending' ? 'Pending' : 'Gagal'}
                           </span>
                         </td>
-                        <td className="font-bold text-white">Rp {fmt(Number(t.amount))}</td>
-                        <td className="font-mono text-xs text-[#c7d2fe]">
+                        <td className="font-bold text-[var(--text-primary)]">Rp {fmt(Number(t.amount))}</td>
+                        <td className="font-mono text-xs text-indigo-500 dark:text-[#c7d2fe]">
                           {t.stockAccount ? (
-                            <span className="select-all block max-w-[200px] truncate" title={t.stockAccount.accountEmail}>
-                              {t.stockAccount.accountEmail}
+                            <span className="select-all block max-w-[200px] truncate" title={maskEmail(t.stockAccount.accountEmail)}>
+                              {maskEmail(t.stockAccount.accountEmail)}
                             </span>
                           ) : (
                             "—"

@@ -362,6 +362,7 @@ model SalesTeam {
   password  String?       @db.VarChar(255)
   whatsapp  String?       @db.VarChar(50)
   status    String        @default("active") @db.VarChar(50) // active | inactive
+  category  String?       @db.VarChar(100)
   createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime      @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
