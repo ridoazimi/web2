@@ -12,7 +12,7 @@ export default function SalesTracker() {
         if (salesCode) {
           // Set 30 days expiration
           const expirationDate = new Date();
-          expirationDate.setDate(expirationDate.getDate() + 30);
+          expirationDate.setDate(expirationDate.getDate() + 3);
 
           // Save to localStorage
           localStorage.setItem("sales_code", salesCode);
