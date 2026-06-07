@@ -214,7 +214,7 @@ export default function SalesDashboardPage() {
                 Tautan Pelacakan Pribadi Anda
               </h3>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4">
-                Sebarkan link di bawah ini ke calon pembeli Anda. Setiap kali pembeli mengeklik link ini, sistem akan mencatat Anda sebagai sales selama 30 hari ke depan secara otomatis.
+                Sebarkan link di bawah ini ke calon pembeli Anda. Setiap kali pembeli mengeklik link ini, sistem akan mencatat Anda sebagai sales selama 3 hari ke depan secara otomatis.
               </p>
             </div>
 
