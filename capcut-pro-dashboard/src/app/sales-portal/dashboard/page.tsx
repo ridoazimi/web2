@@ -32,12 +32,12 @@ function maskWhatsapp(phone: string | null | undefined): string {
   if (!phone) return "—";
   const cleaned = phone.trim();
   if (cleaned.startsWith("+62")) {
-    return cleaned.slice(0, 5) + "****";
+    return "+62" + "****" + cleaned.slice(-4);
   }
   if (cleaned.startsWith("62")) {
-    return cleaned.slice(0, 4) + "****";
+    return "62" + "****" + cleaned.slice(-4);
   }
-  return cleaned.slice(0, 4) + "****";
+  return "****" + cleaned.slice(-4);
 }
 
 function maskEmail(email: string | null | undefined): string {
@@ -90,7 +90,7 @@ export default function SalesDashboardPage() {
   const [activeTab, setActiveTab] = useState<"success" | "all">("success");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  
+
   const [linkCopied, setLinkCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -164,8 +164,8 @@ export default function SalesDashboardPage() {
 
   if (!profile) return null;
 
-  const trackingUrl = typeof window !== "undefined" 
-    ? `${window.location.origin}/?sl=${profile.code}` 
+  const trackingUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/?sl=${profile.code}`
     : `https://dorizstore.com/?sl=${profile.code}`;
 
   const filteredTransactions = profile.transactions.filter(
@@ -216,7 +216,7 @@ export default function SalesDashboardPage() {
 
       {/* Main Container */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 py-8 space-y-6">
-        
+
         {/* Profile Info & Copy Link banner */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Welcome */}
@@ -231,7 +231,7 @@ export default function SalesDashboardPage() {
                   <p className="text-xs text-[var(--text-muted)]">Bergabung sejak {new Date(profile.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
                 </div>
               </div>
-              
+
               <div className="border-t border-[var(--border-color)] pt-4 space-y-2 text-sm text-[var(--text-secondary)]">
                 <div className="flex justify-between">
                   <span>No. WhatsApp:</span>
@@ -281,14 +281,13 @@ export default function SalesDashboardPage() {
         </div>
 
         {/* Realtime Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
             onClick={() => setActiveTab("success")}
-            className={`glass-card p-5 flex items-center gap-4 cursor-pointer border-2 transition-all ${
-              activeTab === "success" 
-                ? "border-[rgba(32,213,210,0.4)] shadow-[var(--shadow-glow)]" 
-                : "border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
-            }`}
+            className={`glass-card p-5 flex items-center gap-4 cursor-pointer border-2 transition-all ${activeTab === "success"
+              ? "border-[rgba(32,213,210,0.4)] shadow-[var(--shadow-glow)]"
+              : "border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
+              }`}
           >
             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400">
               <TrendingUp size={24} />
@@ -298,13 +297,12 @@ export default function SalesDashboardPage() {
               <p className="text-xs text-[var(--text-muted)] font-semibold uppercase tracking-wider">Closing Sukses (Sukses)</p>
             </div>
           </div>
-          <div 
+          <div
             onClick={() => setActiveTab("all")}
-            className={`glass-card p-5 flex items-center gap-4 cursor-pointer border-2 transition-all ${
-              activeTab === "all" 
-                ? "border-indigo-500/50 shadow-indigo-500/10" 
-                : "border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
-            }`}
+            className={`glass-card p-5 flex items-center gap-4 cursor-pointer border-2 transition-all ${activeTab === "all"
+              ? "border-indigo-500/50 shadow-indigo-500/10"
+              : "border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
+              }`}
           >
             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400">
               <Briefcase size={24} />
@@ -312,15 +310,6 @@ export default function SalesDashboardPage() {
             <div>
               <p className="text-2xl font-bold text-[var(--text-primary)]">{profile.totalAllClosing}</p>
               <p className="text-xs text-[var(--text-muted)] font-semibold uppercase tracking-wider">Semua Closing (Semua Status)</p>
-            </div>
-          </div>
-          <div className="glass-card p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-500/10 text-amber-400">
-              <DollarSign size={24} />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-amber-400">Rp {fmt(profile.totalRevenue)}</p>
-              <p className="text-xs text-[var(--text-muted)] font-semibold uppercase tracking-wider">Total Omset Penjualan</p>
             </div>
           </div>
         </div>
@@ -376,17 +365,15 @@ export default function SalesDashboardPage() {
               <div className="flex gap-1 bg-[var(--bg-card)] border border-[var(--border-color)] p-1 rounded-xl">
                 <button
                   onClick={() => setActiveTab("success")}
-                  className={`text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
-                    activeTab === "success" ? "bg-[rgba(32,213,210,0.15)] text-[var(--accent-primary)] font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                  }`}
+                  className={`text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${activeTab === "success" ? "bg-[rgba(32,213,210,0.15)] text-[var(--accent-primary)] font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                    }`}
                 >
                   Sukses
                 </button>
                 <button
                   onClick={() => setActiveTab("all")}
-                  className={`text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${
-                    activeTab === "all" ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                  }`}
+                  className={`text-xs px-3 py-1.5 rounded-lg transition-all cursor-pointer font-medium ${activeTab === "all" ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                    }`}
                 >
                   Semua Status
                 </button>
@@ -424,8 +411,8 @@ export default function SalesDashboardPage() {
                         <td className="font-mono text-xs">{maskWhatsapp(t.user?.whatsapp)}</td>
                         <td className="font-mono text-xs">{maskEmail(t.user?.email)}</td>
                         <td>
-                          {t.purchaseDate 
-                            ? new Date(t.purchaseDate).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) 
+                          {t.purchaseDate
+                            ? new Date(t.purchaseDate).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
                             : "—"
                           }
                         </td>
@@ -437,9 +424,8 @@ export default function SalesDashboardPage() {
                           )}
                         </td>
                         <td>
-                          <span className={`badge ${
-                            t.status === 'success' ? 'badge-success' : t.status === 'pending' ? 'badge-warning' : 'badge-danger'
-                          }`}>
+                          <span className={`badge ${t.status === 'success' ? 'badge-success' : t.status === 'pending' ? 'badge-warning' : 'badge-danger'
+                            }`}>
                             {t.status === 'success' ? 'Sukses' : t.status === 'pending' ? 'Pending' : 'Gagal'}
                           </span>
                         </td>

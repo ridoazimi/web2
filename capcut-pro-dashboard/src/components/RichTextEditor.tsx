@@ -44,7 +44,7 @@ export default function RichTextEditor({ value, onChange, placeholder }: RichTex
         modules={modules}
         formats={formats}
         placeholder={placeholder}
-        className="bg-[var(--bg-card)] text-white rounded-xl overflow-hidden border border-[var(--border-color)]"
+        className="bg-[var(--bg-card)] text-[var(--text-primary)] rounded-xl overflow-hidden border border-[var(--border-color)]"
       />
     </div>
   );

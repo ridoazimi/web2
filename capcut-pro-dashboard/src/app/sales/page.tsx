@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Topbar from "@/components/Topbar";
 import { usePrivacy } from "@/context/PrivacyContext";
+import { useTheme } from "@/context/ThemeContext";
 import {
   Plus,
   Search,
@@ -59,6 +60,7 @@ interface SalesDetail extends SalesItem {
 type SortOption = "newest" | "closingDesc" | "closingAsc" | "revenueDesc" | "revenueAsc";
 
 export default function SalesPage() {
+  const { theme } = useTheme();
   const { maskPhone } = usePrivacy();
   const [sales, setSales] = useState<SalesItem[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -250,7 +252,7 @@ export default function SalesPage() {
               <Users size={24} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{totalSalesActive} / {sales.length}</p>
+              <p className="text-2xl font-bold text-[var(--text-primary)]">{totalSalesActive} / {sales.length}</p>
               <p className="text-xs text-[var(--text-muted)]">Sales Aktif / Total</p>
             </div>
           </div>
@@ -276,7 +278,7 @@ export default function SalesPage() {
 
         {/* Toolbar & Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-wrap items-center gap-3 flex-1">
             <div className="search-box flex-1 max-w-md">
               <Search size={16} className="search-icon" />
               <input
@@ -294,9 +296,9 @@ export default function SalesPage() {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
-                <option value="" className="bg-[#0d111c]">Semua Kategori</option>
+                <option value="" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Semua Kategori</option>
                 {categories.map((cat) => (
-                  <option key={cat} value={cat} className="bg-[#0d111c]">{cat}</option>
+                  <option key={cat} value={cat} className="bg-[var(--bg-card)] text-[var(--text-primary)]">{cat}</option>
                 ))}
               </select>
             </div>
@@ -308,11 +310,11 @@ export default function SalesPage() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
               >
-                <option value="newest" className="bg-[#0d111c]">Terbaru</option>
-                <option value="closingDesc" className="bg-[#0d111c]">Closing Terbanyak</option>
-                <option value="closingAsc" className="bg-[#0d111c]">Closing Terendah</option>
-                <option value="revenueDesc" className="bg-[#0d111c]">Revenue Tertinggi</option>
-                <option value="revenueAsc" className="bg-[#0d111c]">Revenue Terendah</option>
+                <option value="newest" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Terbaru</option>
+                <option value="closingDesc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Closing Terbanyak</option>
+                <option value="closingAsc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Closing Terendah</option>
+                <option value="revenueDesc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Revenue Tertinggi</option>
+                <option value="revenueAsc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Revenue Terendah</option>
               </select>
             </div>
 
@@ -321,7 +323,7 @@ export default function SalesPage() {
               <span className="text-[10px] text-[var(--text-muted)] font-semibold uppercase whitespace-nowrap">Dari</span>
               <input
                 type="date"
-                className="bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 [color-scheme:dark]"
+                className={`bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 ${theme === 'dark' ? '[color-scheme:dark]' : '[color-scheme:light]'}`}
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
@@ -331,7 +333,7 @@ export default function SalesPage() {
               <span className="text-[10px] text-[var(--text-muted)] font-semibold uppercase whitespace-nowrap">Sampai</span>
               <input
                 type="date"
-                className="bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 [color-scheme:dark]"
+                className={`bg-transparent text-xs text-[var(--text-secondary)] outline-none cursor-pointer border-0 ${theme === 'dark' ? '[color-scheme:dark]' : '[color-scheme:light]'}`}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
@@ -390,7 +392,7 @@ export default function SalesPage() {
                 <tbody>
                   {sortedSales.map((s) => (
                     <tr key={s.id}>
-                      <td className="font-medium text-white">{s.name}</td>
+                      <td className="font-medium text-[var(--text-primary)]">{s.name}</td>
                       <td>
                         {s.category ? (
                           <span className="badge badge-info">{s.category}</span>
@@ -414,9 +416,9 @@ export default function SalesPage() {
                         <button
                           onClick={() => handleViewDetail(s.id, "success")}
                           disabled={detailLoading}
-                          className={`flex items-center gap-1.5 hover:text-white transition-colors group cursor-pointer text-[var(--accent-primary)]`}
+                          className={`flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors group cursor-pointer text-[var(--accent-primary)]`}
                         >
-                          <Briefcase size={14} className="group-hover:text-white" />
+                          <Briefcase size={14} className="group-hover:text-[var(--text-primary)]" />
                           <span className="font-bold underline">{s.totalClosing} closing</span>
                         </button>
                       </td>
@@ -424,9 +426,9 @@ export default function SalesPage() {
                         <button
                           onClick={() => handleViewDetail(s.id, "all")}
                           disabled={detailLoading}
-                          className="flex items-center gap-1.5 hover:text-white text-indigo-400 transition-colors group cursor-pointer"
+                          className="flex items-center gap-1.5 hover:text-[var(--text-primary)] text-indigo-400 transition-colors group cursor-pointer"
                         >
-                          <Briefcase size={14} className="group-hover:text-white" />
+                          <Briefcase size={14} className="group-hover:text-[var(--text-primary)]" />
                           <span className="font-bold underline">{s.totalAllClosing} closing</span>
                         </button>
                       </td>
@@ -442,7 +444,7 @@ export default function SalesPage() {
                           </button>
                           <button
                             onClick={() => handleOpenEdit(s)}
-                            className="btn-icon hover:bg-[rgba(99,102,241,0.15)] hover:text-white"
+                            className="btn-icon hover:bg-[rgba(99,102,241,0.15)] hover:text-indigo-400"
                             title="Edit Sales"
                           >
                             <Edit2 size={16} />
@@ -476,7 +478,7 @@ export default function SalesPage() {
             <div className="modal-content" style={{ maxWidth: 768 }} onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <div>
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
                     Detail Performa: {showDetail.name}
                     {showDetail.category && (
                       <span className="badge badge-info text-[10px]">{showDetail.category}</span>
@@ -495,22 +497,22 @@ export default function SalesPage() {
                     className={`p-3 rounded-xl text-center cursor-pointer border transition-all ${
                       activeDetailTab === "success" 
                         ? "bg-[rgba(32,213,210,0.1)] border-[rgba(32,213,210,0.3)] text-[var(--accent-primary)]" 
-                        : "bg-white/5 border-[var(--border-color)] hover:bg-white/10"
+                        : "bg-[var(--bg-secondary)] border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
                     }`}
                   >
                     <p className="text-[10px] text-[var(--text-muted)] uppercase font-semibold">Closing Sukses</p>
-                    <p className="text-lg font-bold text-white mt-1">{showDetail.totalClosing}</p>
+                    <p className="text-lg font-bold text-[var(--text-primary)] mt-1">{showDetail.totalClosing}</p>
                   </div>
                   <div 
                     onClick={() => setActiveDetailTab("all")}
                     className={`p-3 rounded-xl text-center cursor-pointer border transition-all ${
                       activeDetailTab === "all" 
                         ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400" 
-                        : "bg-white/5 border-[var(--border-color)] hover:bg-white/10"
+                        : "bg-[var(--bg-secondary)] border-[var(--border-color)] hover:bg-[var(--bg-card-hover)]"
                     }`}
                   >
                     <p className="text-[10px] text-[var(--text-muted)] uppercase font-semibold">Semua Closing</p>
-                    <p className="text-lg font-bold text-white mt-1">{showDetail.totalAllClosing}</p>
+                    <p className="text-lg font-bold text-[var(--text-primary)] mt-1">{showDetail.totalAllClosing}</p>
                   </div>
                   <div className="p-3 rounded-xl text-center bg-amber-500/5 border border-amber-500/10">
                     <p className="text-[10px] text-[var(--text-muted)] uppercase font-semibold">Total Omset</p>
@@ -529,7 +531,7 @@ export default function SalesPage() {
                         type="button"
                         onClick={() => setActiveDetailTab("success")}
                         className={`text-[10px] px-2.5 py-1 rounded-md transition-all ${
-                          activeDetailTab === "success" ? "bg-[rgba(32,213,210,0.15)] text-[var(--accent-primary)] font-bold" : "text-[var(--text-muted)] hover:text-white"
+                          activeDetailTab === "success" ? "bg-[rgba(32,213,210,0.15)] text-[var(--accent-primary)] font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                         }`}
                       >
                         Sukses
@@ -538,7 +540,7 @@ export default function SalesPage() {
                         type="button"
                         onClick={() => setActiveDetailTab("all")}
                         className={`text-[10px] px-2.5 py-1 rounded-md transition-all ${
-                          activeDetailTab === "all" ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--text-muted)] hover:text-white"
+                          activeDetailTab === "all" ? "bg-indigo-500/15 text-indigo-400 font-bold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                         }`}
                       >
                         Semua
@@ -554,7 +556,7 @@ export default function SalesPage() {
                           className="p-4 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] space-y-3"
                         >
                           <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
-                            <span className="text-sm font-bold text-white">{t.productName || "CapCut Pro (Default)"}</span>
+                            <span className="text-sm font-bold text-[var(--text-primary)]">{t.productName || "CapCut Pro (Default)"}</span>
                             <span className={`badge ${
                               t.status === 'success' ? 'badge-success' : t.status === 'pending' ? 'badge-warning' : 'badge-danger'
                             }`}>
@@ -563,19 +565,19 @@ export default function SalesPage() {
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 text-xs text-[var(--text-secondary)]">
                             <div>
-                              <span className="text-[var(--text-muted)]">Nama Pembeli:</span> <span className="text-white font-medium">{t.user?.name || "—"}</span>
+                              <span className="text-[var(--text-muted)]">Nama Pembeli:</span> <span className="text-[var(--text-primary)] font-medium">{t.user?.name || "—"}</span>
                             </div>
                             <div>
-                              <span className="text-[var(--text-muted)]">Nomor WhatsApp:</span> <span className="text-white font-mono font-medium">{t.user?.whatsapp || "—"}</span>
+                              <span className="text-[var(--text-muted)]">Nomor WhatsApp:</span> <span className="text-[var(--text-primary)] font-mono font-medium">{t.user?.whatsapp || "—"}</span>
                             </div>
                             <div>
-                              <span className="text-[var(--text-muted)]">Alamat Email:</span> <span className="text-white font-mono font-medium">{t.user?.email || "—"}</span>
+                              <span className="text-[var(--text-muted)]">Alamat Email:</span> <span className="text-[var(--text-primary)] font-mono font-medium">{t.user?.email || "—"}</span>
                             </div>
                             <div>
-                              <span className="text-[var(--text-muted)]">Nominal Tagihan:</span> <span className="text-white font-bold">Rp {fmt(Number(t.amount))}</span>
+                              <span className="text-[var(--text-muted)]">Nominal Tagihan:</span> <span className="text-[var(--text-primary)] font-bold">Rp {fmt(Number(t.amount))}</span>
                             </div>
                             <div>
-                              <span className="text-[var(--text-muted)]">Tanggal Transaksi:</span> <span className="text-white font-medium">{t.purchaseDate ? new Date(t.purchaseDate).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}</span>
+                              <span className="text-[var(--text-muted)]">Tanggal Transaksi:</span> <span className="text-[var(--text-primary)] font-medium">{t.purchaseDate ? new Date(t.purchaseDate).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"}</span>
                             </div>
                             {t.voucherCode && (
                               <div>
@@ -583,7 +585,7 @@ export default function SalesPage() {
                               </div>
                             )}
                             {t.stockAccount && (
-                              <div className="col-span-1 md:col-span-2 mt-1 p-2.5 rounded-xl bg-black/40 border border-white/5 font-mono text-[11px] text-[#c7d2fe]">
+                              <div className="col-span-1 md:col-span-2 mt-1 p-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono text-[11px] text-indigo-600 dark:text-[#c7d2fe]">
                                 <span className="text-[var(--text-muted)]">Akun CapCut Terkirim:</span> {t.stockAccount.accountEmail}
                               </div>
                             )}
@@ -612,7 +614,7 @@ export default function SalesPage() {
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
           <div className="modal-content" style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">
                 {editingSales ? "Edit Anggota Sales" : "Tambah Anggota Sales"}
               </h3>
               <button className="btn-icon" onClick={() => setShowForm(false)}><X size={18} /></button>

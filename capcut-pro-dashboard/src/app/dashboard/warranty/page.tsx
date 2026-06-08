@@ -378,7 +378,7 @@ export default function WarrantyDashboardPage() {
                     <div key={claim.id} className="data-card">
                       <div className="flex items-start justify-between mb-3">
                         <div className="min-w-0 flex-1 mr-2">
-                          <p className="font-semibold text-white text-sm truncate">{claim.transaction?.user?.name || "-"}</p>
+                          <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{claim.transaction?.user?.name || "-"}</p>
                           <p className="text-xs text-[var(--text-muted)]">{maskPhone(claim.transaction?.user?.whatsapp)}</p>
                         </div>
                         {getClaimBadge(claim.status)}
@@ -437,7 +437,7 @@ export default function WarrantyDashboardPage() {
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2"><ShieldCheck size={20} className="text-[#818cf8]" /> Proses Klaim Garansi</h3>
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2"><ShieldCheck size={20} className="text-[#818cf8]" /> Proses Klaim Garansi</h3>
               <button className="btn-icon" onClick={closeModal}><X size={18} /></button>
             </div>
             <div className="modal-body space-y-4">
@@ -445,8 +445,8 @@ export default function WarrantyDashboardPage() {
                 <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-3">
                   <p className="font-semibold text-emerald-300">✅ {claimResult.message}</p>
                   <div className="bg-[var(--bg-primary)] rounded-lg p-3 font-mono text-sm space-y-1">
-                    <p><span className="text-[var(--text-muted)]">Email Baru:</span> <span className="text-white">{claimResult.newAccount.email}</span></p>
-                    <p><span className="text-[var(--text-muted)]">Password:</span> <span className="text-white">{claimResult.newAccount.password}</span></p>
+                    <p><span className="text-[var(--text-muted)]">Email Baru:</span> <span className="text-[var(--text-primary)]">{claimResult.newAccount.email}</span></p>
+                    <p><span className="text-[var(--text-muted)]">Password:</span> <span className="text-[var(--text-primary)]">{claimResult.newAccount.password}</span></p>
                   </div>
                   <p className="text-xs text-[var(--text-muted)]">Slot akun lama sudah dikurangi. Kirim data akun baru ke pelanggan.</p>
                 </div>
@@ -494,7 +494,7 @@ export default function WarrantyDashboardPage() {
         <div className="modal-overlay" onClick={closeActionModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 {actionTarget.action === "approve" ? (
                   <><CheckCircle2 size={20} className="text-emerald-400" /> Terima Pengajuan Garansi</>
                 ) : (
@@ -511,8 +511,8 @@ export default function WarrantyDashboardPage() {
                   </p>
                   {actionResult.newAccount && (
                     <div className="bg-[var(--bg-primary)] rounded-lg p-3 font-mono text-sm space-y-1">
-                      <p><span className="text-[var(--text-muted)]">Email Baru:</span> <span className="text-white">{actionResult.newAccount.email}</span></p>
-                      <p><span className="text-[var(--text-muted)]">Password:</span> <span className="text-white">{actionResult.newAccount.password}</span></p>
+                      <p><span className="text-[var(--text-muted)]">Email Baru:</span> <span className="text-[var(--text-primary)]">{actionResult.newAccount.email}</span></p>
+                      <p><span className="text-[var(--text-muted)]">Password:</span> <span className="text-[var(--text-primary)]">{actionResult.newAccount.password}</span></p>
                     </div>
                   )}
                 </div>
@@ -522,15 +522,15 @@ export default function WarrantyDashboardPage() {
                   <div className="bg-[var(--bg-primary)] rounded-xl p-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">Pelanggan</span>
-                      <span className="text-white font-medium">{actionTarget.claim.transaction?.user?.name || "-"}</span>
+                      <span className="text-[var(--text-primary)] font-medium">{actionTarget.claim.transaction?.user?.name || "-"}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">WhatsApp</span>
-                      <span className="text-white">{actionTarget.claim.transaction?.user?.whatsapp || "-"}</span>
+                      <span className="text-[var(--text-primary)]">{actionTarget.claim.transaction?.user?.whatsapp || "-"}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">Alasan</span>
-                      <span className="text-white">{actionTarget.claim.claimReason || "-"}</span>
+                      <span className="text-[var(--text-primary)]">{actionTarget.claim.claimReason || "-"}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">Bukti</span>
@@ -546,7 +546,7 @@ export default function WarrantyDashboardPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-[var(--text-muted)]">Tanggal Klaim</span>
-                      <span className="text-white">{actionTarget.claim.createdAt ? new Date(actionTarget.claim.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-"}</span>
+                      <span className="text-[var(--text-primary)]">{actionTarget.claim.createdAt ? new Date(actionTarget.claim.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "-"}</span>
                     </div>
                   </div>
 
@@ -621,7 +621,7 @@ export default function WarrantyDashboardPage() {
         <div className="modal-overlay" onClick={() => setShowTransactionModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 450 }}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 <LayoutList size={20} className="text-[#818cf8]" /> Detail Transaksi
               </h3>
               <button className="btn-icon" onClick={() => setShowTransactionModal(false)}><X size={18} /></button>
@@ -639,7 +639,7 @@ export default function WarrantyDashboardPage() {
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[rgba(255,255,255,0.05)]">
                   <div className="flex flex-col gap-1">
                     <span className="text-xs text-[var(--text-muted)]">Tanggal Order</span>
-                    <span className="text-sm text-white">
+                    <span className="text-sm text-[var(--text-primary)]">
                       {selectedTransaction.purchaseDate 
                         ? new Date(selectedTransaction.purchaseDate).toLocaleDateString("id-ID", {
                             day: 'numeric',
@@ -687,11 +687,11 @@ export default function WarrantyDashboardPage() {
                 <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[rgba(99,102,241,0.1)] space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-[var(--text-muted)]">Nama</span>
-                    <span className="text-white font-medium">{selectedTransaction.user?.name || "-"}</span>
+                    <span className="text-[var(--text-primary)] font-medium">{selectedTransaction.user?.name || "-"}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-[var(--text-muted)]">WhatsApp</span>
-                    <span className="text-white">{selectedTransaction.user?.whatsapp || "-"}</span>
+                    <span className="text-[var(--text-primary)]">{selectedTransaction.user?.whatsapp || "-"}</span>
                   </div>
                 </div>
               </div>
@@ -708,7 +708,7 @@ export default function WarrantyDashboardPage() {
         <div className="modal-overlay" onClick={() => { setShowReasonModal(false); setSelectedReason(null); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 450 }}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 <AlertTriangle size={20} className="text-amber-400" /> Detail Alasan Klaim
               </h3>
               <button className="btn-icon" onClick={() => { setShowReasonModal(false); setSelectedReason(null); }}><X size={18} /></button>
@@ -716,7 +716,7 @@ export default function WarrantyDashboardPage() {
             <div className="modal-body space-y-4">
               <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[rgba(255,255,255,0.05)] space-y-2">
                 <span className="text-xs text-[var(--text-muted)]">Alasan Lengkap</span>
-                <p className="text-sm text-white whitespace-pre-wrap break-words leading-relaxed">
+                <p className="text-sm text-[var(--text-primary)] whitespace-pre-wrap break-words leading-relaxed">
                   {selectedReason}
                 </p>
               </div>

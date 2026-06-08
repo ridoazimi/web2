@@ -41,7 +41,7 @@ export default function AffiliateReferralsPage() {
   return (
     <div>
       <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-2">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Referral Saya</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Referral Saya</h1>
         <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
           Daftar customer dari link affiliate kamu ({total} total)
         </p>
@@ -90,7 +90,7 @@ export default function AffiliateReferralsPage() {
                   <tbody>
                     {referrals.map(r => (
                       <tr key={r.id}>
-                        <td className="font-medium text-white">{r.name}</td>
+                        <td className="font-medium text-[var(--text-primary)]">{r.name}</td>
                         <td className="text-sm text-[var(--text-muted)] font-mono">{r.email}</td>
                         <td className="text-sm">{new Date(r.createdAt).toLocaleDateString("id-ID")}</td>
                         <td>
@@ -112,7 +112,7 @@ export default function AffiliateReferralsPage() {
                   <div key={r.id} className="px-4 py-3.5 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 pr-2">
-                        <p className="text-sm font-semibold text-white truncate">{r.name}</p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{r.name}</p>
                         <p className="text-[11px] text-[var(--text-muted)] font-mono truncate">{r.email}</p>
                       </div>
                       <span className={`badge text-[10px] flex-shrink-0 ${r.subscriptionStatus === "active" ? "badge-success" : "badge-neutral"}`}>

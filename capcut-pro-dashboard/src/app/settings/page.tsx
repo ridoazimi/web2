@@ -426,7 +426,7 @@ export default function SettingsPage() {
                     <Users size={16} className="text-[#818cf8]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">Customer Aktif</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">Customer Aktif</p>
                     <p className="text-[11px] text-[var(--text-muted)]">Logika perhitungan status</p>
                   </div>
                 </div>
@@ -455,7 +455,7 @@ export default function SettingsPage() {
                     </p>
                     <p className="text-[var(--text-secondary)]">
                       Pelanggan yang memiliki transaksi sukses dalam{" "}
-                      <strong className="text-white">{settings.customer_active_days || "60"} hari</strong>{" "}
+                      <strong className="text-[var(--text-primary)]">{settings.customer_active_days || "60"} hari</strong>{" "}
                       terakhir = <span className="text-emerald-400 font-semibold">Aktif</span>
                     </p>
                     <p className="text-[var(--text-muted)] mt-1">
@@ -472,7 +472,7 @@ export default function SettingsPage() {
                     <Tag size={16} className="text-[#818cf8]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-white">Label Pelanggan</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">Label Pelanggan</p>
                     <p className="text-[11px] text-[var(--text-muted)]">Buat &amp; kelola label untuk kategorisasi</p>
                   </div>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(99,102,241,0.15)", color: "#818cf8" }}>{tags.length}</span>
@@ -525,7 +525,7 @@ export default function SettingsPage() {
                           <button
                             onClick={() => { setEditingTagId(null); setTagError(""); }}
                             className="flex items-center justify-center h-7 px-2 rounded-lg"
-                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text-muted)" }}
+                            style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", color: "var(--text-muted)" }}
                           >
                             <X size={12} />
                           </button>
@@ -542,20 +542,20 @@ export default function SettingsPage() {
                         <button onClick={() => handleDeleteTag(tag.id)} disabled={savingTag} className="text-[11px] font-semibold text-rose-400 hover:text-rose-300 transition-colors">
                           {savingTag ? <Loader2 size={11} className="animate-spin" /> : "Ya"}
                         </button>
-                        <button onClick={() => setDeleteConfirmId(null)} className="text-[11px] text-[var(--text-muted)] hover:text-white transition-colors">Batal</button>
+                        <button onClick={() => setDeleteConfirmId(null)} className="text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">Batal</button>
                       </div>
                     ) : (
                       /* ── Normal row ─────────────────────────── */
                       <div
                         key={tag.id}
                         className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl group transition-colors hover:bg-white/[0.03]"
-                        style={{ border: "1px solid rgba(255,255,255,0.05)" }}
+                        style={{ border: "1px solid var(--border-color)" }}
                       >
                         <span
                           className="w-3 h-3 rounded-full flex-shrink-0"
                           style={{ background: tag.color }}
                         />
-                        <span className="text-sm font-medium text-white flex-1 truncate">{tag.name}</span>
+                        <span className="text-sm font-medium text-[var(--text-primary)] flex-1 truncate">{tag.name}</span>
                         {(tag._count?.customers ?? 0) > 0 && (
                           <span
                             className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0"
@@ -593,7 +593,7 @@ export default function SettingsPage() {
                 )}
 
                 {/* Create New */}
-                <div className="pt-3 border-t border-[rgba(255,255,255,0.06)] space-y-2">
+                <div className="pt-3 border-t border-[var(--border-color)] space-y-2">
                   <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Buat Label Baru</p>
                   {/* Color picker */}
                   <div className="flex flex-wrap gap-1">
@@ -604,7 +604,7 @@ export default function SettingsPage() {
                         className="rounded transition-all"
                         style={{
                           width: 20, height: 20, background: c, flexShrink: 0,
-                          outline: newTagColor === c ? `2px solid white` : "none",
+                          outline: newTagColor === c ? `2px solid var(--border-active)` : "none",
                           outlineOffset: 1,
                         }}
                       />
@@ -661,7 +661,7 @@ export default function SettingsPage() {
                     <MessageSquare size={16} className="text-[#818cf8]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">Template Pesan</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">Template Pesan</p>
                     <p className="text-[11px] text-[var(--text-muted)]">Pilih untuk edit</p>
                   </div>
                 </div>
@@ -677,8 +677,8 @@ export default function SettingsPage() {
                         onClick={() => { setActiveTab(tab.key); setShowPreview(false); }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left"
                         style={{
-                          background: isActive ? `${tab.color}15` : "rgba(255,255,255,0.02)",
-                          border: `1px solid ${isActive ? `${tab.color}35` : "rgba(255,255,255,0.06)"}`,
+                          background: isActive ? `${tab.color}15` : "var(--bg-card)",
+                          border: `1px solid ${isActive ? `${tab.color}35` : "var(--border-color)"}`,
                         }}
                       >
                         <div
@@ -688,7 +688,7 @@ export default function SettingsPage() {
                           <Icon size={14} style={{ color: tab.color }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white flex items-center gap-1.5">
+                          <p className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-1.5">
                             {tab.label}
                             {hasChange && (
                               <span
@@ -736,7 +736,7 @@ export default function SettingsPage() {
                       <Shield size={16} className="text-amber-400" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-white">Manajemen Admin</p>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">Manajemen Admin</p>
                       <p className="text-[11px] text-[var(--text-muted)]">Kelola akun & hak akses</p>
                     </div>
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.15)", color: "#f59e0b" }}>
@@ -760,7 +760,7 @@ export default function SettingsPage() {
                       <div className="space-y-1.5">
                         <div
                           className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
-                          style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.06)" }}
+                          style={{ background: "rgba(0,0,0,0.3)", border: "1px solid var(--border-color)" }}
                         >
                           <span className="text-[11px] font-mono text-[var(--text-muted)] flex-1 truncate">{inviteLink}</span>
                           <button
@@ -793,7 +793,7 @@ export default function SettingsPage() {
                         const isSaving = savingAdminId === admin.id;
 
                         return (
-                          <div key={admin.id} className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
+                          <div key={admin.id} className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--border-color)" }}>
                             {/* Admin row header */}
                             <div className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/[0.02] transition-colors">
                               {/* Avatar */}
@@ -803,7 +803,7 @@ export default function SettingsPage() {
                               </div>
                               {/* Info */}
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-white truncate">{admin.name}</p>
+                                <p className="text-xs font-semibold text-[var(--text-primary)] truncate">{admin.name}</p>
                                 <p className="text-[10px] text-[var(--text-muted)] truncate">{admin.email}</p>
                               </div>
                               {/* Status toggle */}
@@ -811,7 +811,7 @@ export default function SettingsPage() {
                                 onClick={() => handleToggleAdminStatus(admin.id, admin.status)}
                                 disabled={isSaving}
                                 className="flex-shrink-0 w-9 h-5 rounded-full transition-all relative"
-                                style={{ background: admin.status === "active" ? "rgba(34,197,94,0.3)" : "rgba(255,255,255,0.1)", border: `1px solid ${admin.status === "active" ? "rgba(34,197,94,0.5)" : "rgba(255,255,255,0.15)"}` }}
+                                style={{ background: admin.status === "active" ? "rgba(34,197,94,0.3)" : "var(--bg-card)", border: `1px solid ${admin.status === "active" ? "rgba(34,197,94,0.5)" : "var(--border-color)"}` }}
                                 title={admin.status === "active" ? "Klik untuk nonaktifkan" : "Klik untuk aktifkan"}
                               >
                                 <span className="absolute top-0.5 w-4 h-4 rounded-full transition-all" style={{
@@ -846,7 +846,7 @@ export default function SettingsPage() {
 
                             {/* Permissions panel */}
                             {isExpanded && (
-                              <div className="px-3 pb-3 border-t border-white/5 pt-2 space-y-2">
+                              <div className="px-3 pb-3 border-t border-[var(--border-color)] pt-2 space-y-2">
                                 <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Hak Akses</p>
                                 <div className="grid grid-cols-1 gap-1">
                                   {(Object.entries(ALL_PERMISSIONS) as [PermissionKey, string][]).map(([key, label]) => {
@@ -857,14 +857,14 @@ export default function SettingsPage() {
                                         <div
                                           onClick={() => togglePerm(admin.id, key)}
                                           className="w-8 h-4 rounded-full relative flex-shrink-0 transition-all cursor-pointer"
-                                          style={{ background: isOn ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.08)", border: `1px solid ${isOn ? "rgba(99,102,241,0.6)" : "rgba(255,255,255,0.12)"}` }}
+                                          style={{ background: isOn ? "rgba(99,102,241,0.4)" : "var(--bg-card)", border: `1px solid ${isOn ? "rgba(99,102,241,0.6)" : "var(--border-color)"}` }}
                                         >
                                           <span className="absolute top-0.5 w-3 h-3 rounded-full transition-all" style={{
                                             background: isOn ? "#818cf8" : "rgba(255,255,255,0.25)",
                                             left: isOn ? "calc(100% - 14px)" : "2px",
                                           }} />
                                         </div>
-                                        <span className={`text-xs ${isOn ? "text-white" : "text-[var(--text-muted)]"}`}>{label}</span>
+                                        <span className={`text-xs ${isOn ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"}`}>{label}</span>
                                       </label>
                                     );
                                   })}
@@ -889,7 +889,7 @@ export default function SettingsPage() {
                         <div key={dev.id} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl opacity-60" style={{ background: "rgba(245,158,11,0.05)", border: "1px solid rgba(245,158,11,0.15)" }}>
                           <Shield size={14} className="text-amber-400 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-white truncate">{dev.name} <span className="text-amber-400">(Developer)</span></p>
+                            <p className="text-xs font-semibold text-[var(--text-primary)] truncate">{dev.name} <span className="text-amber-400">(Developer)</span></p>
                             <p className="text-[10px] text-[var(--text-muted)] truncate">{dev.email}</p>
                           </div>
                           <span className="text-[10px] text-amber-400 font-semibold">Full Access</span>
@@ -908,7 +908,7 @@ export default function SettingsPage() {
                 {/* Header */}
                 <div
                   className="px-6 py-4 flex items-center justify-between"
-                  style={{ borderBottom: "1px solid rgba(99,102,241,0.1)", background: `${currentTab.color}08` }}
+                  style={{ borderBottom: "1px solid var(--border-color)", background: `${currentTab.color}08` }}
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -918,7 +918,7 @@ export default function SettingsPage() {
                       <currentTab.icon size={17} style={{ color: currentTab.color }} />
                     </div>
                     <div>
-                      <p className="font-semibold text-white">Template {currentTab.label}</p>
+                      <p className="font-semibold text-[var(--text-primary)]">Template {currentTab.label}</p>
                       <p className="text-xs text-[var(--text-muted)]">{currentTab.description}</p>
                     </div>
                   </div>
@@ -926,8 +926,8 @@ export default function SettingsPage() {
                     onClick={() => setShowPreview(p => !p)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                     style={{
-                      background: showPreview ? `${currentTab.color}20` : "rgba(255,255,255,0.05)",
-                      border: `1px solid ${showPreview ? `${currentTab.color}40` : "rgba(255,255,255,0.1)"}`,
+                      background: showPreview ? `${currentTab.color}20` : "var(--bg-card)",
+                      border: `1px solid ${showPreview ? `${currentTab.color}40` : "var(--border-color)"}`,
                       color: showPreview ? currentTab.color : "var(--text-secondary)",
                     }}
                   >

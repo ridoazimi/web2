@@ -267,7 +267,7 @@ export default function ProductsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="font-semibold text-white">{product.name}</p>
+                            <p className="font-semibold text-[var(--text-primary)]">{product.name}</p>
                             <p className="text-xs text-[var(--text-muted)]">/{product.slug}</p>
                           </div>
                         </div>
@@ -278,7 +278,7 @@ export default function ProductsPage() {
                           {product.category || "Uncategorized"}
                         </span>
                       </td>
-                      <td className="font-bold text-white">
+                      <td className="font-bold text-[var(--text-primary)]">
                         {formatCurrency(Number(product.price))}
                       </td>
                       <td>
@@ -332,7 +332,7 @@ export default function ProductsPage() {
         <div className="modal-overlay">
           <div className="modal-content max-w-2xl">
             <div className="modal-header">
-              <h3 className="text-lg font-bold text-white">
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">
                 {editingProduct ? "Edit Produk" : "Tambah Produk Baru"}
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="btn-icon border-none bg-transparent">
@@ -505,7 +505,7 @@ Pass: [password]
                         onChange={(e) => setFormData({...formData, stockStatus: e.target.value})}
                       />
                       <div>
-                        <p className="text-sm font-bold text-white">Terintegrasi Stok</p>
+                        <p className="text-sm font-bold text-[var(--text-primary)]">Terintegrasi Stok</p>
                         <p className="text-[10px] text-[var(--text-muted)]">Otomatis tidak bisa dibeli jika stok kosong</p>
                       </div>
                     </label>
@@ -519,7 +519,7 @@ Pass: [password]
                         onChange={(e) => setFormData({...formData, stockStatus: e.target.value})}
                       />
                       <div>
-                        <p className="text-sm font-bold text-white">Pre-order</p>
+                        <p className="text-sm font-bold text-[var(--text-primary)]">Pre-order</p>
                         <p className="text-[10px] text-[var(--text-muted)]">Bisa dibeli kapan saja (stok tersedia/kosong)</p>
                       </div>
                     </label>

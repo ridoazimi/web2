@@ -58,7 +58,7 @@ export default function AbsensiPage() {
     admin: AdminUser & { role: string };
     schedule: Schedule | null;
     attendance: { checkInAt: string | null; checkOutAt: string | null; webhookSentIn: boolean; webhookSentOut: boolean } | null;
-    assignments: (TaskAssignment & { task: { title: string; description: string | null; recurrenceType: string } })[]; 
+    assignments: (TaskAssignment & { task: { title: string; description: string | null; recurrenceType: string } })[];
     summary: { total: number; done: number; pending: number; completionPct: number };
   };
   const [expandedAdminId, setExpandedAdminId] = useState<string | null>(null);
@@ -227,9 +227,9 @@ export default function AbsensiPage() {
                   onClick={() => setActiveTab(tab)}
                   className="px-4 py-2 rounded-xl text-sm font-semibold transition-all capitalize"
                   style={{
-                    background: activeTab === tab ? "var(--gradient-primary)" : "rgba(255,255,255,0.05)",
-                    color: activeTab === tab ? "white" : "var(--text-muted)",
-                    border: activeTab === tab ? "none" : "1px solid rgba(255,255,255,0.08)",
+                    background: activeTab === tab ? "var(--gradient-primary)" : "var(--bg-card)",
+                    color: activeTab === tab ? "var(--text-primary)" : "var(--text-muted)",
+                    border: activeTab === tab ? "none" : "1px solid var(--border-color)",
                   }}
                 >
                   {tab === "tugas" ? "📋 Tugas (RKHI)" : tab === "jadwal" ? "🕐 Jadwal Shift" : "📊 Rekap Absensi"}
@@ -254,7 +254,7 @@ export default function AbsensiPage() {
                 {/* Task form */}
                 {showTaskForm && (
                   <div className="glass-card p-4 space-y-3">
-                    <p className="text-sm font-semibold text-white">{editingTask ? "Edit Tugas" : "Buat Tugas Baru"}</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">{editingTask ? "Edit Tugas" : "Buat Tugas Baru"}</p>
                     <input className="form-input w-full text-sm" placeholder="Judul tugas..." value={taskTitle} onChange={e => setTaskTitle(e.target.value)} />
                     <textarea className="form-input w-full text-sm resize-none" rows={2} placeholder="Deskripsi (opsional)..." value={taskDesc} onChange={e => setTaskDesc(e.target.value)} />
                     <div className="flex gap-2 flex-wrap">
@@ -308,7 +308,7 @@ export default function AbsensiPage() {
                       <div className="flex items-start gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className={`text-sm font-semibold ${task.isActive ? "text-white" : "text-[var(--text-muted)] line-through"}`}>{task.title}</p>
+                            <p className={`text-sm font-semibold ${task.isActive ? "text-[var(--text-primary)]" : "text-[var(--text-muted)] line-through"}`}>{task.title}</p>
                             <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
                               style={{ background: task.recurrenceType === "daily" ? "rgba(99,102,241,0.15)" : "rgba(245,158,11,0.15)", color: task.recurrenceType === "daily" ? "#818cf8" : "#f59e0b" }}>
                               {task.recurrenceType === "daily" ? "🔄 Harian" : `📅 ${task.scheduledDate}`}
@@ -344,17 +344,17 @@ export default function AbsensiPage() {
 
                       {/* Assign panel */}
                       {assigningTaskId === task.id && (
-                        <div className="mt-3 p-3 rounded-xl space-y-2" style={{ background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="mt-3 p-3 rounded-xl space-y-2" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
                           <p className="text-xs font-semibold text-[var(--text-muted)]">Assign ke admin:</p>
                           {adminUsers.length === 0 && <p className="text-xs text-[var(--text-muted)]">Belum ada admin aktif.</p>}
                           {adminUsers.map(a => (
                             <label key={a.id} className="flex items-center gap-2.5 cursor-pointer">
                               <div onClick={() => setSelectedAdmins(p => ({ ...p, [a.id]: !p[a.id] }))}
                                 className="w-8 h-4 rounded-full relative flex-shrink-0 cursor-pointer transition-all"
-                                style={{ background: selectedAdmins[a.id] ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.08)", border: `1px solid ${selectedAdmins[a.id] ? "rgba(99,102,241,0.6)" : "rgba(255,255,255,0.12)"}` }}>
-                                <span className="absolute top-0.5 w-3 h-3 rounded-full transition-all" style={{ background: selectedAdmins[a.id] ? "#818cf8" : "rgba(255,255,255,0.25)", left: selectedAdmins[a.id] ? "calc(100% - 14px)" : "2px" }} />
+                                style={{ background: selectedAdmins[a.id] ? "rgba(99,102,241,0.4)" : "var(--bg-card)", border: `1px solid ${selectedAdmins[a.id] ? "rgba(99,102,241,0.6)" : "var(--border-color)"}` }}>
+                                <span className="absolute top-0.5 w-3 h-3 rounded-full transition-all" style={{ background: selectedAdmins[a.id] ? "#818cf8" : "var(--text-muted)", left: selectedAdmins[a.id] ? "calc(100% - 14px)" : "2px" }} />
                               </div>
-                              <span className="text-xs text-white">{a.name}</span>
+                              <span className="text-xs text-[var(--text-primary)]">{a.name}</span>
                             </label>
                           ))}
                           <div className="flex gap-2 pt-1">
@@ -392,12 +392,12 @@ export default function AbsensiPage() {
                           {admin.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-white">{admin.name}</p>
+                          <p className="text-sm font-semibold text-[var(--text-primary)]">{admin.name}</p>
                           <p className="text-xs text-[var(--text-muted)]">{admin.whatsapp || admin.email}</p>
                         </div>
                         {sched && !isEditing && (
                           <div className="text-xs font-mono text-right mr-2">
-                            <p className="text-white">{sched.shiftStart} – {sched.shiftEnd}</p>
+                            <p className="text-[var(--text-primary)]">{sched.shiftStart} – {sched.shiftEnd}</p>
                             <p className={sched.isActive ? "text-emerald-400" : "text-rose-400"}>{sched.isActive ? "Aktif" : "Nonaktif"}</p>
                           </div>
                         )}
@@ -526,7 +526,7 @@ export default function AbsensiPage() {
                             {/* Summary stats */}
                             <div className="grid grid-cols-3 gap-2">
                               {[
-                                { label: "Total", val: detail.summary.total, color: "text-white" },
+                                { label: "Total", val: detail.summary.total, color: "text-[var(--text-primary)]" },
                                 { label: "Selesai", val: detail.summary.done, color: "text-emerald-400" },
                                 { label: "Pending", val: detail.summary.pending, color: "text-amber-400" },
                               ].map(s => (
@@ -567,7 +567,7 @@ export default function AbsensiPage() {
                                       }
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className={`text-xs font-medium ${a.status === "done" ? "line-through text-[var(--text-muted)]" : "text-white"}`}>
+                                      <p className={`text-xs font-medium ${a.status === "done" ? "line-through text-[var(--text-muted)]" : "text-[var(--text-primary)]"}`}>
                                         {a.task.title}
                                       </p>
                                       {a.task.description && (
@@ -577,9 +577,8 @@ export default function AbsensiPage() {
                                         <p className="text-[10px] text-emerald-400">✓ {fmtTime(a.completedAt)}</p>
                                       )}
                                     </div>
-                                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
-                                      a.status === "done" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
-                                    }`}>{a.status === "done" ? "Selesai" : "Pending"}</span>
+                                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${a.status === "done" ? "bg-emerald-500/10 text-emerald-400" : "bg-amber-500/10 text-amber-400"
+                                      }`}>{a.status === "done" ? "Selesai" : "Pending"}</span>
                                   </div>
                                 ))}
                               </div>
@@ -607,7 +606,7 @@ export default function AbsensiPage() {
                       <CalendarClock size={20} style={{ color: "var(--accent-primary)" }} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white">Status Hari Ini</p>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">Status Hari Ini</p>
                       <p className="text-xs text-[var(--text-muted)]">{todayWIB()} • {now} WIB</p>
                     </div>
                   </div>
@@ -640,7 +639,7 @@ export default function AbsensiPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ClipboardList size={16} style={{ color: "var(--accent-primary)" }} />
-                  <p className="text-sm font-semibold text-white">Tugas Hari Ini</p>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">Tugas Hari Ini</p>
                 </div>
                 <span className="text-xs text-[var(--text-muted)]">
                   {myAssignments.filter(a => a.status === "done").length}/{myAssignments.length} selesai
@@ -671,7 +670,7 @@ export default function AbsensiPage() {
                         }
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium transition-all ${assignment.status === "done" ? "line-through text-[var(--text-muted)]" : "text-white"}`}>
+                        <p className={`text-sm font-medium transition-all ${assignment.status === "done" ? "line-through text-[var(--text-muted)]" : "text-[var(--text-primary)]"}`}>
                           {assignment.task.title}
                         </p>
                         {assignment.task.description && (

@@ -109,7 +109,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
           <div className="flex items-center gap-2">
             <Users size={18} className="text-[#818cf8]" />
             <div>
-              <h3 className="font-semibold text-white text-base">Cek Pengguna Akun</h3>
+              <h3 className="font-semibold text-[var(--text-primary)] text-base">Cek Pengguna Akun</h3>
               <p className="text-xs text-(--text-muted) font-mono mt-0.5">{account.accountEmail}</p>
             </div>
           </div>
@@ -119,7 +119,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
         {/* Slot summary bar */}
         <div className="px-5 pt-4">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 bg-[rgba(255,255,255,0.05)] rounded-lg h-2 overflow-hidden">
+            <div className="flex-1 bg-[var(--border-color)] rounded-lg h-2 overflow-hidden">
               <div
                 className="h-full rounded-lg transition-all"
                 style={{
@@ -148,8 +148,8 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
                     onClick={() => setActiveTab(i)}
                     className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                     style={{
-                      background: activeTab === i ? "rgba(129,140,248,0.2)" : "rgba(255,255,255,0.04)",
-                      border: `1px solid ${activeTab === i ? "rgba(129,140,248,0.4)" : "rgba(255,255,255,0.08)"}`,
+                      background: activeTab === i ? "rgba(129,140,248,0.2)" : "var(--bg-card)",
+                      border: `1px solid ${activeTab === i ? "rgba(129,140,248,0.4)" : "var(--border-color)"}`,
                       color: activeTab === i ? "#818cf8" : "var(--text-muted)",
                     }}
                   >
@@ -183,7 +183,7 @@ function UserCheckModal({ account, onClose }: { account: StockItem; onClose: () 
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-xs text-(--text-muted)">Nama</span>
-                          <span className="text-sm font-semibold text-white">{user?.name || "—"}</span>
+                          <span className="text-sm font-semibold text-[var(--text-primary)]">{user?.name || "—"}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-xs text-(--text-muted)">Email</span>
@@ -848,7 +848,7 @@ export default function StockPage() {
                             </td>
                             <td>
                               <div className="flex items-center gap-1.5">
-                                <div className="w-12 h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
+                                <div className="w-12 h-1.5 bg-[var(--border-color)] rounded-full overflow-hidden">
                                   <div className="h-full rounded-full transition-all" style={{ width: `${(item.usedSlots || 0) / (item.maxSlots || 3) * 100}%`, background: (item.usedSlots || 0) >= (item.maxSlots || 3) ? "#ef4444" : "#22c55e" }} />
                                 </div>
                                 <span className="text-xs font-medium text-(--text-secondary)">{item.usedSlots || 0}/{item.maxSlots || 3}</span>
@@ -901,7 +901,7 @@ export default function StockPage() {
                       <div key={item.id} className="data-card">
                         <div className="flex items-start justify-between mb-3">
                           <div className="min-w-0 flex-1 mr-2">
-                            <p className="font-mono text-sm text-white truncate">{item.accountEmail}</p>
+                            <p className="font-mono text-sm text-[var(--text-primary)] truncate">{item.accountEmail}</p>
                             <span className="flex items-center gap-1 text-xs font-medium mt-1 text-(--text-muted)">
                               {(item.product?.maxSlots || item.maxSlots) === 2 ? <><Monitor size={12} className="text-blue-400" />Desktop</> : <><Smartphone size={12} className="text-green-400" />Mobile</>}
                             </span>
@@ -929,7 +929,7 @@ export default function StockPage() {
                           <div className="data-card-row">
                             <span className="data-card-label">Slot</span>
                             <div className="flex items-center gap-2">
-                              <div className="w-16 h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full overflow-hidden">
+                              <div className="w-16 h-1.5 bg-[var(--border-color)] rounded-full overflow-hidden">
                                 <div className="h-full rounded-full" style={{ width: `${(item.usedSlots || 0) / (item.maxSlots || 3) * 100}%`, background: (item.usedSlots || 0) >= (item.maxSlots || 3) ? "#ef4444" : "#22c55e" }} />
                               </div>
                               <span className="text-xs text-(--text-secondary)">{item.usedSlots || 0}/{item.maxSlots || 3}</span>
@@ -973,7 +973,7 @@ export default function StockPage() {
               )}
               {/* ── Load More Footer ── */}
               <div className="flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(99,102,241,0.08)] gap-3">
-                <p className="text-sm text-[var(--text-muted)]">Menampilkan <span className="font-semibold text-white">{accounts.length}</span> dari <span className="font-semibold text-white">{total}</span> akun</p>
+                <p className="text-sm text-[var(--text-muted)]">Menampilkan <span className="font-semibold text-[var(--text-primary)]">{accounts.length}</span> dari <span className="font-semibold text-[var(--text-primary)]">{total}</span> akun</p>
                 {hasMore && !loading ? (
                   <button
                     onClick={handleLoadMore}
@@ -1010,7 +1010,7 @@ export default function StockPage() {
         <div className="modal-overlay" onClick={() => setShowSingleModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg">Tambah Stok Akun</h3>
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg">Tambah Stok Akun</h3>
               <button className="btn-icon" onClick={() => setShowSingleModal(false)}><X size={18} /></button>
             </div>
             <div className="modal-body space-y-4">
@@ -1034,7 +1034,7 @@ export default function StockPage() {
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setSingleForm({ ...singleForm, maxSlots: n })}
-                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${singleForm.maxSlots === n ? "border-(--accent) bg-[rgba(99,102,241,0.15)] text-(--accent)" : "border-[rgba(255,255,255,0.1)] text-(--text-muted) hover:border-[rgba(255,255,255,0.2)]"}`}>
+                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${singleForm.maxSlots === n ? "border-(--accent) bg-[rgba(99,102,241,0.15)] text-(--accent)" : "border-[var(--border-color)] text-(--text-muted) hover:border-[var(--border-active)]"}`}>
                       {n}
                     </button>
                   ))}
@@ -1047,11 +1047,11 @@ export default function StockPage() {
                 <label className="form-label">Tipe Perangkat</label>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSingleForm({ ...singleForm, productType: "mobile" })}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.productType === "mobile" ? "border-green-500 bg-green-500/10 text-green-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.productType === "mobile" ? "border-green-500 bg-green-500/10 text-green-400" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <Smartphone size={14} /> Mobile
                   </button>
                   <button type="button" onClick={() => setSingleForm({ ...singleForm, productType: "desktop" })}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.productType === "desktop" ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.productType === "desktop" ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <Monitor size={14} /> Desktop
                   </button>
                 </div>
@@ -1060,11 +1060,11 @@ export default function StockPage() {
                 <label className="form-label">Peruntukan Stok</label>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setSingleForm({ ...singleForm, usageType: "sale" })}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <ShoppingBag size={14} /> Stok Jualan
                   </button>
                   <button type="button" onClick={() => setSingleForm({ ...singleForm, usageType: "warranty" })}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${singleForm.usageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <Shield size={14} /> Stok Garansi
                   </button>
                 </div>
@@ -1096,7 +1096,7 @@ export default function StockPage() {
         <div className="modal-overlay" onClick={() => setShowBulkModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg">Bulk Import Stok Akun</h3>
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg">Bulk Import Stok Akun</h3>
               <button className="btn-icon" onClick={() => setShowBulkModal(false)}><X size={18} /></button>
             </div>
             <div className="modal-body space-y-4">
@@ -1119,11 +1119,11 @@ export default function StockPage() {
                 <label className="form-label">Tipe Perangkat</label>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setBulkProductType("mobile")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkProductType === "mobile" ? "border-green-500 bg-green-500/10 text-green-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkProductType === "mobile" ? "border-green-500 bg-green-500/10 text-green-400" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <Smartphone size={14} /> Mobile
                   </button>
                   <button type="button" onClick={() => setBulkProductType("desktop")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkProductType === "desktop" ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkProductType === "desktop" ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <Monitor size={14} /> Desktop
                   </button>
                 </div>
@@ -1133,7 +1133,7 @@ export default function StockPage() {
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setBulkMaxSlots(n)}
-                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${bulkMaxSlots === n ? "border-(--accent) bg-[rgba(99,102,241,0.15)] text-(--accent)" : "border-[rgba(255,255,255,0.1)] text-(--text-muted) hover:border-[rgba(255,255,255,0.2)]"}`}>
+                      className={`w-10 h-10 rounded-lg text-sm font-bold border transition-all ${bulkMaxSlots === n ? "border-(--accent) bg-[rgba(99,102,241,0.15)] text-(--accent)" : "border-[var(--border-color)] text-(--text-muted) hover:border-[var(--border-active)]"}`}>
                       {n}
                     </button>
                   ))}
@@ -1146,11 +1146,11 @@ export default function StockPage() {
                 <label className="form-label">Peruntukan Stok</label>
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setBulkUsageType("sale")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "sale" ? "border-[#a78bfa] bg-[rgba(139,92,246,0.15)] text-[#a78bfa]" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <ShoppingBag size={14} /> Stok Jualan
                   </button>
                   <button type="button" onClick={() => setBulkUsageType("warranty")}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[rgba(255,255,255,0.1)] text-(--text-muted)"}`}>
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold border transition-all ${bulkUsageType === "warranty" ? "border-[#f472b6] bg-[rgba(236,72,153,0.15)] text-[#f472b6]" : "border-[var(--border-color)] text-(--text-muted)"}`}>
                     <Shield size={14} /> Stok Garansi
                   </button>
                 </div>
@@ -1190,7 +1190,7 @@ export default function StockPage() {
                   <AlertTriangle size={18} className="text-rose-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">Hapus Stok Akun?</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)]">Hapus Stok Akun?</h3>
                   <p className="text-xs text-[var(--text-muted)]">Tindakan ini tidak bisa dibatalkan</p>
                 </div>
               </div>
@@ -1203,10 +1203,10 @@ export default function StockPage() {
               {/* Akun info */}
               <div
                 className="p-3 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
               >
                 <p className="text-xs text-[var(--text-muted)] mb-1">Akun yang akan dihapus:</p>
-                <p className="font-mono text-sm text-white">{deleteConfirm.accountEmail}</p>
+                <p className="font-mono text-sm text-[var(--text-primary)]">{deleteConfirm.accountEmail}</p>
                 <div className="flex items-center gap-3 mt-2">
                   {getStockBadge(deleteConfirm.status, deleteConfirm.usedSlots, deleteConfirm.maxSlots)}
                   <span className="text-xs text-[var(--text-muted)]">

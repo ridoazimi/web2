@@ -248,7 +248,7 @@ export default function RetentionPage() {
         {/* Date Filter Section */}
         <div className="glass-card p-4 flex flex-wrap lg:flex-nowrap items-end gap-6">
           <div className="flex-1 space-y-2">
-            <h4 className="text-sm font-semibold text-white flex items-center gap-1.5"><CalendarDays size={14} className="text-blue-400" /> Periode A (Lalu)</h4>
+            <h4 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-1.5"><CalendarDays size={14} className="text-blue-400" /> Periode A (Lalu)</h4>
             <div className="flex items-center gap-2">
               <input type="date" className="form-input text-sm !py-1.5" value={startA} onChange={(e) => setStartA(e.target.value)} />
               <span className="text-[var(--text-muted)] text-sm">s/d</span>
@@ -260,7 +260,7 @@ export default function RetentionPage() {
           <div className="hidden lg:flex flex-col items-center justify-center text-[var(--text-muted)] mx-2 pb-5"><RefreshCw size={20} /></div>
 
           <div className="flex-1 space-y-2">
-            <h4 className="text-sm font-semibold text-white flex items-center gap-1.5"><CalendarDays size={14} className="text-green-400" /> Periode B (Sekarang)</h4>
+            <h4 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-1.5"><CalendarDays size={14} className="text-green-400" /> Periode B (Sekarang)</h4>
             <div className="flex items-center gap-2">
               <input type="date" className="form-input text-sm !py-1.5" value={startB} onChange={(e) => setStartB(e.target.value)} />
               <span className="text-[var(--text-muted)] text-sm">s/d</span>
@@ -281,7 +281,7 @@ export default function RetentionPage() {
               <p className="text-xs text-[var(--text-muted)] font-medium">Total Beli Periode A</p>
               <Users size={16} className="text-[var(--text-secondary)]" />
             </div>
-            <p className="text-2xl font-bold text-white">{data?.summary.totalPeriodA || 0}</p>
+            <p className="text-2xl font-bold text-[var(--text-primary)]">{data?.summary.totalPeriodA || 0}</p>
             {activeTag && (
               <p className="text-[10px] mt-1" style={{ color: activeTag.color }}>Label: {activeTag.name}</p>
             )}
@@ -408,7 +408,7 @@ export default function RetentionPage() {
                     return (
                       <tr key={c.id}>
                         <td>
-                          <p className="text-sm font-medium text-white">{c.name}</p>
+                          <p className="text-sm font-medium text-[var(--text-primary)]">{c.name}</p>
                           <p className="text-xs text-[var(--text-muted)] font-mono">{maskPhone(c.whatsapp) || maskEmail(c.email)}</p>
                         </td>
 
@@ -515,7 +515,8 @@ export default function RetentionPage() {
               left: Math.min(tagPopoverPos.left, window.innerWidth - 220),
               zIndex: 9999,
               width: 210,
-              background: "rgba(15,17,30,0.97)",
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-color)",
               backdropFilter: "blur(16px)",
             }}
           >

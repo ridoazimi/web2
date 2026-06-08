@@ -41,7 +41,7 @@ export default function AffiliateCommissionsPage() {
   return (
     <div>
       <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-2">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Riwayat Komisi</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Riwayat Komisi</h1>
         <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
           Detail komisi dari transaksi referral ({total} total)
         </p>
@@ -90,7 +90,7 @@ export default function AffiliateCommissionsPage() {
                     {commissions.map(c => (
                       <tr key={c.id}>
                         <td className="text-sm">{new Date(c.createdAt).toLocaleDateString("id-ID")}</td>
-                        <td className="font-medium text-white">{c.user?.name || "—"}</td>
+                        <td className="font-medium text-[var(--text-primary)]">{c.user?.name || "—"}</td>
                         <td className="text-sm text-[var(--text-secondary)]">{c.transaction?.productName || "—"}</td>
                         <td className="text-sm">Rp {fmt(Number(c.transactionAmount))}</td>
                         <td className="text-emerald-400 font-bold">+Rp {fmt(Number(c.amount))}</td>
@@ -111,7 +111,7 @@ export default function AffiliateCommissionsPage() {
                   <div key={c.id} className="px-4 py-3.5 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 pr-2">
-                        <p className="text-sm font-semibold text-white truncate">{c.user?.name || "—"}</p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{c.user?.name || "—"}</p>
                         <p className="text-[11px] text-[var(--text-muted)] truncate">
                           {c.transaction?.productName || "Transaksi"}
                         </p>

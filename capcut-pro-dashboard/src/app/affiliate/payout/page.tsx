@@ -130,7 +130,7 @@ export default function AffiliatePayoutPage() {
   return (
     <div>
       <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-2">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">Tarik Saldo</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">Tarik Saldo</h1>
         <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
           Request payout ke DANA atau Transfer Bank
         </p>
@@ -235,7 +235,7 @@ export default function AffiliatePayoutPage() {
                         className={`px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                           parseFloat(amount) === q
                             ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                            : "bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border-color)] hover:text-white hover:border-white/20"
+                            : "bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border-color)] hover:text-[var(--text-primary)] hover:border-[var(--border-color)]"
                         }`}
                         style={{ border: "1px solid" }}
                       >
@@ -292,7 +292,7 @@ export default function AffiliatePayoutPage() {
           <div className="lg:col-span-3">
             <div className="glass-card overflow-hidden">
               <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--border-color)]">
-                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
                   <Banknote size={16} className="text-emerald-400" />
                   Riwayat Penarikan
                 </h3>

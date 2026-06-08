@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const txResult = await prisma.$transaction(async (tx) => {
       let account = null;
-      
+
       // Ambil data stock berdasarkan relasi product (bukan product_type)
       let candidateAccounts = await tx.stockAccount.findMany({
         where: {
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
       const accountMaxSlots = account.maxSlots ?? 3;
       const newUsedSlots = (account.usedSlots ?? 0) + 1;
-      
+
       const updatedAccount = await tx.stockAccount.updateMany({
         where: {
           id: account.id,
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         .replace(/\[password\]/g, account.accountPassword)
         .replace(/\[whatsapp\]/g, waNumber);
 
-      await fetch("https://appsheetindonesia-dorrizstore.qxifii.easypanel.host/webhook/bf7fc32f-47cd-43c8-9b62-626948d502b7", {
+      await fetch("https://dorizz-n8n.7mewuf.easypanel.host/webhook/bf7fc32f-47cd-43c8-9b62-626948d502b7", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

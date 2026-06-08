@@ -828,7 +828,7 @@ export default function TransactionsPage() {
                             <td className="font-mono text-xs text-[#818cf8]">
                               <div className="flex items-center gap-1.5">
                                 <span title={trx.id}>{trx.id.substring(0, 8)}...</span>
-                                <button onClick={() => copyUUID(trx.id)} title="Copy UUID" className="text-[var(--text-muted)] hover:text-white transition-colors">
+                                <button onClick={() => copyUUID(trx.id)} title="Copy UUID" className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
                                   {copiedId === trx.id ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
                                 </button>
                               </div>
@@ -904,7 +904,7 @@ export default function TransactionsPage() {
                       <div key={trx.id} className="data-card">
                         <div className="flex items-start justify-between mb-3">
                           <div className="min-w-0 flex-1 mr-2">
-                            <p className="font-semibold text-white text-sm truncate">{trx.user?.name || "-"}</p>
+                            <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{trx.user?.name || "-"}</p>
                             <p className="text-xs text-[var(--text-muted)] truncate">{maskEmail(trx.user?.email)}</p>
                           </div>
                           {getStatusBadge(trx.status)}
@@ -912,7 +912,7 @@ export default function TransactionsPage() {
                         <div className="space-y-1.5 pt-2.5 border-t border-[rgba(99,102,241,0.08)]">
                           <div className="data-card-row">
                             <span className="data-card-label">Nominal</span>
-                            <span className="data-card-value font-semibold text-white">{formatCurrency(Number(trx.amount))}</span>
+                            <span className="data-card-value font-semibold text-[var(--text-primary)]">{formatCurrency(Number(trx.amount))}</span>
                           </div>
                           <div className="data-card-row">
                             <span className="data-card-label">Produk</span>
@@ -994,8 +994,8 @@ export default function TransactionsPage() {
               <div className="flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(99,102,241,0.08)] gap-3">
                 <p className="text-sm text-[var(--text-muted)]">
                   Menampilkan{" "}
-                  <span className="font-semibold text-white">{transactions.length}</span> dari{" "}
-                  <span className="font-semibold text-white">{total}</span> transaksi
+                  <span className="font-semibold text-[var(--text-primary)]">{transactions.length}</span> dari{" "}
+                  <span className="font-semibold text-[var(--text-primary)]">{total}</span> transaksi
                 </p>
                 {hasMore && !loading ? (
                   <button
@@ -1121,7 +1121,7 @@ export default function TransactionsPage() {
                 <div className="flex items-center gap-2">
                   <Users size={18} className="text-[#818cf8]" />
                   <div>
-                    <h3 className="font-semibold text-white text-lg">
+                    <h3 className="font-semibold text-[var(--text-primary)] text-lg">
                       {exportStep === 1 ? "Daftar Pelanggan" : "Buat Jadwal Follow-Up"}
                     </h3>
                     <p className="text-xs text-[var(--text-muted)]">
@@ -1150,7 +1150,7 @@ export default function TransactionsPage() {
                         className="flex items-center gap-2 w-full text-left mb-2"
                       >
                         <MessageCircle size={13} className="text-emerald-400 flex-shrink-0" />
-                        <span className="text-xs font-semibold text-white flex-1">Template Pesan WA</span>
+                        <span className="text-xs font-semibold text-[var(--text-primary)] flex-1">Template Pesan WA</span>
                         <span
                           className="text-[10px] font-medium px-2 py-0.5 rounded-full"
                           style={{
@@ -1268,7 +1268,7 @@ export default function TransactionsPage() {
                                 {u.name?.charAt(0)?.toUpperCase() || "?"}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-white truncate">{u.name}</p>
+                                <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{u.name}</p>
                                 <p className="text-[11px] text-[var(--text-muted)] truncate">{maskEmail(u.email)}</p>
                                 <div className="flex items-center gap-3 mt-1 flex-wrap">
                                   <span className="text-[10px] text-[var(--text-muted)]">{u.productName || "CapCut Pro"}</span>
@@ -1423,7 +1423,7 @@ export default function TransactionsPage() {
                         >
                           <Users size={16} className="text-[#818cf8] flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-semibold text-white">{usersWithWA.length} penerima</p>
+                            <p className="text-sm font-semibold text-[var(--text-primary)]">{usersWithWA.length} penerima</p>
                             <p className="text-[11px] text-[var(--text-muted)]">
                               {usersWithWA.slice(0, 3).map(u => u.name).join(", ")}
                               {usersWithWA.length > 3 ? `, +${usersWithWA.length - 3} lainnya` : ""}
@@ -1471,7 +1471,7 @@ export default function TransactionsPage() {
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2"><Send size={18} className="text-[#818cf8]" /> Transaksi Manual</h3>
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2"><Send size={18} className="text-[#818cf8]" /> Transaksi Manual</h3>
               <button className="btn-icon" onClick={closeModal}><X size={18} /></button>
             </div>
             <div className="modal-body space-y-4">
@@ -1592,7 +1592,7 @@ export default function TransactionsPage() {
         <div className="modal-overlay" onClick={() => { setShowStatusModal(false); setSelectedTrxForStatus(null); }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 400 }}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 Ubah Status Transaksi
               </h3>
               <button className="btn-icon" onClick={() => { setShowStatusModal(false); setSelectedTrxForStatus(null); }}><X size={18} /></button>
@@ -1671,7 +1671,7 @@ export default function TransactionsPage() {
         <div className="modal-overlay" onClick={() => { if (!importing) closeImportModal(); }}>
           <div className="modal-content" style={{ maxWidth: 560 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 <FileSpreadsheet size={18} className="text-[#818cf8]" /> Import Data Lynk.id
               </h3>
               <div className="flex items-center gap-1">
@@ -1695,7 +1695,7 @@ export default function TransactionsPage() {
               {!importing && !importDone && (
                 <div className="p-4 rounded-xl space-y-3" style={{ background: "var(--bg-secondary)", border: "1px dashed var(--border-color)" }}>
                   <p className="text-sm text-[var(--text-secondary)]">
-                    Pilih satu atau beberapa file Lynk.id (<span className="text-white font-medium">.csv</span>, <span className="text-white font-medium">.xlsx</span>, <span className="text-white font-medium">.json</span>). Akan diproses dari <span className="text-[#818cf8] font-medium">terbaru → terlama</span>.
+                    Pilih satu atau beberapa file Lynk.id (<span className="text-[var(--text-primary)] font-medium">.csv</span>, <span className="text-[var(--text-primary)] font-medium">.xlsx</span>, <span className="text-[var(--text-primary)] font-medium">.json</span>). Akan diproses dari <span className="text-[#818cf8] font-medium">terbaru → terlama</span>.
                   </p>
                   <input
                     type="file"

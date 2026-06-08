@@ -150,8 +150,8 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: var(--gradient-primary);
-  color: white;
+  background: var(--bg-card);
+  color: var(--text-primary);
   border: none;
   border-radius: 10px;
   font-size: 14px;

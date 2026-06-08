@@ -211,7 +211,7 @@ export default function AffiliatePage() {
 
         {/* Actions & Filters */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex flex-wrap items-center gap-3 flex-1">
             <div className="search-box flex-1 max-w-md">
               <Search size={16} className="search-icon" />
               <input type="text" placeholder="Cari affiliate..." className="form-input !pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -224,11 +224,11 @@ export default function AffiliatePage() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
               >
-                <option value="newest" className="bg-[#1e1e2d]">Terbaru</option>
-                <option value="referralDesc" className="bg-[#1e1e2d]">Referral Terbanyak</option>
-                <option value="referralAsc" className="bg-[#1e1e2d]">Referral Paling Sedikit</option>
-                <option value="balanceDesc" className="bg-[#1e1e2d]">Saldo Tertinggi</option>
-                <option value="balanceAsc" className="bg-[#1e1e2d]">Saldo Terendah</option>
+                <option value="newest" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Terbaru</option>
+                <option value="referralDesc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Referral Terbanyak</option>
+                <option value="referralAsc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Referral Paling Sedikit</option>
+                <option value="balanceDesc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Saldo Tertinggi</option>
+                <option value="balanceAsc" className="bg-[var(--bg-card)] text-[var(--text-primary)]">Saldo Terendah</option>
               </select>
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function AffiliatePage() {
             <tbody>
               {sortedAffiliates.map((a) => (
                 <tr key={a.id}>
-                  <td className="font-medium text-white">{a.name}</td>
+                  <td className="font-medium text-[var(--text-primary)]">{a.name}</td>
                   <td className="text-sm">{maskEmail(a.email)}</td>
                   <td className="text-sm font-mono">{maskPhone(a.whatsapp)}</td>
                   <td><span className="badge badge-primary">{a.commissionRate}%</span></td>
@@ -273,9 +273,9 @@ export default function AffiliatePage() {
                   <td>
                     <button 
                       onClick={() => handleViewDetail(a.id)}
-                      className="flex items-center gap-1.5 hover:text-white transition-colors group cursor-pointer"
+                      className="flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors group cursor-pointer"
                     >
-                      <Users size={14} className="text-[var(--text-muted)] group-hover:text-white" />
+                      <Users size={14} className="text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" />
                       <span className="font-medium">{a._count?.referredUsers || 0}</span>
                     </button>
                   </td>
@@ -296,7 +296,7 @@ export default function AffiliatePage() {
                       <button onClick={() => { setShowWithdrawHistory(a); handleViewDetail(a.id); }} className="btn-icon" title="Riwayat Penarikan Saldo">
                         <History size={16} />
                       </button>
-                      <button onClick={() => handleViewDetail(a.id)} className="btn-icon hover:bg-[rgba(99,102,241,0.15)] hover:text-white" title="Lihat Detail Pelanggan">
+                      <button onClick={() => handleViewDetail(a.id)} className="btn-icon hover:bg-[rgba(99,102,241,0.15)] hover:text-indigo-400" title="Lihat Detail Pelanggan">
                         <Eye size={16} />
                       </button>
                       <button onClick={() => { setShowWithdraw(a); setWithdrawData({ amount: "", notes: "" }); }}
@@ -320,7 +320,7 @@ export default function AffiliatePage() {
           <div className="modal-content" style={{ maxWidth: 768 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <h3 className="text-lg font-bold text-white">{showDetail.name}</h3>
+                <h3 className="text-lg font-bold text-[var(--text-primary)]">{showDetail.name}</h3>
                 <p className="text-xs text-[var(--text-muted)]">{maskEmail(showDetail.email)} • {maskPhone(showDetail.whatsapp) || "No WA"}</p>
               </div>
               <button className="btn-icon" onClick={() => setShowDetail(null)}><X size={18} /></button>
@@ -356,7 +356,7 @@ export default function AffiliatePage() {
                     <div className="space-y-1.5 max-h-40 overflow-y-auto pr-2 rounded-xl p-2" style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}>
                       {showDetail.referredUsers.map((u) => (
                         <div key={u.id} className="flex items-center justify-between p-2.5 rounded-lg hover:bg-[rgba(99,102,241,0.06)] transition-colors">
-                          <span className="text-sm font-medium text-white">{u.name}</span>
+                          <span className="text-sm font-medium text-[var(--text-primary)]">{u.name}</span>
                           <span className="text-xs font-mono text-[var(--text-muted)]">{maskEmail(u.email)}</span>
                         </div>
                       ))}
@@ -377,7 +377,7 @@ export default function AffiliatePage() {
                     {showDetail.commissions.map((c) => (
                       <div key={c.id} className="flex items-center justify-between p-2.5 rounded-lg hover:bg-[rgba(34,197,94,0.06)] transition-colors">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-white truncate">{c.user?.name || "—"}</p>
+                          <p className="text-sm font-medium text-[var(--text-primary)] truncate">{c.user?.name || "—"}</p>
                           <p className="text-xs text-[var(--text-muted)]">Transaksi Rp {fmt(Number(c.transactionAmount))}</p>
                         </div>
                         <span className="text-sm font-bold text-green-400 flex-shrink-0 ml-4">+Rp {fmt(Number(c.amount))}</span>
@@ -418,13 +418,13 @@ export default function AffiliatePage() {
         <div className="modal-overlay" onClick={() => setShowWithdrawHistory(null)} style={{ zIndex: 60 }}>
           <div className="modal-content" style={{ maxWidth: 500 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white">Riwayat Tarik Saldo</h3>
+              <h3 className="font-semibold text-[var(--text-primary)]">Riwayat Tarik Saldo</h3>
               <button className="btn-icon" onClick={() => setShowWithdrawHistory(null)}><X size={16} /></button>
             </div>
 
             <div className="modal-body">
               <div className="mb-4">
-                <p className="text-sm text-[var(--text-secondary)]">Affiliate: <span className="font-medium text-white">{showWithdrawHistory.name}</span></p>
+                <p className="text-sm text-[var(--text-secondary)]">Affiliate: <span className="font-medium text-[var(--text-primary)]">{showWithdrawHistory.name}</span></p>
                 <p className="text-sm text-[var(--text-secondary)] mb-4">Saldo Saat Ini: <span className="text-yellow-400 font-bold">Rp {fmt(Number(showWithdrawHistory.balance || 0))}</span></p>
               </div>
 
@@ -463,13 +463,13 @@ export default function AffiliatePage() {
         <div className="modal-overlay" onClick={() => setShowWithdraw(null)} style={{ zIndex: 60 }}>
           <div className="modal-content" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white">Tarik Saldo Affiliate</h3>
+              <h3 className="font-semibold text-[var(--text-primary)]">Tarik Saldo Affiliate</h3>
               <button className="btn-icon" onClick={() => setShowWithdraw(null)}><X size={16} /></button>
             </div>
 
             <div className="modal-body space-y-4">
               <div className="p-4 rounded-xl" style={{ background: "rgba(250,204,21,0.08)", border: "1px solid rgba(250,204,21,0.2)" }}>
-                <p className="text-sm text-[var(--text-secondary)] mb-1">Affiliate: <span className="font-medium text-white">{showWithdraw.name}</span></p>
+                <p className="text-sm text-[var(--text-secondary)] mb-1">Affiliate: <span className="font-medium text-[var(--text-primary)]">{showWithdraw.name}</span></p>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-[var(--text-secondary)]">Saldo Tersedia:</span>
                   <span className="text-lg font-bold text-yellow-400">Rp {fmt(Number(showWithdraw.balance || 0))}</span>
@@ -505,7 +505,7 @@ export default function AffiliatePage() {
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
           <div className="modal-content" style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="text-lg font-bold text-white">Tambah Affiliate</h3>
+              <h3 className="text-lg font-bold text-[var(--text-primary)]">Tambah Affiliate</h3>
               <button className="btn-icon" onClick={() => setShowForm(false)}><X size={18} /></button>
             </div>
 
@@ -559,7 +559,7 @@ export default function AffiliatePage() {
         <div className="modal-overlay" style={{ zIndex: 70 }} onClick={() => setShowReferralPicker(null)}>
           <div className="modal-content" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white">Pilih Customer untuk Referral</h3>
+              <h3 className="font-semibold text-[var(--text-primary)]">Pilih Customer untuk Referral</h3>
               <button className="btn-icon" onClick={() => setShowReferralPicker(null)}><X size={16} /></button>
             </div>
 
@@ -584,10 +584,10 @@ export default function AffiliatePage() {
                     const isMine = c.referredBy === showReferralPicker;
 
                     return (
-                      <div key={c.id} className="w-full flex items-center justify-between p-3 rounded-xl text-left transition-all hover:bg-[rgba(99,102,241,0.06)]"
-                        style={{ border: "1px solid var(--border-color)", opacity: isAlreadyReferred ? 0.6 : 1 }}>
-                        <div className="min-w-0 pr-2">
-                          <p className="text-sm font-medium text-white truncate">{c.name}</p>
+                        <div key={c.id} className="w-full flex items-center justify-between p-3 rounded-xl text-left transition-all hover:bg-[rgba(99,102,241,0.06)]"
+                          style={{ border: "1px solid var(--border-color)", opacity: isAlreadyReferred ? 0.6 : 1 }}>
+                          <div className="min-w-0 pr-2">
+                            <p className="text-sm font-medium text-[var(--text-primary)] truncate">{c.name}</p>
                           <p className="text-xs text-[var(--text-muted)] truncate">{maskPhone(c.whatsapp) || "Tanpa WA"} · {maskEmail(c.email)}</p>
                         </div>
 

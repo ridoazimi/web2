@@ -163,8 +163,8 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
               className="absolute right-0 top-full mt-2 rounded-2xl overflow-hidden shadow-2xl z-50"
               style={{
                 width: 320,
-                background: "rgba(13,15,28,0.98)",
-                border: "1px solid rgba(129,140,248,0.15)",
+                background: "var(--bg-card)",
+                border: "1px solid var(--border-color)",
                 backdropFilter: "blur(20px)",
               }}
             >
@@ -202,8 +202,8 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
                     {tasks.map((a) => (
                       <div
                         key={a.id}
-                        className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-white/3"
-                        style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}
+                        className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-[var(--bg-card-hover)]"
+                        style={{ borderBottom: "1px solid var(--border-color)" }}
                       >
                         <div className="flex-shrink-0 mt-0.5">
                           {a.status === "done" ? (
@@ -291,10 +291,10 @@ export default function Topbar({ title, subtitle, children }: TopbarProps) {
           {showUserMenu && (
             <div
               className="absolute right-0 top-full mt-2 w-52 rounded-xl overflow-hidden shadow-2xl z-50"
-              style={{ background: "rgba(15,17,30,0.97)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(16px)" }}
+              style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", backdropFilter: "blur(16px)" }}
             >
               {/* User info */}
-              <div className="px-4 py-3 border-b border-white/5">
+              <div className="px-4 py-3 border-b border-[var(--border-color)]">
                 <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{user?.name}</p>
                 <p className="text-xs text-[var(--text-muted)] truncate">{user?.email}</p>
                 <div className="flex items-center gap-1 mt-1">

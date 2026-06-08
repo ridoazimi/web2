@@ -589,7 +589,7 @@ export default function UsersPage() {
           {/* Tag Manager Button */}
           <button
             onClick={() => setShowTagManager(true)}
-            className="flex items-center gap-2 px-3 py-1.5 h-[38px] rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-sm text-[var(--text-secondary)] hover:text-white hover:border-[#818cf8] transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 h-[38px] rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-sm text-[var(--text-secondary)] hover:bg-[#818cf8]/10 hover:text-[#818cf8] hover:border-[#818cf8] transition-all"
           >
             <TagIcon size={15} />
             Kelola Tag
@@ -598,7 +598,7 @@ export default function UsersPage() {
           {/* WA Template Settings Button */}
           <button
             onClick={() => { setShowWASettings(true); fetchWASettings(); }}
-            className="flex items-center gap-2 px-3 py-1.5 h-[38px] rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-sm text-[var(--text-secondary)] hover:text-white hover:border-[#25d366] transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 h-[38px] rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-sm text-[var(--text-secondary)] hover:bg-[#25d366]/10 hover:text-[#25d366] hover:border-[#25d366] transition-all"
             style={{ borderColor: 'rgba(37,211,102,0.25)', color: '#25d366' }}
             title="Pengaturan template pesan WhatsApp"
           >
@@ -749,7 +749,7 @@ export default function UsersPage() {
               {selectAllDB && (
                 <div className="flex items-center justify-center gap-3 py-3 px-6" style={{ background: "rgba(99,102,241,0.12)", borderBottom: "1px solid rgba(99,102,241,0.2)" }}>
                   <span className="text-sm font-medium text-[#818cf8]">✓ Semua {total} user dari filter ini dipilih.</span>
-                  <button onClick={() => { setSelectAllDB(false); setSelectedIds(new Set()); }} className="text-sm text-[var(--text-muted)] hover:text-white transition-colors">Batalkan</button>
+                  <button onClick={() => { setSelectAllDB(false); setSelectedIds(new Set()); }} className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">Batalkan</button>
                 </div>
               )}
 
@@ -928,7 +928,7 @@ export default function UsersPage() {
                               {isSelected ? <CheckSquare size={15} className="text-[#818cf8]" /> : <Square size={15} />}
                             </button>
                             <div className="min-w-0">
-                              <p className="font-semibold text-white text-sm truncate">{user.name}</p>
+                              <p className="font-semibold text-[var(--text-primary)] text-sm truncate">{user.name}</p>
                               <p className="text-xs text-[var(--text-muted)] truncate">{maskEmail(user.email)}</p>
                             </div>
                           </div>
@@ -964,8 +964,8 @@ export default function UsersPage() {
               <div className="flex flex-col sm:flex-row items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(99,102,241,0.08)] gap-3">
                 <p className="text-sm text-[var(--text-muted)]">
                   Menampilkan{" "}
-                  <span className="font-semibold text-white">{users.length}</span> dari{" "}
-                  <span className="font-semibold text-white">{total}</span> pelanggan
+                  <span className="font-semibold text-[var(--text-primary)]">{users.length}</span> dari{" "}
+                  <span className="font-semibold text-[var(--text-primary)]">{total}</span> pelanggan
                 </p>
                 {hasMore && !loading ? (
                   <button
@@ -1003,7 +1003,8 @@ export default function UsersPage() {
             top: tagPopoverPos.top,
             right: tagPopoverPos.right,
             zIndex: 9999,
-            background: "rgba(15,17,30,0.97)",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-color)",
             backdropFilter: "blur(16px)",
           }}
           onClick={(e) => e.stopPropagation()}
@@ -1019,7 +1020,7 @@ export default function UsersPage() {
                 <div className="px-3 py-2.5 border-b border-[var(--border-color)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Tag size={13} className="text-[#818cf8]" />
-                    <p className="text-xs font-semibold text-white">{popUser.name.split(" ")[0]}</p>
+                    <p className="text-xs font-semibold text-[var(--text-primary)]">{popUser.name.split(" ")[0]}</p>
                   </div>
                   {userPending && (
                     <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 6, background: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)', fontWeight: 600 }}>UNSAVED</span>
@@ -1107,20 +1108,20 @@ export default function UsersPage() {
           alignItems: "center",
           gap: 12,
           padding: "12px 20px",
-          background: "rgba(15,17,30,0.92)",
+          background: "var(--bg-card)",
           backdropFilter: "blur(16px)",
           borderRadius: 16,
-          border: "1px solid rgba(99,102,241,0.35)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.1)",
+          border: "1px solid var(--border-active)",
+          boxShadow: "var(--shadow-card)",
           whiteSpace: "nowrap",
         }}
       >
-        <span className="flex items-center gap-2 text-sm font-medium text-white">
+        <span className="flex items-center gap-2 text-sm font-medium text-[var(--text-primary)]">
           <Users size={15} className="text-[#818cf8]" />
           <span className="text-[#818cf8] font-bold">{selectionCount}</span>
           <span className="text-[var(--text-secondary)]">user dipilih</span>
         </span>
-        <div style={{ width: 1, height: 20, background: "rgba(255,255,255,0.1)" }} />
+        <div style={{ width: 1, height: 20, background: "var(--border-color)" }} />
         <button
           onClick={exportToFollowUp}
           style={{
@@ -1159,7 +1160,7 @@ export default function UsersPage() {
         <div className="modal-overlay" onClick={() => setShowTagManager(false)}>
           <div className="modal-content" style={{ maxWidth: 520 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 <Tag size={18} className="text-[#818cf8]" /> Kelola Tag Pelanggan
               </h3>
               <button className="btn-icon" onClick={() => setShowTagManager(false)}><X size={18} /></button>
@@ -1254,7 +1255,7 @@ export default function UsersPage() {
                       >
                         <div className="flex items-center gap-3">
                           <span className="w-4 h-4 rounded-full flex-shrink-0" style={{ background: tag.color }} />
-                          <span className="text-sm font-medium text-white">{tag.name}</span>
+                          <span className="text-sm font-medium text-[var(--text-primary)]">{tag.name}</span>
                           <span className="text-xs text-[var(--text-muted)]">{tag._count?.customers || 0} pelanggan</span>
                         </div>
                         <button
@@ -1289,7 +1290,7 @@ export default function UsersPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header">
-              <h3 className="font-semibold text-white flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] flex items-center gap-2">
                 <Trash2 size={18} className="text-red-400" /> Hapus Tag
               </h3>
               <button className="btn-icon" onClick={() => setDeleteTagConfirm(null)} disabled={deletingTag}>
@@ -1370,7 +1371,7 @@ export default function UsersPage() {
                   <MessageSquare size={17} style={{ color: '#25d366' }} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-base">Template Pesan WhatsApp</h3>
+                  <h3 className="font-semibold text-[var(--text-primary)] text-base">Template Pesan WhatsApp</h3>
                   <p className="text-xs" style={{ color: 'var(--text-muted)', marginTop: 1 }}>Atur template pesan WA yang dikirim ke pelanggan</p>
                 </div>
               </div>
@@ -1586,7 +1587,7 @@ export default function UsersPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" style={{ maxWidth: 700 }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-primary)] text-lg flex items-center gap-2">
                 <Receipt size={18} className="text-[#818cf8]" /> Histori Transaksi: {selectedUser.name}
               </h3>
               <button className="btn-icon" onClick={() => setShowModal(false)}><X size={18} /></button>

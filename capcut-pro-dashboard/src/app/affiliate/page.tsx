@@ -63,7 +63,7 @@ export default function AffiliateDashboardPage() {
     <div>
       {/* Topbar */}
       <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-2">
-        <h1 className="text-xl sm:text-2xl font-bold text-white">
+        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
           Selamat datang, {user?.name?.split(" ")[0]} 👋
         </h1>
         <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
@@ -127,7 +127,7 @@ export default function AffiliateDashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Monthly Chart */}
           <div className="glass-card p-4 sm:p-6">
-            <h3 className="text-sm font-semibold text-white mb-4">Komisi Bulanan</h3>
+            <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Komisi Bulanan</h3>
             {months.length > 0 ? (
               <div className="flex items-end gap-2 sm:gap-3 h-32 sm:h-40">
                 {months.map(([month, value]) => {
@@ -161,7 +161,7 @@ export default function AffiliateDashboardPage() {
           {/* Recent Commissions */}
           <div className="glass-card p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-white">Komisi Terbaru</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Komisi Terbaru</h3>
               <Link href="/affiliate/commissions" className="text-xs text-emerald-400 hover:underline flex items-center gap-1">
                 Lihat semua <ArrowRight size={12} />
               </Link>
@@ -175,7 +175,7 @@ export default function AffiliateDashboardPage() {
                     style={{ border: "1px solid var(--border-color)" }}
                   >
                     <div className="min-w-0 pr-2 sm:pr-3">
-                      <p className="text-xs sm:text-sm font-medium text-white truncate">{c.user?.name || "—"}</p>
+                      <p className="text-xs sm:text-sm font-medium text-[var(--text-primary)] truncate">{c.user?.name || "—"}</p>
                       <p className="text-[10px] sm:text-xs text-[var(--text-muted)] truncate">
                         {c.transaction?.productName || "Transaksi"} • {new Date(c.createdAt).toLocaleDateString("id-ID")}
                       </p>
@@ -200,7 +200,7 @@ export default function AffiliateDashboardPage() {
             <div className="flex items-center gap-3">
               <Users size={18} className="text-cyan-400 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors">Lihat Referral</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-cyan-400 transition-colors">Lihat Referral</p>
                 <p className="text-[10px] sm:text-xs text-[var(--text-muted)]">Cek customer dari link kamu</p>
               </div>
               <ArrowRight size={16} className="text-[var(--text-muted)] group-hover:text-cyan-400 transition-colors flex-shrink-0" />
@@ -211,7 +211,7 @@ export default function AffiliateDashboardPage() {
             <div className="flex items-center gap-3">
               <Coins size={18} className="text-amber-400 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors">Riwayat Komisi</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-amber-400 transition-colors">Riwayat Komisi</p>
                 <p className="text-[10px] sm:text-xs text-[var(--text-muted)]">Detail komisi per transaksi</p>
               </div>
               <ArrowRight size={16} className="ml-auto text-[var(--text-muted)] group-hover:text-amber-400 transition-colors flex-shrink-0" />
@@ -222,7 +222,7 @@ export default function AffiliateDashboardPage() {
             <div className="flex items-center gap-3">
               <Wallet size={18} className="text-emerald-400 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors">Tarik Saldo</p>
+                <p className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-emerald-400 transition-colors">Tarik Saldo</p>
                 <p className="text-[10px] sm:text-xs text-[var(--text-muted)]">DANA atau Transfer Bank</p>
               </div>
               <ArrowRight size={16} className="ml-auto text-[var(--text-muted)] group-hover:text-emerald-400 transition-colors flex-shrink-0" />
