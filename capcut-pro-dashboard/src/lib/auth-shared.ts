@@ -14,6 +14,7 @@ export const ALL_PERMISSIONS = {
   page_absensi: "Halaman Absensi",
   page_warranty: "Halaman Klaim Garansi",
   page_marketplace: "Katalog Produk",
+  page_testimonials: "Kelola Testimoni",
   page_vouchers: "Manajemen Voucher",
   export_data: "Export CSV",
 
@@ -36,6 +37,7 @@ export const DEFAULT_ADMIN_PERMISSIONS: Record<PermissionKey, boolean> = {
   page_absensi: true,
   page_warranty: true,
   page_marketplace: true,
+  page_testimonials: true,
   page_vouchers: false,
   export_data: true,
 

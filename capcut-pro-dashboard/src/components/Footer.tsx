@@ -18,6 +18,7 @@ export default function Footer() {
 
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
             <a href="/warranty" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Garansi</a>
+            <a href="/testimoni" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Testimoni</a>
             <a href="/terms" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Syarat</a>
             <a href="/privacy" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Privasi</a>
           </div>

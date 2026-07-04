@@ -21,6 +21,7 @@ import {
   Lock,
   ClipboardList,
   ShoppingBag,
+  Star,
 } from "lucide-react";
 import type { PermissionKey } from "@/lib/auth-shared";
 
@@ -39,6 +40,7 @@ const navItems: { href: string; label: string; icon: React.ElementType; permissi
 
 const marketingItems: { href: string; label: string; icon: React.ElementType; permission?: PermissionKey }[] = [
   { href: "/dashboard/vouchers", label: "Voucher", icon: Scissors, permission: "page_vouchers" },
+  { href: "/dashboard/testimoni", label: "Kelola Testimoni", icon: Star, permission: "page_testimonials" },
   { href: "/followup", label: "Follow-Up", icon: CalendarClock, permission: "page_followup" },
   { href: "/affiliates", label: "Affiliate", icon: UserPlus, permission: "page_affiliates" },
   { href: "/sales", label: "Tim Sales", icon: Users, permission: "page_sales" },

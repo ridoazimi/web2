@@ -18,6 +18,7 @@ const PUBLIC_PATHS = [
   "/terms",
   "/privacy",
   "/warranty",
+  "/testimoni",
   // Affiliate public paths
 
 

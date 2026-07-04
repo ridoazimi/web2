@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getProducts } from "./dashboard/products/actions";
 import { ShoppingCart, Star, Zap, ChevronRight, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import CtaButton, { WhatsAppIcon } from "@/components/CtaButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -73,9 +74,21 @@ export default async function MarketplacePage() {
               />
             </div>
             {/* Handle / Tagline */}
-            <h1 className="text-xl md:text-3xl font-bold text-[var(--hero-accent)] mb-6 tracking-wide drop-shadow-sm">
+            <h1 className="text-xl md:text-3xl font-bold text-[var(--hero-accent)] mb-4 tracking-wide drop-shadow-sm">
               @dorizzstore
             </h1>
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+              <CtaButton href="/testimoni" icon={<Star size={18} />}>
+                Testimoni
+              </CtaButton>
+              <CtaButton
+                href="https://wa.me/6285277815289"
+                external
+                icon={<WhatsAppIcon size={18} />}
+              >
+                WhatsApp
+              </CtaButton>
+            </div>
           </div>
         </section>
         <div className="-mt-1 w-full overflow-hidden leading-none">

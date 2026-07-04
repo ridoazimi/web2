@@ -8,7 +8,7 @@ import { put } from "@vercel/blob";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-export async function uploadImage(file: File, folder: string): Promise<string> {
+export async function uploadMedia(file: File, folder: string): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
@@ -45,4 +45,9 @@ export async function uploadImage(file: File, folder: string): Promise<string> {
   await writeFile(filePath, buffer);
   // Di Next.js public folder diakses langsung dari root
   return `/uploads/${folder}/${filename}`;
+}
+
+/** @deprecated Use uploadMedia — kept for existing call sites */
+export async function uploadImage(file: File, folder: string): Promise<string> {
+  return uploadMedia(file, folder);
 }

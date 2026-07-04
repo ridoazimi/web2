@@ -370,3 +370,17 @@ model SalesTeam {
 
   @@map("sales_teams")
 }
+
+model Testimonial {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type         String   @db.VarChar(20)
+  mediaUrl     String   @map("media_url") @db.VarChar(500)
+  customerName String   @map("customer_name") @db.VarChar(255)
+  topTag       String?  @map("top_tag") @db.VarChar(100)
+  statusText   String?  @map("status_text") @db.VarChar(255)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("testimonials")
+}
