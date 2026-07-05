@@ -73,29 +73,22 @@ export default function TestimoniClient({
                   className="relative w-full overflow-hidden bg-[#0f1218] outline-none"
                   aria-label={`Lihat media testimoni ${item.customerName}`}
                 >
-                  <div
-                    className={
-                      item.type === "video"
-                        ? "relative w-full overflow-hidden aspect-[9/16]"
-                        : "relative w-full overflow-hidden aspect-[4/3]"
-                    }
-                  >
+                  <div className="relative w-full overflow-hidden bg-[#0f1218]">
                     {item.type === "video" ? (
                       <video
                         controls
                         muted
                         playsInline
-                        className="w-full h-full object-cover pointer-events-none"
+                        webkit-playsinline
+                        className="w-full h-auto object-contain pointer-events-none"
                       >
                         <source src={item.mediaUrl} type="video/mp4" />
                       </video>
                     ) : (
-                      <Image
+                      <img
                         src={item.mediaUrl}
                         alt={`Testimoni dari ${item.customerName}`}
-                        fill
-                        className="w-full object-cover pointer-events-none"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        className="w-full h-auto object-contain pointer-events-none"
                       />
                     )}
                   </div>
@@ -145,6 +138,7 @@ export default function TestimoniClient({
                 src={selectedMedia.mediaUrl}
                 controls
                 playsInline
+                webkit-playsinline
                 className="max-w-full max-h-[90vh] object-contain rounded-lg"
               />
             ) : (

@@ -49,7 +49,21 @@ export async function createTestimonial(formData: FormData) {
 
   if (!customerName) throw new Error("Nama pelanggan wajib diisi");
   if (!type || !["image", "video"].includes(type)) throw new Error("Tipe media tidak valid");
-  if (!mediaFile || mediaFile.size === 0) throw new Error("File media wajib diunggah");
+
+  // Validate file exists and check size
+  if (!mediaFile) {
+    throw new Error("Gagal mengunggah file. Pastikan ukuran file tidak terlalu besar dan formatnya didukung (Max 5MB).");
+  }
+
+  if (mediaFile.size === 0) {
+    throw new Error("File media wajib diunggah");
+  }
+
+  // Check file size limit (5MB)
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+  if (mediaFile.size > MAX_FILE_SIZE) {
+    throw new Error("Ukuran file terlalu besar. Maksimal ukuran file adalah 5MB.");
+  }
 
   let mediaUrl: string;
   try {

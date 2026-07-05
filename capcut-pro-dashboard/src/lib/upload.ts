@@ -9,6 +9,10 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 export async function uploadMedia(file: File, folder: string): Promise<string> {
+  if (!file) {
+    throw new Error("File tidak valid atau kosong");
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
