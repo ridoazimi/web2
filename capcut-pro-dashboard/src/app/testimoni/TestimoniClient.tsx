@@ -79,7 +79,7 @@ export default function TestimoniClient({
                         controls
                         muted
                         playsInline
-                        webkit-playsinline
+                        webkit-playsinline="true"
                         className="w-full h-auto object-contain pointer-events-none"
                       >
                         <source src={item.mediaUrl} type="video/mp4" />
@@ -138,7 +138,7 @@ export default function TestimoniClient({
                 src={selectedMedia.mediaUrl}
                 controls
                 playsInline
-                webkit-playsinline
+                webkit-playsinline="true"
                 className="max-w-full max-h-[90vh] object-contain rounded-lg"
               />
             ) : (
