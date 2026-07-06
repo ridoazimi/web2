@@ -7,27 +7,25 @@ type TestimonialMediaCardProps = {
 
 export default function TestimonialMediaCard({ item }: TestimonialMediaCardProps) {
   const isVideo = item.type === "video";
-  const aspectClass = isVideo ? "aspect-[9/16]" : "aspect-[4/3]";
 
   return (
-    <article className="flex flex-col bg-[#11141a] rounded-2xl border border-gray-800 overflow-hidden relative">
-      <div className={`relative w-full overflow-hidden bg-[#0f1218] ${aspectClass}`}>
+    <article className="flex flex-col bg-white dark:bg-[#11141a] rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden relative">
+      <div className="relative w-full overflow-hidden bg-gray-100 dark:bg-[#0f1218]">
         {isVideo ? (
           <video
             controls
             muted
             playsInline
-            className="w-full h-full object-cover"
+            webkit-playsinline="true"
+            className="w-full h-auto object-contain"
           >
             <source src={item.mediaUrl} type="video/mp4" />
           </video>
         ) : (
-          <Image
+          <img
             src={item.mediaUrl}
             alt={item.customerName ? `Testimoni dari ${item.customerName}` : "Testimoni pelanggan"}
-            fill
-            className="w-full object-cover"
-            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="w-full h-auto object-contain"
           />
         )}
       </div>
@@ -38,7 +36,7 @@ export default function TestimonialMediaCard({ item }: TestimonialMediaCardProps
             {item.topTag}
           </span>
         )}
-        <h3 className="text-sm sm:text-base font-bold text-white leading-snug">
+        <h3 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white leading-snug">
           {item.customerName}
         </h3>
         <p className="text-[10px] sm:text-xs font-semibold text-green-500 mt-auto pt-2">

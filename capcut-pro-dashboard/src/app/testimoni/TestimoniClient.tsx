@@ -44,13 +44,13 @@ export default function TestimoniClient({
             <button
               type="button"
               onClick={() => router.back()}
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-200 font-medium text-sm"
+              className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-200 font-medium text-sm"
             >
               <ArrowLeft size={16} />
               <span>Kembali</span>
             </button>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-center text-white mt-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-center text-[var(--text-primary)] mt-4">
               Testimoni Pelanggan
             </h1>
           </div>
@@ -59,48 +59,47 @@ export default function TestimoniClient({
             {testimonials.map((item) => (
               <article
                 key={item.id}
-                className="flex flex-col bg-[#11141a] rounded-2xl border border-gray-800 overflow-hidden relative"
+                className="flex flex-col bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden relative"
               >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSelectedMedia({
-                      type: item.type,
-                      mediaUrl: item.mediaUrl,
-                      customerName: item.customerName,
-                    })
-                  }
-                  className="relative w-full overflow-hidden bg-[#0f1218] outline-none"
-                  aria-label={`Lihat media testimoni ${item.customerName}`}
-                >
-                  <div className="relative w-full overflow-hidden bg-[#0f1218]">
+                <div className="relative w-full overflow-hidden bg-[var(--bg-secondary)]">
                     {item.type === "video" ? (
                       <video
                         controls
-                        muted
                         playsInline
                         webkit-playsinline="true"
-                        className="w-full h-auto object-contain pointer-events-none"
+                        className="w-full h-auto object-contain"
                       >
                         <source src={item.mediaUrl} type="video/mp4" />
                       </video>
                     ) : (
-                      <img
-                        src={item.mediaUrl}
-                        alt={`Testimoni dari ${item.customerName}`}
-                        className="w-full h-auto object-contain pointer-events-none"
-                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedMedia({
+                            type: item.type,
+                            mediaUrl: item.mediaUrl,
+                            customerName: item.customerName,
+                          })
+                        }
+                        className="w-full outline-none block"
+                        aria-label={`Lihat media testimoni ${item.customerName}`}
+                      >
+                        <img
+                          src={item.mediaUrl}
+                          alt={`Testimoni dari ${item.customerName}`}
+                          className="w-full h-auto object-contain"
+                        />
+                      </button>
                     )}
                   </div>
-                </button>
-
+                  
                 <div className="p-4 flex flex-col gap-1.5 flex-grow">
                   {item.topTag && (
                     <span className="text-[10px] sm:text-xs font-bold text-[#1bc5b3] uppercase tracking-wide">
                       {item.topTag}
                     </span>
                   )}
-                  <h3 className="text-sm sm:text-base font-bold text-white leading-snug">
+                  <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] leading-snug">
                     {item.customerName}
                   </h3>
                   <p className="text-[10px] sm:text-xs font-semibold text-green-500 mt-auto pt-2">
@@ -126,7 +125,7 @@ export default function TestimoniClient({
           <button
             type="button"
             onClick={() => setSelectedMedia(null)}
-            className="absolute top-6 right-6 text-gray-400 hover:text-white bg-gray-900/50 p-2 rounded-full transition-colors"
+            className="absolute top-6 right-6 text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-card)]/50 p-2 rounded-full transition-colors"
             aria-label="Tutup lightbox"
           >
             <X size={18} />

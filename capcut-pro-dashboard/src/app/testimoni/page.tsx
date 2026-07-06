@@ -19,12 +19,12 @@ export default async function TestimoniPage() {
   const testimonials = dbTestimonials.length > 0 ? dbTestimonials : mockTestimonials;
 
   return (
-    <div className="min-h-screen bg-[#0f1218] text-white">
-      <Navbar variant="dark" />
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300">
+      <Navbar />
 
       <TestimoniClient testimonials={testimonials} />
 
-      <div className="bg-[#0f1218] border-t border-gray-800/60">
+      <div className="bg-[var(--bg-primary)] border-t border-[var(--border-color)]">
         <Footer />
       </div>
     </div>

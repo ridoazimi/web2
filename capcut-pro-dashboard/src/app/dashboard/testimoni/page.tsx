@@ -63,7 +63,7 @@ export default function TestimoniAdminPage() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#0f1218]">
+      <div className="flex items-center justify-center min-h-screen bg-[var(--bg-primary)]">
         <Loader2 className="animate-spin text-[#1bc5b3]" size={40} />
       </div>
     );
@@ -71,12 +71,12 @@ export default function TestimoniAdminPage() {
 
   if (!canManage) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#0f1218] p-6 text-center text-white">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[var(--bg-primary)] p-6 text-center text-[var(--text-primary)]">
         <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mb-6 border border-red-500/20">
           <Lock size={40} className="text-red-400" />
         </div>
         <h1 className="text-2xl font-bold mb-2">Akses Ditolak</h1>
-        <p className="text-gray-400 max-w-md">
+        <p className="text-[var(--text-secondary)] max-w-md">
           Anda tidak memiliki izin untuk mengelola testimoni.
         </p>
       </div>
@@ -155,7 +155,7 @@ export default function TestimoniAdminPage() {
   };
 
   const inputClass =
-    "w-full bg-[#161b22] border border-gray-800 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#1bc5b3] transition-colors";
+    "w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[#1bc5b3] transition-colors";
 
   return (
     <>
@@ -164,19 +164,19 @@ export default function TestimoniAdminPage() {
         subtitle="Unggah dan kelola testimoni pelanggan untuk halaman publik"
       />
 
-      <div className="bg-[#0f1218] text-white min-h-screen px-4 md:px-8 pb-12">
+      <div className="bg-[var(--bg-primary)] text-[var(--text-primary)] min-h-screen px-4 md:px-8 pb-12">
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           {/* Upload Form */}
-          <div className="bg-[#11141a] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6">
             <div className="flex items-center gap-2 mb-6">
               <Star size={20} className="text-[#1bc5b3]" />
-              <h2 className="text-lg font-bold">Tambah Testimoni Baru</h2>
+              <h2 className="text-lg font-bold text-[var(--text-primary)]">Tambah Testimoni Baru</h2>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Media Upload Zone */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Media (Gambar atau Video)
                 </label>
                 <div
@@ -189,7 +189,7 @@ export default function TestimoniAdminPage() {
                   className={`relative border-2 border-dashed rounded-xl overflow-hidden transition-colors ${
                     dragActive
                       ? "border-[#1bc5b3] bg-[#1bc5b3]/5"
-                      : "border-gray-800 hover:border-gray-700"
+                      : "border-[var(--border-color)] hover:border-[var(--border-active)]"
                   }`}
                 >
                   <input
@@ -200,7 +200,7 @@ export default function TestimoniAdminPage() {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   {mediaPreview ? (
-                    <div className="relative aspect-[4/3] w-full bg-[#0f1218]">
+                    <div className="relative aspect-[4/3] w-full bg-[var(--bg-secondary)]">
                       {formData.type === "video" ? (
                         <video
                           src={mediaPreview}
@@ -218,23 +218,23 @@ export default function TestimoniAdminPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center gap-3 py-12 text-gray-500">
+                    <div className="flex flex-col items-center justify-center gap-3 py-12 text-[var(--text-secondary)]">
                       <Upload size={32} className="text-[#1bc5b3]/60" />
                       <p className="text-sm font-medium">
                         Seret & lepas file, atau klik untuk memilih
                       </p>
-                      <p className="text-xs text-gray-600">JPG, PNG, MP4, WebM</p>
+                      <p className="text-xs text-[var(--text-muted)]">JPG, PNG, MP4, WebM</p>
                     </div>
                   )}
                 </div>
                 {mediaFile && (
-                  <p className="text-xs text-gray-500 mt-2 truncate">{mediaFile.name}</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-2 truncate">{mediaFile.name}</p>
                 )}
               </div>
 
               {/* Media Type Toggle */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Tipe Media
                 </label>
                 <div className="flex gap-3">
@@ -244,7 +244,7 @@ export default function TestimoniAdminPage() {
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-semibold text-sm transition-all ${
                       formData.type === "image"
                         ? "bg-[#1bc5b3]/10 border-[#1bc5b3] text-[#1bc5b3]"
-                        : "bg-[#161b22] border-gray-800 text-gray-400 hover:border-gray-700"
+                        : "bg-gray-50 dark:bg-[#161b22] border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700"
                     }`}
                   >
                     <ImageIcon size={16} />
@@ -256,7 +256,7 @@ export default function TestimoniAdminPage() {
                     className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border font-semibold text-sm transition-all ${
                       formData.type === "video"
                         ? "bg-[#1bc5b3]/10 border-[#1bc5b3] text-[#1bc5b3]"
-                        : "bg-[#161b22] border-gray-800 text-gray-400 hover:border-gray-700"
+                        : "bg-gray-50 dark:bg-[#161b22] border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700"
                     }`}
                   >
                     <Video size={16} />
@@ -266,7 +266,7 @@ export default function TestimoniAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Nama Pelanggan
                 </label>
                 <input
@@ -282,7 +282,7 @@ export default function TestimoniAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Tag / Platform
                 </label>
                 <input
@@ -295,7 +295,7 @@ export default function TestimoniAdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                   Berlangganan sejak
                 </label>
                 <input
@@ -326,7 +326,7 @@ export default function TestimoniAdminPage() {
 
           {/* Existing Testimonials */}
           <div>
-            <h2 className="text-lg font-bold mb-4">
+            <h2 className="text-lg font-bold text-[var(--text-primary)] mb-4">
               Testimoni Tersimpan ({testimonials.length})
             </h2>
 
@@ -335,7 +335,7 @@ export default function TestimoniAdminPage() {
                 <Loader2 className="animate-spin text-[#1bc5b3]" size={32} />
               </div>
             ) : testimonials.length === 0 ? (
-              <div className="bg-[#11141a] border border-gray-800 rounded-2xl p-12 text-center text-gray-500">
+              <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-12 text-center text-[var(--text-secondary)]">
                 <Star size={40} className="mx-auto mb-4 opacity-30" />
                 <p>Belum ada testimoni. Unggah yang pertama!</p>
               </div>
@@ -348,7 +348,7 @@ export default function TestimoniAdminPage() {
                       type="button"
                       onClick={() => handleDelete(item.id)}
                       disabled={deletingId === item.id}
-                      className="absolute top-2 right-2 z-10 p-2 rounded-lg bg-red-600/90 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 disabled:opacity-50"
+                      className="absolute top-2 right-2 z-10 p-2 rounded-lg bg-red-600/90 text-white shadow-md transition-opacity hover:bg-red-600 disabled:opacity-50"
                       title="Hapus testimoni"
                     >
                       {deletingId === item.id ? (
