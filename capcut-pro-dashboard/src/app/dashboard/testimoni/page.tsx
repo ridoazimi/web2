@@ -202,25 +202,29 @@ export default function TestimoniAdminPage() {
                   {mediaPreview ? (
                     <div className="relative aspect-[4/3] w-full bg-[var(--bg-secondary)] rounded-xl overflow-hidden border border-[var(--border-color)]">
                       {formData.type === "video" ? (
-                        <div className="flex flex-col items-center justify-center w-full h-full gap-3 p-6 bg-gray-50 dark:bg-[#161b22]">
-                          <div className="w-16 h-16 rounded-full bg-[#1bc5b3]/10 flex items-center justify-center mb-2">
-                            <Video size={28} className="text-[#1bc5b3]" />
-                          </div>
-                          <div className="text-center px-4 w-full">
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate w-full">
-                              {mediaFile?.name || "Video Terpilih"}
-                            </p>
-                            {mediaFile?.size && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                {(mediaFile.size / (1024 * 1024)).toFixed(2)} MB
+                          /* FIX 1: Added absolute inset-0 */
+                          <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full gap-3 p-6 bg-gray-50 dark:bg-[#161b22]">
+                            /* FIX 2: Added flex-shrink-0 to stabilize layout item scales */
+                            <div className="w-16 h-16 rounded-full bg-[#1bc5b3]/10 flex-shrink-0 flex items-center justify-center mb-2">
+                              <Video size={28} className="text-[#1bc5b3]" />
+                            </div>
+                            
+                            /* FIX 3: Added min-w-0 and maximum bounds layout caps */
+                            <div className="text-center px-4 w-full min-w-0 flex flex-col items-center">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate w-full max-w-[250px]">
+                                {mediaFile?.name || "Video Terpilih"}
                               </p>
-                            )}
+                              {mediaFile?.size && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                  {(mediaFile.size / (1024 * 1024)).toFixed(2)} MB
+                                </p>
+                              )}
+                            </div>
+                            <div className="mt-2 text-[10px] font-bold text-[#1bc5b3] uppercase tracking-wider bg-[#1bc5b3]/10 px-3 py-1.5 rounded-full flex-shrink-0">
+                              Siap Diunggah
+                            </div>
                           </div>
-                          <div className="mt-2 text-[10px] font-bold text-[#1bc5b3] uppercase tracking-wider bg-[#1bc5b3]/10 px-3 py-1.5 rounded-full">
-                            Siap Diunggah
-                          </div>
-                        </div>
-                      ) : (
+                        ) : (
                         <Image
                           src={mediaPreview}
                           alt="Preview"
