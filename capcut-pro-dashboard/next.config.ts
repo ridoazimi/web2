@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
   // Increase body size limit for Server Actions to handle larger file uploads (5MB)
   experimental: {
     serverActions: {
-      bodySizeLimit: '5mb',
+      bodySizeLimit: '50mb',
     },
   },
 };
