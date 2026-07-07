@@ -92,17 +92,16 @@ export default function TestimoniClient({
                         customerName: item.customerName,
                       })
                     }
-                    className="w-full outline-none block"
+                    className="w-full outline-none block bg-[var(--bg-secondary)] relative"
                     aria-label={`Lihat media testimoni ${item.customerName}`}
                   >
-                    {/* Consistent layout structure to match video sizes */}
-                    <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] md:aspect-[2/3] bg-[var(--bg-secondary)] overflow-hidden">
-                      <img
-                        src={item.mediaUrl}
-                        alt={`Testimoni dari ${item.customerName}`}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                    </div>
+                    {/* Removed the fixed aspect-ratio completely. 
+                        w-full and h-auto allows the image to stretch the card to its actual uploaded height */}
+                    <img
+                      src={item.mediaUrl}
+                      alt={`Testimoni dari ${item.customerName}`}
+                      className="w-full h-auto block"
+                    />
                   </button>
                 )}
                   
@@ -137,10 +136,11 @@ export default function TestimoniClient({
           <button
             type="button"
             onClick={() => setSelectedMedia(null)}
-            className="absolute top-6 right-6 text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-card)]/50 p-2 rounded-full transition-colors"
+            // Added z-[60], backdrop blur, and solid background so it ALWAYS floats above the image
+            className="absolute top-4 right-4 md:top-6 md:right-6 z-[60] text-[var(--text-primary)] hover:text-red-500 bg-[var(--bg-card)]/90 backdrop-blur-md p-2.5 rounded-full transition-all shadow-lg"
             aria-label="Tutup lightbox"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
 
           <div className="relative">
