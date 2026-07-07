@@ -62,27 +62,26 @@ export default function TestimoniClient({
                 className="flex flex-col bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden relative"
               >
                 {item.type === "video" ? (
-                    /* Force a strict responsive aspect ratio container box */
-                    <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] md:aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
-                      <video
-                        controls
-                        preload="metadata"
-                        playsInline
-                        webkit-playsinline="true"
-                        className="absolute inset-0 w-full h-full object-cover"
-                        // Safely seek forward only when the video metadata has loaded and is finite
-                        onLoadedMetadata={(e) => {
-                          const video = e.currentTarget;
-                          if (Number.isFinite(video.duration) && video.currentTime === 0) {
-                            video.currentTime = 0.5;
-                          }
-                        }}
-                      >
-                        {/* Kept clean of string fragments to prevent NaN/Infinity duration crashes */}
-                        <source src={item.mediaUrl} type="video/mp4" />
-                      </video>
-                    </div>
-                  ) : (
+                  /* Removed fixed aspect-ratio, added min-h-[250px] to prevent iOS collapse */
+                  <div className="relative w-full bg-black flex items-center justify-center overflow-hidden min-h-[250px]">
+                    <video
+                      controls
+                      preload="metadata"
+                      playsInline
+                      webkit-playsinline="true"
+                      /* Removed absolute positioning and object-cover to allow natural video height */
+                      className="w-full h-auto block"
+                      onLoadedMetadata={(e) => {
+                        const video = e.currentTarget;
+                        if (Number.isFinite(video.duration) && video.currentTime === 0) {
+                          video.currentTime = 0.5;
+                        }
+                      }}
+                    >
+                      <source src={item.mediaUrl} type="video/mp4" />
+                    </video>
+                  </div>
+                ) : (
                   <button
                     type="button"
                     onClick={() =>

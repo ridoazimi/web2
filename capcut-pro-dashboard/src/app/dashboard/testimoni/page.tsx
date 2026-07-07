@@ -202,14 +202,12 @@ export default function TestimoniAdminPage() {
                   {mediaPreview ? (
                     <div className="relative aspect-[4/3] w-full bg-[var(--bg-secondary)] rounded-xl overflow-hidden border border-[var(--border-color)]">
                       {formData.type === "video" ? (
-                          /* FIX 1: Added absolute inset-0 */
+                        
                           <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full gap-3 p-6 bg-gray-50 dark:bg-[#161b22]">
-                            /* FIX 2: Added flex-shrink-0 to stabilize layout item scales */
                             <div className="w-16 h-16 rounded-full bg-[#1bc5b3]/10 flex-shrink-0 flex items-center justify-center mb-2">
                               <Video size={28} className="text-[#1bc5b3]" />
                             </div>
-                            
-                            /* FIX 3: Added min-w-0 and maximum bounds layout caps */
+                          
                             <div className="text-center px-4 w-full min-w-0 flex flex-col items-center">
                               <p className="text-sm font-semibold text-gray-900 dark:text-white truncate w-full max-w-[250px]">
                                 {mediaFile?.name || "Video Terpilih"}
