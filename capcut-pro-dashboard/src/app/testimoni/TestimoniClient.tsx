@@ -61,37 +61,50 @@ export default function TestimoniClient({
                 key={item.id}
                 className="flex flex-col bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] overflow-hidden relative"
               >
-                <div className="relative w-full overflow-hidden bg-[var(--bg-secondary)]">
-                    {item.type === "video" ? (
+                {item.type === "video" ? (
+                    /* Force a strict responsive aspect ratio container box */
+                    <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] md:aspect-[2/3] bg-black flex items-center justify-center overflow-hidden">
                       <video
                         controls
+                        preload="metadata"
                         playsInline
                         webkit-playsinline="true"
-                        className="w-full h-auto object-contain bg-black"
+                        className="absolute inset-0 w-full h-full object-cover"
+                        // Safely seek forward only when the video metadata has loaded and is finite
+                        onLoadedMetadata={(e) => {
+                          const video = e.currentTarget;
+                          if (Number.isFinite(video.duration) && video.currentTime === 0) {
+                            video.currentTime = 0.5;
+                          }
+                        }}
                       >
-                        <source src={`${item.mediaUrl}#t=0.001`} type="video/mp4" />
+                        {/* Kept clean of string fragments to prevent NaN/Infinity duration crashes */}
+                        <source src={item.mediaUrl} type="video/mp4" />
                       </video>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSelectedMedia({
-                            type: item.type,
-                            mediaUrl: item.mediaUrl,
-                            customerName: item.customerName,
-                          })
-                        }
-                        className="w-full outline-none block"
-                        aria-label={`Lihat media testimoni ${item.customerName}`}
-                      >
-                        <img
-                          src={item.mediaUrl}
-                          alt={`Testimoni dari ${item.customerName}`}
-                          className="w-full h-auto object-contain"
-                        />
-                      </button>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedMedia({
+                        type: item.type,
+                        mediaUrl: item.mediaUrl,
+                        customerName: item.customerName,
+                      })
+                    }
+                    className="w-full outline-none block"
+                    aria-label={`Lihat media testimoni ${item.customerName}`}
+                  >
+                    {/* Consistent layout structure to match video sizes */}
+                    <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] md:aspect-[2/3] bg-[var(--bg-secondary)] overflow-hidden">
+                      <img
+                        src={item.mediaUrl}
+                        alt={`Testimoni dari ${item.customerName}`}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    </div>
+                  </button>
+                )}
                   
                 <div className="p-4 flex flex-col gap-1.5 flex-grow">
                   {item.topTag && (
@@ -113,7 +126,6 @@ export default function TestimoniClient({
       </main>
 
       {selectedMedia && (
-
         <div
           role="dialog"
           aria-modal="true"
@@ -155,4 +167,3 @@ export default function TestimoniClient({
     </>
   );
 }
-
