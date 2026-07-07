@@ -67,9 +67,9 @@ export default function TestimoniClient({
                         controls
                         playsInline
                         webkit-playsinline="true"
-                        className="w-full h-auto object-contain"
+                        className="w-full h-auto object-contain bg-black"
                       >
-                        <source src={item.mediaUrl} type="video/mp4" />
+                        <source src={`${item.mediaUrl}#t=0.001`} type="video/mp4" />
                       </video>
                     ) : (
                       <button
